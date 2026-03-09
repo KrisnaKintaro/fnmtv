@@ -18,9 +18,10 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -45,4 +46,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function berita() { return $this->hasMany(Berita::class); }
+    public function pendapatan() { return $this->hasMany(Pendapatan::class); }
+    public function komentar() { return $this->hasMany(Komentar::class); }
+    public function reaksi() { return $this->hasMany(Reaksi::class); }
 }
