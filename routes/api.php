@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\moderasiKomentarController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,4 +35,10 @@ Route::prefix('admin/manajemen_user')->group(function() {
     Route::post('/tambahData', [UserController::class, 'tambahPenggunaBaru']);
     Route::put('/ubahData/{id}', [UserController::class, 'ubahDataPengguna']);
     Route::delete('/hapusData/{id}', [UserController::class, 'hapusPengguna']);
+});
+
+Route::prefix('admin/manajemen_komentar')->group(function(){
+    Route::get('/ambilData',[moderasiKomentarController::class, 'getDaftarKomentar']);
+    Route::put('/ubahStatus/{id}',[moderasiKomentarController::class, 'ubahStatusModerasi']);
+    Route::delete('/hapusKomentar/{id', [moderasiKomentarController::class, 'hapusKomentar']);
 });
