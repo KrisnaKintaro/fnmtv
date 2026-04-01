@@ -39,3 +39,9 @@ Route::get('/pengaturan', function () {
 Route::get('/berita-saya', function () {
     return view('Admin.pages.Editor.berita_saya');
 });
+
+#================= REDAKSI =================
+Route::get('/manajemen-redaksi', function () {
+    return view('Admin.pages.Redaksi.manajemen_berita');
+});
+
