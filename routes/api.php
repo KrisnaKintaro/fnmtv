@@ -40,8 +40,8 @@ Route::prefix('admin/manajemen_user')->group(function() {
 
 Route::prefix('admin/manajemen_komentar')->group(function(){
     Route::get('/ambilData',[moderasiKomentarController::class, 'getDaftarKomentar']);
-    Route::put('/ubahStatus/{id}',[moderasiKomentarController::class, 'ubahStatusModerasi']);
-    Route::delete('/hapusKomentar/{id', [moderasiKomentarController::class, 'hapusKomentar']);
+    Route::put('/ubahStatus/{id_komentar}',[moderasiKomentarController::class, 'ubahStatusModerasi']);
+    Route::delete('/hapusKomentar/{id_komentar', [moderasiKomentarController::class, 'hapusKomentar']);
 });
 
 
