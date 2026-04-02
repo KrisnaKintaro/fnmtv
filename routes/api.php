@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdministrasiFinansial\LaporanFinansialController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
 use App\Http\Controllers\Admin\TrackingPembayaranController;
@@ -41,10 +42,14 @@ Route::prefix('admin/manajemen_user')->group(function() {
 Route::prefix('admin/manajemen_komentar')->group(function(){
     Route::get('/ambilData',[moderasiKomentarController::class, 'getDaftarKomentar']);
     Route::put('/ubahStatus/{id_komentar}',[moderasiKomentarController::class, 'ubahStatusModerasi']);
-    Route::delete('/hapusKomentar/{id_komentar', [moderasiKomentarController::class, 'hapusKomentar']);
+    Route::delete('/hapusKomentar/{id_komentar}', [moderasiKomentarController::class, 'hapusKomentar']);
 });
 
 Route::prefix('admin/tracking_pembayaran')->group(function () {
     Route::get('/ambilData', [TrackingPembayaranController::class, 'getDaftarPembayaran']);
     Route::put('/updatePembayaran/{berita_id}', [TrackingPembayaranController::class, 'updatePembayaran']);
+});
+
+Route::prefix('admin/laporan_finansial')->group(function() {
+    Route::get('/ambilData', [LaporanFinansialController::class, 'getLaporan']);
 });
