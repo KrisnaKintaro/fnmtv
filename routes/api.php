@@ -34,8 +34,8 @@ Route::prefix('admin/manajemen_kategori')->group(function() {
 Route::prefix('admin/manajemen_user')->group(function() {
     Route::get('/ambilData',[UserController::class, 'getDaftarPengguna']);
     Route::post('/tambahData', [UserController::class, 'tambahPenggunaBaru']);
-    Route::put('/ubahData/{id}', [UserController::class, 'ubahDataPengguna']);
-    Route::delete('/hapusData/{id}', [UserController::class, 'hapusPengguna']);
+    Route::put('/ubahData/{id_user}', [UserController::class, 'ubahDataPengguna']);
+    Route::delete('/hapusData/{id_user}', [UserController::class, 'hapusPengguna']);
 });
 
 Route::prefix('admin/manajemen_komentar')->group(function(){
