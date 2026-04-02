@@ -44,7 +44,6 @@ Route::prefix('admin/manajemen_komentar')->group(function(){
     Route::delete('/hapusKomentar/{id_komentar', [moderasiKomentarController::class, 'hapusKomentar']);
 });
 
-
 Route::prefix('admin/tracking_pembayaran')->group(function () {
     Route::get('/ambilData', [TrackingPembayaranController::class, 'getDaftarPembayaran']);
     Route::put('/updatePembayaran/{berita_id}', [TrackingPembayaranController::class, 'updatePembayaran']);
