@@ -47,9 +47,9 @@ class UserController extends Controller
         ]);
     }
 
-    public function ubahDataPengguna(Request $request, $id)
+    public function ubahDataPengguna(Request $request, $id_user)
     {
-        $pengguna = User::find($id);
+        $pengguna = User::find($id_user);
 
         if (!$pengguna) {
             return response()->json(['status' => 'error', 'message' => 'User tidak ditemukan!'], 404);
@@ -57,7 +57,7 @@ class UserController extends Controller
 
         $request->validate([
             'username' => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email,' . $id, // Boleh email sama asal punya dia sendiri
+            'email'    => 'required|email|unique:users,email,' . $id_user, // Boleh email sama asal punya dia sendiri
             'role'     => 'required|in:admin,redaksi,editor,viewer'
         ]);
 
@@ -81,15 +81,15 @@ class UserController extends Controller
     /**
      * FUNGSI 4: MENGHAPUS PENGGUNA
      */
-    public function hapusPengguna($id)
+    public function hapusPengguna($id_user)
     {
-        $pengguna = User::find($id);
+        $pengguna = User::find($id_user);
 
         if (!$pengguna) {
             return response()->json(['status' => 'error', 'message' => 'User gagal dihapus!'], 404);
         }
 
-        if (Auth::id() == $id) {
+        if (Auth::id() == $id_user) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Lu gak bisa hapus akun lu sendiri cuy!'
