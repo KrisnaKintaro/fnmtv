@@ -43,9 +43,9 @@ class KategoriController extends Controller
         ]);
     }
 
-    public function ubahDataKategori(Request $request, $id)
+    public function ubahDataKategori(Request $request, $id_kategori)
     {
-        $kategori = Kategori::find($id);
+        $kategori = Kategori::find($id_kategori);
 
         if (!$kategori) {
             return response()->json([
@@ -55,7 +55,7 @@ class KategoriController extends Controller
         }
 
         $request->validate([
-            'nama_kategori' => 'required|string|unique:kategoris,nama_kategori,' . $id
+            'nama_kategori' => 'required|string|unique:kategoris,nama_kategori,' . $id_kategori
         ]);
 
         $kategori->nama_kategori = $request->nama_kategori;
@@ -69,9 +69,9 @@ class KategoriController extends Controller
         ]);
     }
 
-    public function hapusKategori($id)
+    public function hapusKategori($id_kategori)
     {
-        $kategori = Kategori::find($id);
+        $kategori = Kategori::find($id_kategori);
 
         if (!$kategori) {
             return response()->json([
