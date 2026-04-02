@@ -25,9 +25,9 @@ class moderasiKomentarController extends Controller
         ]);
     }
 
-    public function ubahStatusModerasi(Request $request, $id)
+    public function ubahStatusModerasi(Request $request, $id_komentar)
     {
-        $komentar = Komentar::find($id);
+        $komentar = Komentar::find($id_komentar);
 
         if (!$komentar) {
             return response()->json([
@@ -53,9 +53,9 @@ class moderasiKomentarController extends Controller
         ]);
     }
 
-    public function hapusKomentar($id)
+    public function hapusKomentar($id_komentar)
     {
-        $komentar = Komentar::find($id);
+        $komentar = Komentar::find($id_komentar);
 
         if (!$komentar) {
             return response()->json([
