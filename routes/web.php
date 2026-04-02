@@ -34,3 +34,8 @@ Route::get('/user', function () {
 Route::get('/pengaturan', function () {
     return view('Admin.pages.pengaturan');
 });
+
+#================= EDITOR =================
+Route::get('/berita-saya', function () {
+    return view('Admin.pages.Editor.berita_saya');
+});

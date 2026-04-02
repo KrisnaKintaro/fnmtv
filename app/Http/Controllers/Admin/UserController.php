@@ -77,10 +77,7 @@ class UserController extends Controller
             'data' => $pengguna
         ]);
     }
-
-    /**
-     * FUNGSI 4: MENGHAPUS PENGGUNA
-     */
+  
     public function hapusPengguna($id_user)
     {
         $pengguna = User::find($id_user);
