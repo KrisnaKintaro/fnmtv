@@ -53,3 +53,65 @@ Route::prefix('admin/tracking_pembayaran')->group(function () {
 Route::prefix('admin/laporan_finansial')->group(function() {
     Route::get('/ambilData', [LaporanFinansialController::class, 'getLaporan']);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use App\Http\Controllers\Editor\BeritaController;
+use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
+
+// Bagian Editor
+Route::prefix('editor/manajemen_berita')->group(function() {
+    Route::get('/ambilData', [BeritaController::class, 'getDaftarBerita']);
+    Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
+    Route::post('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']); // Gunakan POST karena ada upload file
+    Route::patch('/ajukanBerita/{id_berita}', [BeritaController::class, 'ajukanKeRedaksi']);
+    Route::delete('/hapusData/{id_berita}', [BeritaController::class, 'hapusBeritaDraft']);
+});
+
+// Bagian Redaksi
+Route::prefix('redaksi/verifikasi_berita')->group(function() {
+    Route::get('/ambilData', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
+    Route::patch('/prosesVerifikasi/{id_berita}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
+});
