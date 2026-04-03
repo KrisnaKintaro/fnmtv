@@ -53,3 +53,64 @@ Route::prefix('admin/tracking_pembayaran')->group(function () {
 Route::prefix('admin/laporan_finansial')->group(function() {
     Route::get('/ambilData', [LaporanFinansialController::class, 'getLaporan']);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use App\Http\Controllers\Editor\BeritaController;
+use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
+
+// Group Editor
+Route::prefix('editor')->group(function () {
+    Route::get('/berita', [BeritaController::class, 'index']);
+    Route::post('/berita/tambah', [BeritaController::class, 'store']);
+    Route::post('/berita/update/{id}', [BeritaController::class, 'update']); // Gunakan POST jika kirim file
+    Route::patch('/berita/ajukan/{id}', [BeritaController::class, 'ajukan']);
+});
+
+// Group Redaksi
+Route::prefix('redaksi')->group(function () {
+    Route::get('/masuk', [VerifikasiBeritaController::class, 'index']);
+    Route::patch('/verifikasi/{id}', [VerifikasiBeritaController::class, 'verifikasi']);
+});
