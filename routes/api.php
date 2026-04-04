@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdministrasiFinansial\LaporanFinansialController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
 use App\Http\Controllers\Admin\StatistikInteraksiBeritaController;
+use App\Http\Controllers\Admin\TopPerformanceController;
 use App\Http\Controllers\Admin\TrackingPembayaranController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Http\Request;
@@ -57,6 +58,10 @@ Route::prefix('admin/laporan_finansial')->group(function() {
 
 Route::prefix('admin/statistik_interaksi_berita')->group(function() {
     Route::get('/ambilData', [StatistikInteraksiBeritaController::class, 'getStatistikInteraksi']);
+});
+
+Route::prefix('admin/top_performance')->group(function () {
+    Route::get('/ambilData', [TopPerformanceController::class, 'getTopPerformance']);
 });
 
 

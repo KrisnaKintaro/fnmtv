@@ -14,7 +14,6 @@ class StatistikInteraksiBeritaController extends Controller
             ->where('status_berita', 'Published')
             ->with(['user:id,username'])
             ->withCount(['komentar', 'reaksi'])
-
             ->orderBy('waktu_publikasi', 'desc')
             ->get();
 
