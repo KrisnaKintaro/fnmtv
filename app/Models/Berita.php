@@ -19,6 +19,7 @@ class Berita extends Model
         'foto_isi_berita',
         'status_berita',
         'jumlah_view',
+        'catatan_penolakan',
         'waktu_publikasi'
     ];
 

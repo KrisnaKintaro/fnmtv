@@ -21,6 +21,7 @@ return new class extends Migration
             $table->longText('isi_berita');
             $table->string('foto_thumbnail');
             $table->string('foto_isi_berita')->nullable();
+            $table->text('catatan_penolakan')->nullable();
 
             // Pake index biar pas pengunjung cari berita "Published" loadingnya cepet
             $table->enum('status_berita', ['Draft', 'Pending','Published', 'Rejected'])->default('Draft')->index();
