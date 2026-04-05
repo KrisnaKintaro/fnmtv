@@ -1,7 +1,104 @@
-@extends('Admin.master_admin')
+@extends('Admin.layout.editor_master')
 @section('css')
 @endsection
 @section('konten')
+  <!-- ══ PAGE: TULIS BERITA BARU ══ -->
+  <div id="page-write-news" class="page">
+    <div class="page-header">
+      <div id="backButtonContainer" class="back-button" style="display:none;">
+        <button class="btn btn-ghost btn-sm btn-pill" onclick="showPage('my-news', document.querySelectorAll('.s-item')[1])" style="gap:6px;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Kembali
+        </button>
+      </div>
+      <div class="section-title" id="sectionTitle">Tulis Berita Baru</div>
+    </div>
+    <div class="form-grid">
+
+      <!-- LEFT: Main Form -->
+      <div>
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-title">Informasi Artikel</div>
+          <div class="field">
+            <label>Judul Berita *</label>
+            <input type="text" placeholder="Masukkan judul berita yang menarik...">
+          </div>
+          <div class="field">
+            <label>Slug URL</label>
+            <input type="text" placeholder="judul-berita-menarik" style="font-family:'JetBrains Mono',monospace;font-size:13px;">
+          </div>
+          <div class="field">
+            <label>Konten Berita *</label>
+            <div class="rte-mock">
+              <div class="rte-toolbar">
+                <button class="rte-btn"><b>B</b></button>
+                <button class="rte-btn"><i>I</i></button>
+                <button class="rte-btn"><u>U</u></button>
+                <div class="rte-sep"></div>
+                <button class="rte-btn">H1</button>
+                <button class="rte-btn">H2</button>
+                <button class="rte-btn">H3</button>
+                <div class="rte-sep"></div>
+                <button class="rte-btn">≡</button>
+                <button class="rte-btn">≣</button>
+                <button class="rte-btn">⊶</button>
+                <div class="rte-sep"></div>
+                <button class="rte-btn">🔗</button>
+                <button class="rte-btn">🖼</button>
+                <button class="rte-btn">❝</button>
+              </div>
+              <div class="rte-body" contenteditable="true"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Sidebar Controls -->
+      <div>
+        <!-- Publish Box -->
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-title">Status Pengiriman</div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Kirim sebagai</label>
+            <div class="toggle-group">
+              <div class="tgl-opt sel-draft" id="tglDraft" onclick="confirmStatus('draft')">Draft</div>
+              <div class="tgl-opt" id="tglPending" onclick="confirmStatus('pending')">Kirim ke Redaksi</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thumbnail -->
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-title">Thumbnail Berita</div>
+          <div class="thumb-upload">
+            <div class="ico">🖼</div>
+            <p><span>Pilih file</span> atau seret ke sini</p>
+            <p style="font-size:11px;margin-top:4px;">JPG, PNG, JPEG · Maks. 2 MB</p>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="form-card">
+          <div class="form-title">Kategori</div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Pilih Kategori *</label>
+            <select>
+              <option value="">-- Pilih Kategori --</option>
+              <option>Politik</option>
+              <option>Ekonomi</option>
+              <option>Teknologi</option>
+              <option>Olahraga</option>
+              <option>Kesehatan</option>
+              <option>Budaya</option>
+              <option>Internasional</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: BERITA SAYA ══ -->
   <div id="page-my-news" class="page active">
     <div class="section-title">Berita Saya</div>
 
@@ -59,7 +156,7 @@
             <td style="font-size:12px;color:var(--muted);">30 Mar 2026</td>
             <td>
               <div class="act-btns">
-                <div class="ico-btn" title="Edit" onclick="showPage('write-news',null)">✏️</div>
+                <div class="ico-btn" title="Edit" onclick="editFromTable('write-news')">✏️</div>
                 <div class="ico-btn" title="Hapus" onclick="confirmDelete(this)">🗑</div>
               </div>
             </td>
@@ -76,7 +173,7 @@
             <td style="font-size:12px;color:var(--muted);">29 Mar 2026</td>
             <td>
               <div class="act-btns">
-                <div class="ico-btn" title="Edit" onclick="showPage('write-news',null)">✏️</div>
+                <div class="ico-btn" title="Edit" onclick="editFromTable('write-news')">✏️</div>
                 <div class="ico-btn" title="Hapus" onclick="confirmDelete(this)">🗑</div>
               </div>
             </td>
@@ -93,7 +190,7 @@
             <td style="font-size:12px;color:var(--muted);">28 Mar 2026</td>
             <td>
               <div class="act-btns">
-                <div class="ico-btn" title="Edit" onclick="showPage('write-news',null)">✏️</div>
+                <div class="ico-btn" title="Edit" onclick="editFromTable('write-news')">✏️</div>
                 <div class="ico-btn" title="Hapus" onclick="confirmDelete(this)">🗑</div>
               </div>
             </td>
@@ -110,7 +207,7 @@
             <td style="font-size:12px;color:var(--muted);">27 Mar 2026</td>
             <td>
               <div class="act-btns">
-                <div class="ico-btn" title="Edit" onclick="showPage('write-news',null)">✏️</div>
+                <div class="ico-btn" title="Edit" onclick="editFromTable('write-news')">✏️</div>
                 <div class="ico-btn" title="Hapus" onclick="confirmDelete(this)">🗑</div>
               </div>
             </td>
@@ -181,7 +278,7 @@
             <td style="font-size:12px;color:var(--muted);">22 Mar 2026</td>
             <td>
               <div class="act-btns">
-                <div class="ico-btn" title="Revisi &amp; Edit" onclick="showPage('write-news',null)">✏️</div>
+                <div class="ico-btn" title="Revisi &amp; Edit" onclick="editFromTable('write-news')">✏️</div>
                 <div class="ico-btn" title="Hapus" onclick="confirmDelete(this)">🗑</div>
               </div>
             </td>
@@ -202,7 +299,7 @@
             <td style="font-size:12px;color:var(--muted);">20 Mar 2026</td>
             <td>
               <div class="act-btns">
-                <div class="ico-btn" title="Revisi &amp; Edit" onclick="showPage('write-news',null)">✏️</div>
+                <div class="ico-btn" title="Revisi &amp; Edit" onclick="editFromTable('write-news')">✏️</div>
                 <div class="ico-btn" title="Hapus" onclick="confirmDelete(this)">🗑</div>
               </div>
             </td>
@@ -218,9 +315,62 @@
       </div>
     </div>
   </div>
+
+</main>
+
+<!-- ══ MODAL: Konfirmasi Status Draft ══ -->
+<div id="modalDraft" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
+  <div style="background:var(--white);border-radius:12px;padding:32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
+    <div style="font-size:32px;text-align:center;margin-bottom:12px;">📝</div>
+    <div style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">Simpan sebagai Draft?</div>
+    <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;">Artikel akan disimpan sebagai draft dan hanya terlihat oleh Anda. Anda bisa mengedit dan mengirimnya kapan saja.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeStatusModal('draft')">Batal</button>
+      <button class="btn btn-ghost" style="flex:1;" onclick="applyStatus('draft')">Ya, Simpan Draft</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Konfirmasi Kirim ke Redaksi ══ -->
+<div id="modalPending" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
+  <div style="background:var(--white);border-radius:12px;padding:32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
+    <div style="font-size:32px;text-align:center;margin-bottom:12px;">📨</div>
+    <div style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">Kirim ke Redaksi?</div>
+    <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;">Artikel akan dikirim ke Redaksi untuk diverifikasi dan diterbitkan. Pastikan artikel sudah siap sebelum melanjutkan.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeStatusModal('pending')">Batal</button>
+      <button class="btn btn-ghost" style="flex:1;" onclick="applyStatus('pending')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+        Ya, Kirim
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Konfirmasi Hapus ══ -->
+<div id="modalDelete" style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
+  <div style="background:var(--white);border-radius:12px;padding:32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
+    <div style="font-size:32px;text-align:center;margin-bottom:12px;">🗑</div>
+    <div style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">Hapus Artikel?</div>
+    <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;">Artikel yang dihapus tidak dapat dipulihkan. Pastikan Anda yakin sebelum melanjutkan.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeDelete()">Batal</button>
+      <button class="btn btn-red" style="flex:1;" onclick="doDelete()">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
 @endsection
 @section('js')
 <script>
+let isEditingFromTable = false;
+
+function editFromTable(pageId) {
+  isEditingFromTable = true;
+  document.getElementById('backButtonContainer').style.display = 'block';
+  document.getElementById('sectionTitle').textContent = 'Edit Berita';
+  showPage(pageId, null);
+}
+
 /* ── LOGIN ── */
 function doLogin() {
   const email = document.getElementById('loginEmail').value;
@@ -255,24 +405,52 @@ function showPage(id, el) {
     document.querySelectorAll('.s-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
   }
+  // Reset back button when navigating from sidebar
+  if (el) {
+    isEditingFromTable = false;
+    document.getElementById('backButtonContainer').style.display = 'none';
+    document.getElementById('sectionTitle').textContent = 'Tulis Berita Baru';
+  }
   const [title, crumb] = pageTitles[id] || ['—','—'];
   document.getElementById('tbTitle').textContent = title;
   document.getElementById('tbCrumb').textContent = crumb;
 }
 
 /* ── STATUS TOGGLE (Write page) ── */
-function setStatus(v) {
+function confirmStatus(v) {
   const d = document.getElementById('tglDraft');
   const p = document.getElementById('tglPending');
-  const h = document.getElementById('statusHint');
+  // Ubah warna tombol langsung dulu
   if (v === 'draft') {
     d.className = 'tgl-opt sel-draft';
     p.className = 'tgl-opt';
-    h.textContent = 'Draft: hanya terlihat oleh Anda';
+    document.getElementById('modalDraft').style.display = 'flex';
   } else {
     d.className = 'tgl-opt';
     p.className = 'tgl-opt sel-pending';
-    h.textContent = 'Pending: artikel akan dikirim ke Redaksi untuk diverifikasi';
+    document.getElementById('modalPending').style.display = 'flex';
+  }
+}
+function closeStatusModal(v) {
+  const d = document.getElementById('tglDraft');
+  const p = document.getElementById('tglPending');
+  // Batal: kembalikan visual ke posisi sebelumnya
+  if (v === 'draft') {
+    document.getElementById('modalDraft').style.display = 'none';
+    d.className = 'tgl-opt';
+    p.className = 'tgl-opt sel-pending';
+  } else {
+    document.getElementById('modalPending').style.display = 'none';
+    d.className = 'tgl-opt sel-draft';
+    p.className = 'tgl-opt';
+  }
+}
+function applyStatus(v) {
+  // Konfirmasi: tinggal tutup modal, warna sudah berubah dari confirmStatus
+  if (v === 'draft') {
+    document.getElementById('modalDraft').style.display = 'none';
+  } else {
+    document.getElementById('modalPending').style.display = 'none';
   }
 }
 
@@ -310,12 +488,32 @@ function closeDelete() {
   rowToDelete = null;
 }
 function doDelete() {
-  if (rowToDelete) {
-    rowToDelete.style.transition = 'opacity .3s';
-    rowToDelete.style.opacity = '0';
-    setTimeout(() => { rowToDelete.remove(); }, 300);
+  const row = rowToDelete;
+  // Tutup modal & reset state dulu
+  const modal = document.getElementById('modalDelete');
+  modal.style.display = 'none';
+  rowToDelete = null;
+
+  if (row) {
+    const cells = row.querySelectorAll('td');
+    // Fade out
+    row.style.transition = 'opacity .2s ease';
+    row.style.opacity = '0';
+    // Collapse via td
+    setTimeout(() => {
+      cells.forEach(td => {
+        td.style.transition = 'max-height .3s ease, padding .3s ease';
+        td.style.overflow = 'hidden';
+        td.style.maxHeight = td.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+          td.style.maxHeight = '0';
+          td.style.paddingTop = '0';
+          td.style.paddingBottom = '0';
+        });
+      });
+      setTimeout(() => { row.remove(); }, 320);
+    }, 200);
   }
-  closeDelete();
 }
 </script>
 @endsection

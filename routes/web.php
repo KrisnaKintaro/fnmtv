@@ -36,6 +36,14 @@ Route::get('/pengaturan', function () {
 });
 
 #================= EDITOR =================
+Route::get('/editor', function () {
+    return view('Admin.pages.Editor.berita_saya');
+});
+
 Route::get('/berita-saya', function () {
     return view('Admin.pages.Editor.berita_saya');
+});
+
+Route::get('/tulis-editor', function () {
+    return view('Admin.pages.Editor.tulis_berita');
 });
