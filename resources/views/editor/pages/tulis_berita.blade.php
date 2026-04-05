@@ -1,4 +1,4 @@
-@extends('Admin.master_admin')
+@extends('editor.editor_master')
 @section('css')
 @endsection
 @section('konten')
