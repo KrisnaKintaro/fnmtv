@@ -1,8 +1,3 @@
-<?php
-
-namespace App\Http\Controllers\Editor;
-
-use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,13 +9,11 @@ class BeritaController extends Controller
     // Tampilkan berita milik editor yang login
     public function getDaftarBerita()
     {
-        $data = Berita::where('user_id', Auth::id())->get();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Berhasil mengambil daftar berita editor.',
-            'data' => $data,
-        ], 200);
+        $data = Berita::with('kategori:id,nama_kategori')
+            ->where('user_id', Auth::id() ?? 1)
+            ->latest()
+            ->get();
+        return response()->json($data);
     }
 
     // Tambah Berita Baru
@@ -53,11 +46,17 @@ class BeritaController extends Controller
                 'jumlah_view' => 0
             ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Berita berhasil disimpan sebagai Draft.',
-            'data' => $berita,
-        ], 201);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Berita berhasil disimpan sebagai ' . $request->status_berita,
+                'data' => $berita
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal simpan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     // Update Berita (Hanya jika status Draft atau Rejected)
@@ -70,12 +69,7 @@ class BeritaController extends Controller
                 'foto_thumbnail' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             ]);
 
-        if (!in_array($berita->status_berita, ['Draft', 'Rejected'])) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Berita yang sudah diproses tidak bisa diubah.',
-            ], 403);
-        }
+            $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id() ?? 1)->firstOrFail();
 
             if (!in_array($berita->status_berita, ['Draft', 'Rejected'])) {
                 return response()->json(['message' => 'Berita tidak bisa diubah'], 403);
@@ -105,7 +99,7 @@ class BeritaController extends Controller
 
             return response()->json(['message' => 'Data berita berhasil diperbarui.', 'data' => $berita]);
         } catch (\Exception $e) {
-            // Balikin error asli biar lu bisa liat di Inspect Element -> teru Network -> Response
+            // Balikin error asli biar lu bisa liat di Inspect Element -> Network
             return response()->json([
                 'message' => 'Error Server: ' . $e->getMessage(),
                 'line' => $e->getLine()
@@ -119,13 +113,24 @@ class BeritaController extends Controller
             // Cari berita milik user yang login (atau ID 1 buat testing)
             $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id() ?? 1)->firstOrFail();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Berita berhasil diajukan ke Redaksi.',
-            'data' => [
-                'id' => $berita->id,
-                'status_berita' => $berita->status_berita,
-            ],
-        ], 200);
+            // 1. Hapus file fisik foto thumbnail jika ada
+            $pathFoto = public_path('uploads/thumbnail/' . $berita->foto_thumbnail);
+            if (File::exists($pathFoto)) {
+                File::delete($pathFoto);
+            }
+
+            // 2. Hapus data dari database (ini akan trigger SoftDeletes karena lu pake di Model)
+            $berita->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Berita berhasil dihapus permanen.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menghapus: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
