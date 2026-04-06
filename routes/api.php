@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AdministrasiFinansial\LaporanFinansialController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
+use App\Http\Controllers\Admin\StatistikInteraksiBeritaController;
+use App\Http\Controllers\Admin\TopPerformanceController;
 use App\Http\Controllers\Admin\TrackingPembayaranController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Http\Request;
@@ -52,6 +54,14 @@ Route::prefix('admin/tracking_pembayaran')->group(function () {
 
 Route::prefix('admin/laporan_finansial')->group(function() {
     Route::get('/ambilData', [LaporanFinansialController::class, 'getLaporan']);
+});
+
+Route::prefix('admin/statistik_interaksi_berita')->group(function() {
+    Route::get('/ambilData', [StatistikInteraksiBeritaController::class, 'getStatistikInteraksi']);
+});
+
+Route::prefix('admin/top_performance')->group(function () {
+    Route::get('/ambilData', [TopPerformanceController::class, 'getTopPerformance']);
 });
 
 
@@ -113,4 +123,18 @@ Route::prefix('editor')->group(function () {
 Route::prefix('redaksi')->group(function () {
     Route::get('/masuk', [VerifikasiBeritaController::class, 'index']);
     Route::patch('/verifikasi/{id}', [VerifikasiBeritaController::class, 'verifikasi']);
+});
+// Bagian Editor
+Route::prefix('editor/manajemen_berita')->group(function() {
+    Route::get('/ambilData', [BeritaController::class, 'getDaftarBerita']);
+    Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
+    Route::post('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']); // Gunakan POST karena ada upload file
+    Route::patch('/ajukanBerita/{id_berita}', [BeritaController::class, 'ajukanKeRedaksi']);
+    Route::delete('/hapusData/{id_berita}', [BeritaController::class, 'hapusBeritaDraft']);
+});
+
+// Bagian Redaksi
+Route::prefix('redaksi/verifikasi_berita')->group(function() {
+    Route::get('/ambilData', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
+    Route::patch('/prosesVerifikasi/{id_berita}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
 });
