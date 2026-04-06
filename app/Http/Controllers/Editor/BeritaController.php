@@ -104,7 +104,7 @@ class BeritaController extends Controller
 
             return response()->json(['message' => 'Data berita berhasil diperbarui.', 'data' => $berita]);
         } catch (\Exception $e) {
-            // Balikin error asli biar lu bisa liat di Inspect Element -> Network
+            // Balikin error asli biar lu bisa liat di Inspect Element -> teru Network -> Response
             return response()->json([
                 'message' => 'Error Server: ' . $e->getMessage(),
                 'line' => $e->getLine()
