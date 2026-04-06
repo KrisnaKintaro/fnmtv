@@ -1,3 +1,8 @@
+<?php
+namespace App\Http\Controllers\Editor;
+
+use App\Http\Controllers\Controller;
+
 use App\Models\Berita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -134,3 +139,4 @@ class BeritaController extends Controller
         }
     }
 }
+
