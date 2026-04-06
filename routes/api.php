@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\AdministrasiFinansial\LaporanFinansialController;
 use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\LaporanFinansialController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
 use App\Http\Controllers\Admin\StatistikInteraksiBeritaController;
 use App\Http\Controllers\Admin\TopPerformanceController;
