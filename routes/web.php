@@ -49,6 +49,6 @@ Route::get('/tulis-editor', function () {
 });
 #================= REDAKSI =================
 Route::get('/manajemen-redaksi', function () {
-    return view('Admin.pages.Redaksi.manajemen_berita');
+    return view('Redaksi.redaksi_master');
 });
 
