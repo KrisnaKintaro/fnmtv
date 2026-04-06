@@ -110,16 +110,18 @@ Route::prefix('admin/top_performance')->group(function () {
 use App\Http\Controllers\Editor\BeritaController;
 use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
 
-// Group Editor
-Route::prefix('editor')->group(function () {
-    Route::get('/berita', [BeritaController::class, 'index']);
-    Route::post('/berita/tambah', [BeritaController::class, 'store']);
-    Route::post('/berita/update/{id}', [BeritaController::class, 'update']); // Gunakan POST jika kirim file
-    Route::patch('/berita/ajukan/{id}', [BeritaController::class, 'ajukan']);
+
+// Bagian Editor
+Route::prefix('editor/manajemen_berita')->group(function() {
+    Route::get('/ambilData', [BeritaController::class, 'getDaftarBerita']);
+    Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
+    Route::put('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']);
+    Route::delete('/hapusBerita/{id_berita}', [BeritaController::class, 'hapusDataBerita']);
 });
 
 // Group Redaksi
 Route::prefix('redaksi')->group(function () {
-    Route::get('/masuk', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
-    Route::patch('/verifikasi/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
+    Route::get('/masuk', [VerifikasiBeritaController::class, 'index']);
+    Route::patch('/verifikasi/{id}', [VerifikasiBeritaController::class, 'verifikasi']);
 });
+
