@@ -1,4 +1,3 @@
-<!-- ══════════ SIDEBAR ══════════ -->
 <aside class="sidebar">
   <div class="s-brand">
     <div>
