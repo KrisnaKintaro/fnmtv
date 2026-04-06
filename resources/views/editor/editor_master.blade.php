@@ -9,6 +9,9 @@
         href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('admin/css/admin_css.css') }}">
+    <style>
+        .s-role-badge{background:#1a7a3c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:1px;text-transform:uppercase;margin-left:auto;flex-shrink:0;}
+    </style>
     @yield('css')
 </head>
 

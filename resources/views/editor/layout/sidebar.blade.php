@@ -5,7 +5,7 @@
         <div class="s-logo">FNM</div>
         <div class="s-tag">Editor Panel</div>
       </div>
-      <div class="s-editor-badge">Editor</div>
+      <div class="s-role-badge">Editor</div>
     </div>
 
     <div class="s-section">
