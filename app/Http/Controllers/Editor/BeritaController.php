@@ -14,7 +14,12 @@ class BeritaController extends Controller
     public function index()
     {
         $data = Berita::where('user_id', Auth::id())->get();
-        return response()->json($data);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berhasil mengambil daftar berita editor.',
+            'data' => $data,
+        ], 200);
     }
 
     // Tambah Berita Baru
@@ -43,7 +48,11 @@ class BeritaController extends Controller
             'jumlah_view' => 0
         ]);
 
-        return response()->json(['message' => 'Berita berhasil disimpan sebagai Draft', 'data' => $berita]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berita berhasil disimpan sebagai Draft.',
+            'data' => $berita,
+        ], 201);
     }
 
     // Update Berita (Hanya jika status Draft atau Rejected)
@@ -52,7 +61,10 @@ class BeritaController extends Controller
         $berita = Berita::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
         if (!in_array($berita->status_berita, ['Draft', 'Rejected'])) {
-            return response()->json(['message' => 'Berita yang sudah diproses tidak bisa diubah'], 403);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Berita yang sudah diproses tidak bisa diubah.',
+            ], 403);
         }
 
         $berita->update([
@@ -62,7 +74,11 @@ class BeritaController extends Controller
             'slug' => $request->judul_berita ? Str::slug($request->judul_berita) . '-' . time() : $berita->slug
         ]);
 
-        return response()->json(['message' => 'Berita berhasil diupdate', 'data' => $berita]);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berita berhasil diupdate.',
+            'data' => $berita,
+        ], 200);
     }
 
     // Kirim ke Redaksi
@@ -71,6 +87,13 @@ class BeritaController extends Controller
         $berita = Berita::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
         $berita->update(['status_berita' => 'Pending']);
 
-        return response()->json(['message' => 'Berita berhasil diajukan ke Redaksi']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berita berhasil diajukan ke Redaksi.',
+            'data' => [
+                'id' => $berita->id,
+                'status_berita' => $berita->status_berita,
+            ],
+        ], 200);
     }
 }
