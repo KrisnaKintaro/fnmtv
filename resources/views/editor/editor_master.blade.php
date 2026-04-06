@@ -18,6 +18,7 @@
   </main>
 
   <script src="{{ asset('admin/js/admin_js.js') }}"></script>
+  <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
   @yield('js')
 </body>
 </html>
