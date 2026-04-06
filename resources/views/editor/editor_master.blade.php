@@ -21,9 +21,18 @@
         @yield('konten')
     </main>
 
-  <script src="{{ asset('admin/js/admin_js.js') }}"></script>
-  <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
-  @yield('js')
+    <script src="{{ asset('admin/js/admin_js.js') }}"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+    @yield('js')
 </body>
 
 </html>

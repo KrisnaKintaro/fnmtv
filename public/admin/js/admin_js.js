@@ -50,4 +50,3 @@
                 sidebar.classList.toggle('mobile-open');
             }
         }
-        
