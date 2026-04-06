@@ -1,4 +1,3 @@
-<!-- ══════════ SIDEBAR ══════════ -->
 <aside class="sidebar">
     <div class="s-brand">
         <div>
@@ -34,4 +33,5 @@
             </svg>
         </div>
     </div>
+  </div>
 </aside>

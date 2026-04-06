@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\AdministrasiFinansial;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pendapatan;
@@ -36,7 +36,7 @@ class LaporanFinansialController extends Controller
             'status' => 'success',
             'message' => 'Berhasil mengambil data laporan finansial',
             'data' => [
-                'total_pendapatan' => $totalPendapatan, 
+                'total_pendapatan' => $totalPendapatan,
                 'rincian_data' => $laporan
             ]
         ]);

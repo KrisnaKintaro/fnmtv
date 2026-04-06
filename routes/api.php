@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Admin\AdministrasiFinansial\LaporanFinansialController;
 use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\LaporanFinansialController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
 use App\Http\Controllers\Admin\StatistikInteraksiBeritaController;
 use App\Http\Controllers\Admin\TopPerformanceController;
@@ -107,16 +107,16 @@ Route::prefix('admin/top_performance')->group(function () {
 
 
 
-
 use App\Http\Controllers\Editor\BeritaController;
 use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
 
-// Group Editor
-Route::prefix('editor')->group(function () {
-    Route::get('/berita', [BeritaController::class, 'index']);
-    Route::post('/berita/tambah', [BeritaController::class, 'store']);
-    Route::post('/berita/update/{id}', [BeritaController::class, 'update']); // Gunakan POST jika kirim file
-    Route::patch('/berita/ajukan/{id}', [BeritaController::class, 'ajukan']);
+
+// Bagian Editor
+Route::prefix('editor/manajemen_berita')->group(function() {
+    Route::get('/ambilData', [BeritaController::class, 'getDaftarBerita']);
+    Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
+    Route::put('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']);
+    Route::delete('/hapusBerita/{id_berita}', [BeritaController::class, 'hapusDataBerita']);
 });
 
 // Group Redaksi
@@ -124,17 +124,4 @@ Route::prefix('redaksi')->group(function () {
     Route::get('/masuk', [VerifikasiBeritaController::class, 'index']);
     Route::patch('/verifikasi/{id}', [VerifikasiBeritaController::class, 'verifikasi']);
 });
-// Bagian Editor
-Route::prefix('editor/manajemen_berita')->group(function() {
-    Route::get('/ambilData', [BeritaController::class, 'getDaftarBerita']);
-    Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
-    Route::post('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']); // Gunakan POST karena ada upload file
-    Route::patch('/ajukanBerita/{id_berita}', [BeritaController::class, 'ajukanKeRedaksi']);
-    Route::delete('/hapusData/{id_berita}', [BeritaController::class, 'hapusBeritaDraft']);
-});
 
-// Bagian Redaksi
-Route::prefix('redaksi/verifikasi_berita')->group(function() {
-    Route::get('/ambilData', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
-    Route::patch('/prosesVerifikasi/{id_berita}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
-});

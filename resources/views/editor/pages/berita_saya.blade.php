@@ -1,5 +1,14 @@
 @extends('editor.editor_master')
 @section('css')
+    <style>
+        .rte-btn.active {
+            background: #eef2ff;
+            /* Warna biru muda pudar */
+            color: var(--blue);
+            border: 1px solid var(--blue);
+            border-radius: 4px;
+        }
+    </style>
 @endsection
 @section('konten')
     <!-- ══ PAGE: TULIS BERITA BARU ══ -->
@@ -136,6 +145,7 @@
                 </select>
             </div>
         </div>
+    </div>
 
         <!-- Table -->
         <div class="card">
@@ -352,6 +362,10 @@
             </div>
         </div>
     </div>
+@endsection
+@section('js')
+    <script>
+        let isEditingFromTable = false;
 
     <!-- ══ MODAL: Konfirmasi Status Draft ══ -->
     <div id="modalDraft"

@@ -1,733 +1,714 @@
-@extends('Redaksi.redaksi_master')
+@extends('redaksi.redaksi_master') @section('css')
+    <style>
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 6px 12px;
+            gap: 8px;
+        }
 
-@section('css')
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            width: 200px;
+        }
+
+        textarea.reject-notes {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            min-height: 100px;
+            resize: vertical;
+            margin-bottom: 16px;
+            outline: none;
+        }
+
+        textarea.reject-notes:focus {
+            border-color: var(--blue);
+        }
+
+        /* ── STYLE BARU MODAL REVIEW (SENSITIVE) ── */
+        #modalViewBerita .modal-content {
+            max-width: 950px;
+            /* Bikin rada lebar dikit */
+            padding: 0;
+            /* Hapus padding global */
+            overflow: hidden;
+            /* Biar background header/footer gak bocor */
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            /* Jaga tinggi modal biar gak off-screen */
+        }
+
+        /* 1. Bagian Atas (Header) - Abu-abu Muda */
+        .view-header-panel {
+            background: #f9fafb;
+            /* Warna abu abu super muda */
+            padding: 30px 40px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .view-thumb {
+            width: 160px;
+            height: 100px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .view-meta-info {
+            flex: 1;
+        }
+
+        .view-meta-judul {
+            font-family: 'Merriweather', serif;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            color: var(--black);
+        }
+
+        .view-meta-sub {
+            font-size: 13px;
+            color: var(--muted);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        /* 2. Bagian Tengah (Isi Berita) - Putih Murni + Scroll */
+        .view-body-panel {
+            background: #ffffff;
+            /* Putih bersih buat baca */
+            padding: 40px;
+            flex: 1;
+            /* Ambil sisa space */
+            overflow-y: auto;
+            /* Scroll di sini */
+            font-size: 15px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        /* Styling HTML Content di dalam body */
+        .view-body-panel p {
+            margin-bottom: 1.5em;
+        }
+
+        .view-body-panel h2,
+        .view-body-panel h3 {
+            font-family: 'Merriweather', serif;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+            color: var(--black);
+        }
+
+        .view-body-panel blockquote {
+            border-left: 4px solid var(--blue);
+            padding-left: 20px;
+            font-style: italic;
+            color: #555;
+            margin: 25px 0;
+        }
+
+        /* 3. Bagian Bawah (Validasi + Tombol) - Panel Terpisah */
+        .view-footer-panel {
+            background: #fafafa;
+            border-top: 1px solid #eee;
+            padding: 0;
+            /* Padding diatur di child */
+        }
+
+        /* Section Poin Validasi (Biru Muda Callout) */
+        .validation-callout {
+            background: #eef2ff;
+            /* Biru muda pucat */
+            padding: 20px 40px;
+            border-bottom: 1px solid #e0e7ff;
+        }
+
+        .validation-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .validation-list {
+            font-size: 13px;
+            color: #444;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* Bikin 2 kolom biar ringkas */
+            gap: 8px 20px;
+        }
+
+        .validation-list li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Section Tombol Tutup (Paling Bawah) */
+        .footer-action-bar {
+            padding: 15px 40px;
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
 @endsection
 
 @section('konten')
-    <!-- ══ HALAMAN UTAMA ══ -->
-    <div class="page active">
-        <div class="section-title">Manajemen Berita</div>
+    <div id="page-validasi-berita" class="page active">
+        <div class="section-title">Monitoring & Validasi Berita</div>
 
-        <!-- FILTER BAR -->
         <div class="filter-bar">
             <div class="tab-pills" id="tabPills">
-                <div class="tab-p active" id="tab-all" onclick="showTab('all', this)">
-                    Semua <span class="tab-cnt cnt-all" id="cnt-all">9</span>
-                </div>
-                <div class="tab-p" id="tab-pending" onclick="showTab('pending', this)">
-                    Pending <span class="tab-cnt cnt-pending" id="cnt-pending">5</span>
-                </div>
-                <div class="tab-p" id="tab-approved" onclick="showTab('approved', this)">
-                    Disetujui <span class="tab-cnt cnt-approved" id="cnt-approved">3</span>
-                </div>
-                <div class="tab-p" id="tab-rejected" onclick="showTab('rejected', this)">
-                    Ditolak <span class="tab-cnt cnt-rejected" id="cnt-rejected">1</span>
-                </div>
+                <div class="tab-p active" onclick="filterTab(this,'all')">Semua <span class="badge-count">...</span></div>
+                <div class="tab-p" onclick="filterTab(this,'pending')">Menunggu <span class="badge-count"
+                        style="background:#e6ecf4;color:var(--blue);">...</span></div>
+                <div class="tab-p" onclick="filterTab(this,'published')">Terbit <span class="badge-count"
+                        style="background:#e6f4ea;color:#1e8e3e;">...</span></div>
+                <div class="tab-p" onclick="filterTab(this,'rejected')">Ditolak <span class="badge-count"
+                        style="background:#fde8e8;color:var(--red);">...</span></div>
             </div>
-            <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-                <select class="filter-select" id="filterKategori" style="font-size:12px;padding:6px 10px;"
-                    onchange="applyFilters()">
-                    <option value="">Semua Kategori</option>
-                    <option>Politik</option>
-                    <option>Ekonomi</option>
-                    <option>Teknologi</option>
-                    <option>Olahraga</option>
-                    <option>Kesehatan</option>
-                    <option>Internasional</option>
-                    <option>Sains</option>
-                    <option>Infrastruktur</option>
-                    <option>Hiburan</option>
+
+            <div style="margin-left:auto;display:flex;gap:8px;">
+                <div class="search-box">
+                    <svg width="14" height="14" fill="none" stroke="#7a7570" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8" stroke-width="2" />
+                        <path d="m21 21-4.35-4.35" stroke-linecap="round" stroke-width="2" />
+                    </svg>
+                    <input type="text" id="searchInput" onkeyup="jalankanFilter()" placeholder="Cari judul berita...">
+                </div>
+
+                <select class="filter-select select-kategori-ajax" id="filterKategori" onchange="jalankanFilter()"
+                    style="font-size:12px;padding:6px 10px;">
+                    <option value="all">Semua Kategori</option>
                 </select>
-                <select class="filter-select" id="filterPenulis" style="font-size:12px;padding:6px 10px;"
-                    onchange="applyFilters()">
-                    <option value="">Semua Penulis</option>
-                    <option>Budi Santoso</option>
-                    <option>Arif Wibowo</option>
-                    <option>Dewi Puspita</option>
-                    <option>Sari Maharani</option>
+                <select id="filterUrutan" class="filter-select" onchange="jalankanFilter()"
+                    style="font-size:12px;padding:6px 10px;">
+                    <option value="baru">Terbaru</option>
+                    <option value="lama">Terlama</option>
                 </select>
             </div>
         </div>
 
-        <!-- ══ TABEL ══ -->
         <div class="card">
             <div class="card-hd">
-                <div class="card-ht" id="cardTitle">Daftar Artikel Masuk dari Editor</div>
-                <div class="card-hm" id="tableCount">Menampilkan 9 artikel</div>
+                <div class="card-ht">Daftar Antrean Berita</div>
+                <div class="card-hm" id="tableCount">Menampilkan ... artikel</div>
             </div>
-            <table>
+            <table id="newsTable">
                 <thead>
                     <tr>
-                        <th style="width:70px;">Thumbnail</th>
-                        <th>Judul &amp; Informasi</th>
+                        <th>Thumbnail</th>
+                        <th>Judul & Penulis</th>
                         <th>Kategori</th>
-                        <th>Penulis</th>
-                        <th>Tanggal Kirim</th>
                         <th>Status</th>
-                        <th style="width:80px;text-align:center;">Aksi</th>
+                        <th>Tanggal Masuk</th>
+                        <th>Aksi Redaksi</th>
                     </tr>
                 </thead>
                 <tbody id="newsBody">
-
-                    <!-- ═══ PENDING ═══ -->
-                    <tr data-status="pending" data-key="beras" data-cat="Ekonomi" data-author="Budi Santoso">
+                    <tr>
                         <td>
-                            <div class="tbl-img">🌾</div>
+                            <div class="tbl-img">
+                                <div style="width:40px;height:40px;background:#eee;border-radius:4px;"></div>
+                            </div>
                         </td>
                         <td>
-                            <div class="tbl-title">Harga Beras Naik Jelang Lebaran, Pemerintah Buka Impor</div>
-                            <div class="tbl-meta">Menunggu keputusan Redaksi</div>
+                            <div class="tbl-title">Timnas Menang Telak</div>
+                            <div class="tbl-meta">Oleh: Budi (Editor)</div>
                         </td>
-                        <td><span class="badge b-cat">Ekonomi</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Budi Santoso</td>
-                        <td style="font-size:12px;color:var(--muted);">26 Mar 2026</td>
-                        <td><span class="badge b-pending">Pending</span></td>
+                        <td><span class="badge" style="background:#fde8e8;color:var(--red);">Olahraga</span></td>
+                        <td><span class="badge b-review">Pending</span></td>
+                        <td style="font-size:12px;color:var(--muted);">14 Feb 2026</td>
                         <td>
                             <div class="act-btns">
-                                <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('beras')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
+                                <div class="ico-btn" title="Review & Edit Minor" onclick="reviewBerita(1)">👁️</div>
+                                <div class="ico-btn" title="Terbitkan" onclick="confirmPublish(1)" style="color:#1e8e3e;">✅
+                                </div>
+                                <div class="ico-btn" title="Tolak" onclick="confirmReject(1)" style="color:var(--red);">❌
                                 </div>
                             </div>
                         </td>
                     </tr>
-
-                    <tr data-status="pending" data-key="bpjs" data-cat="Kesehatan" data-author="Arif Wibowo">
-                        <td>
-                            <div class="tbl-img">🏥</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">BPJS Kesehatan Tanggung Biaya Operasi Jantung Terbaru</div>
-                            <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                        </td>
-                        <td><span class="badge b-cat">Kesehatan</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Arif Wibowo</td>
-                        <td style="font-size:12px;color:var(--muted);">25 Mar 2026</td>
-                        <td><span class="badge b-pending">Pending</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('bpjs')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-status="pending" data-key="asean" data-cat="Internasional" data-author="Budi Santoso">
-                        <td>
-                            <div class="tbl-img">🌐</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">KTT ASEAN 2026 Bahas Krisis Pangan dan Energi Regional</div>
-                            <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                        </td>
-                        <td><span class="badge b-cat">Internasional</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Budi Santoso</td>
-                        <td style="font-size:12px;color:var(--muted);">24 Mar 2026</td>
-                        <td><span class="badge b-pending">Pending</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('asean')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-status="pending" data-key="brin" data-cat="Sains" data-author="Dewi Puspita">
-                        <td>
-                            <div class="tbl-img">🔬</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">Peneliti BRIN Temukan Spesies Baru di Hutan Papua</div>
-                            <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                        </td>
-                        <td><span class="badge b-cat">Sains</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Dewi Puspita</td>
-                        <td style="font-size:12px;color:var(--muted);">23 Mar 2026</td>
-                        <td><span class="badge b-pending">Pending</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('brin')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-status="pending" data-key="lrt" data-cat="Infrastruktur" data-author="Arif Wibowo">
-                        <td>
-                            <div class="tbl-img">🏙️</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">Proyek LRT Jabodebek Fase 2 Mulai Konstruksi April 2026</div>
-                            <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                        </td>
-                        <td><span class="badge b-cat">Infrastruktur</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Arif Wibowo</td>
-                        <td style="font-size:12px;color:var(--muted);">22 Mar 2026</td>
-                        <td><span class="badge b-pending">Pending</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('lrt')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- ═══ DISETUJUI ═══ -->
-                    <tr data-status="approved" data-key="kebijakan" data-cat="Politik" data-author="Budi Santoso">
-                        <td>
-                            <div class="tbl-img">🏛️</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">Pemerintah Umumkan Kebijakan Ekonomi Baru untuk 2026</div>
-                            <div class="tbl-meta">Disetujui oleh Redaksi · 15 Mar 2026</div>
-                        </td>
-                        <td><span class="badge b-cat">Politik</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Budi Santoso</td>
-                        <td style="font-size:12px;color:var(--muted);">15 Mar 2026</td>
-                        <td><span class="badge b-approved">Disetujui</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat Detail" onclick="openModal('kebijakan')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-status="approved" data-key="garuda" data-cat="Olahraga" data-author="Sari Maharani">
-                        <td>
-                            <div class="tbl-img">⚽</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">Timnas Garuda Menang Telak 3-0 Lawan Vietnam</div>
-                            <div class="tbl-meta">Disetujui oleh Redaksi · 14 Mar 2026</div>
-                        </td>
-                        <td><span class="badge b-cat">Olahraga</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Sari Maharani</td>
-                        <td style="font-size:12px;color:var(--muted);">14 Mar 2026</td>
-                        <td><span class="badge b-approved">Disetujui</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat Detail" onclick="openModal('garuda')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr data-status="approved" data-key="film" data-cat="Hiburan" data-author="Sari Maharani">
-                        <td>
-                            <div class="tbl-img">🎬</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">Film Indonesia Raih Penghargaan di Festival Berlin</div>
-                            <div class="tbl-meta">Disetujui oleh Redaksi · 12 Mar 2026</div>
-                        </td>
-                        <td><span class="badge b-cat">Hiburan</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Sari Maharani</td>
-                        <td style="font-size:12px;color:var(--muted);">12 Mar 2026</td>
-                        <td><span class="badge b-approved">Disetujui</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat Detail" onclick="openModal('film')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- ═══ DITOLAK ═══ -->
-                    <tr data-status="rejected" data-key="hoaks" data-cat="Teknologi" data-author="Dewi Puspita">
-                        <td>
-                            <div class="tbl-img">📱</div>
-                        </td>
-                        <td>
-                            <div class="tbl-title">Aplikasi Medsos Baru Diklaim Lebih Privat dari WhatsApp</div>
-                            <div class="tbl-meta">Ditolak · Sumber tidak terverifikasi</div>
-                        </td>
-                        <td><span class="badge b-cat">Teknologi</span></td>
-                        <td style="font-size:12px;color:var(--muted);">Dewi Puspita</td>
-                        <td style="font-size:12px;color:var(--muted);">10 Mar 2026</td>
-                        <td><span class="badge b-rejected">✕ Ditolak</span></td>
-                        <td>
-                            <div class="act-btns">
-                                <div class="ico-btn" title="Lihat Detail" onclick="openModal('hoaks')">
-                                    <svg width="13" height="13" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-
                 </tbody>
             </table>
 
-            <!-- empty state -->
-            <div class="empty-state" id="emptyState" style="display:none;">
-                <div class="ico">📭</div>
-                <p>Tidak ada artikel ditemukan pada kategori ini.</p>
-            </div>
-
-            <div class="pager">
-                <div class="pg-btn active">1</div>
-                <div class="pg-btn">2</div>
-                <div class="pg-btn">›</div>
-                <div class="pg-info" id="pagerInfo">Menampilkan 9 dari 9 artikel</div>
-            </div>
+            <div class="pager" id="paginationControl"></div>
         </div>
-    </div><!-- /page -->
+    </div>
 
-    <!-- ══════════════════════════════════════
-             MODAL DETAIL ARTIKEL + VALIDASI
-        ══════════════════════════════════════ -->
-    <div class="modal-backdrop" id="modalDetail" onclick="handleBackdropClick(event)">
-        <div class="modal">
-            <div class="modal-hd">
-                <div class="modal-hd-text">
-                    <div class="modal-title" id="mdTitle">—</div>
-                    <div class="modal-sub" id="mdSub">—</div>
-                </div>
-                <div class="modal-close" onclick="closeDetail()">✕</div>
-            </div>
-            <div class="modal-body">
-                <div class="modal-thumb" id="mdThumb">📰</div>
-                <div class="modal-chips" id="mdChips">
-                    <div class="chip">Penulis: <b id="md-author">—</b></div>
-                    <div class="chip">Kategori: <b id="md-cat">—</b></div>
-                    <div class="chip">Dikirim: <b id="md-date">—</b></div>
-                    <div class="chip">Status: <b id="md-status">—</b></div>
-                </div>
-                <div class="modal-sec">Isi Artikel</div>
-                <div class="modal-article-body" id="mdContent"></div>
-                <div class="modal-divider"></div>
-
-                <!-- KOTAK VALIDASI — hanya muncul jika status pending -->
-                <div id="mdVerdictWrap" style="display:none;">
-                    <div class="verdict-box">
-                        <div class="verdict-title">Keputusan Redaksi</div>
-                        <div class="verdict-desc">Periksa artikel dengan saksama sebelum memberikan keputusan. Keputusan
-                            akan langsung diteruskan ke Editor yang bersangkutan.</div>
-                        <div class="verdict-actions">
-                            <button class="vbtn vbtn-approve" onclick="verdictApprove()">
-                                <svg width="14" height="14" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M5 13l4 4L19 7" />
-                                </svg>
-                                Setujui Artikel
-                            </button>
-                            <button class="vbtn vbtn-reject" onclick="verdictReject()">
-                                <svg width="14" height="14" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                Tolak Artikel
-                            </button>
-                        </div>
-                        <!-- Form alasan penolakan -->
-                        <div class="reject-note" id="mdRejectNote">
-                            <label>Alasan Penolakan (wajib diisi)</label>
-                            <textarea id="mdRejectText"
-                                placeholder="Tuliskan alasan penolakan yang jelas untuk Editor, misalnya: sumber tidak terverifikasi, konten tidak sesuai standar editorial, dll."></textarea>
-                            <div class="reject-note-btns">
-                                <button class="btn btn-outline btn-sm" onclick="closeRejectNote()">Batal</button>
-                                <button class="btn btn-red btn-sm" onclick="submitRejectFromDetail()">
-                                    <svg width="12" height="12" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                    </svg>
-                                    Kirim Penolakan
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- STATUS INFO — muncul jika sudah disetujui atau ditolak -->
-                <div id="mdResultWrap" style="display:none;">
-                    <div class="info-result-box" id="mdResultBox">
-                        <div class="ico" id="mdResultIco"></div>
-                        <div class="txt">
-                            <strong id="mdResultTitle"></strong>
-                            <span id="mdResultDesc"></span>
-                        </div>
-                    </div>
-                </div>
-
+    <div id="modalPublish"
+        style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
+        <div
+            style="background:var(--white);border-radius:12px;padding:32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
+            <div style="font-size:32px;text-align:center;margin-bottom:12px;">✅</div>
+            <div
+                style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">
+                Terbitkan Artikel?</div>
+            <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;">Artikel ini akan berstatus
+                "Published" dan dapat diakses oleh publik di website portal berita.</div>
+            <div style="display:flex;gap:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="closeModal('modalPublish')">Batal</button>
+                <button class="btn btn-blue" style="flex:1;" onclick="doPublish()">Ya, Terbitkan</button>
             </div>
         </div>
     </div>
 
-    <!-- ── TOAST ── -->
-    <div id="toast" style="display:none;opacity:1;">
-        <span id="toastIco"></span>
-        <span id="toastMsg"></span>
+    <div id="modalReject"
+        style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
+        <div
+            style="background:var(--white);border-radius:12px;padding:32px;max-width:450px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
+            <div style="font-size:32px;text-align:center;margin-bottom:12px;">❌</div>
+            <div
+                style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">
+                Tolak Artikel</div>
+            <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px;">Berikan catatan revisi agar
+                Editor tahu apa yang perlu diperbaiki sebelum mengajukan ulang.</div>
+
+            <textarea id="catatanPenolakan" class="reject-notes"
+                placeholder="Contoh: Judul terlalu clickbait, mohon diperbaiki dan cek kembali paragraf 3..."></textarea>
+            <p id="errorCatatan"
+                style="color:var(--red); font-size:11px; display:none; margin-top:-10px; margin-bottom:16px;">Catatan
+                penolakan wajib diisi!</p>
+
+            <div style="display:flex;gap:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="closeModal('modalReject')">Batal</button>
+                <button class="btn btn-red" style="flex:1;" onclick="doReject()">Kirim Penolakan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalViewBerita"
+        style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;">
+        <div class="modal-content card">
+
+            <div class="ico-btn" onclick="closeModal('modalViewBerita')"
+                style="position:absolute; top:15px; right:15px; font-size:16px; z-index:10; background:rgba(255,255,255,.8); width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:50%;">
+                ✕</div>
+
+            <div class="view-header-panel">
+                <div class="view-thumb" id="viewThumb"
+                    style="display:flex; align-items:center; justify-content:center; color:#aaa; font-size:11px; font-weight:bold;">
+                    THUMBNAIL
+                </div>
+                <div class="view-meta-info">
+                    <div class="view-meta-judul" id="viewJudul">Judul Berita Sample</div>
+                    <div class="view-meta-sub">
+                        <span id="viewKategori" class="badge b-draft">Kategori</span>
+                        <span>Oleh: <b id="viewPenulis" style="color:var(--black);">Nama Penulis</b></span>
+                        <span id="viewTanggal">14 Feb 2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view-body-panel" id="viewBodyKonten">
+            </div>
+
+            <div class="view-footer-panel">
+                <div class="validation-callout">
+                    <div class="validation-title">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Poin Penting Validasi Redaksi
+                    </div>
+                    <ul class="validation-list">
+                        <li>✅ Periksa EYD & Tanda Baca</li>
+                        <li>✅ Cek Kesesuaian Judul vs Isi</li>
+                        <li>✅ Pastikan Tidak Ada Unsur SARA/Hoaks</li>
+                        <li>✅ Verifikasi Sumber Gambar/Thumbnail</li>
+                        <li>✅ Cek Format HTML (Heading, Bold)</li>
+                        <li>✅ Pastikan Kategori Sudah Tepat</li>
+                    </ul>
+                </div>
+
+                <div class="footer-action-bar">
+                    <button class="btn btn-outline btn-sm" onclick="closeModal('modalViewBerita')">Tutup Review</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 @endsection
 @section('js')
     <script>
-        /* ══════════════════════════════════════
-       DATABASE ARTIKEL (simulasi)
-    ══════════════════════════════════════ */
-        const DB = {
-            beras: {
-                title: 'Harga Beras Naik Jelang Lebaran, Pemerintah Buka Impor',
-                author: 'Budi Santoso',
-                cat: 'Ekonomi',
-                date: '26 Mar 2026',
-                status: 'pending',
-                emoji: '🌾',
-                content: `<p>Harga beras di berbagai pasar tradisional Indonesia mengalami kenaikan signifikan menjelang Hari Raya Idul Fitri 2026. Berdasarkan data dari Badan Pangan Nasional, harga beras medium kini menyentuh Rp16.500 per kilogram, naik sekitar 12% dari bulan sebelumnya.</p>
-    <p>Pemerintah melalui Kementerian Perdagangan mengumumkan kebijakan buka impor beras sebanyak 500.000 ton untuk menstabilkan pasokan dalam negeri. Langkah ini diambil setelah stok Bulog di beberapa daerah mulai menipis akibat tingginya permintaan menjelang lebaran.</p>
-    <p>Menteri Pertanian dalam konferensi pers menyatakan bahwa kebijakan impor ini bersifat sementara dan tidak akan mengganggu petani lokal. "Kami memastikan harga di tingkat petani tetap terjaga," ujarnya.</p>`
+        // 1. DUMMY DATA (Minimal 12 biar keliatan paginationnya)
+        let dataBeritaMaster = [{
+                id: 1,
+                judul_berita: "Timnas Menang Telak 5-0",
+                penulis: "Budi Santoso",
+                slug: "timnas-menang-telak",
+                kategori: "Olahraga",
+                status_berita: "Pending",
+                created_at: "2026-04-06T10:00:00"
             },
-            bpjs: {
-                title: 'BPJS Kesehatan Tanggung Biaya Operasi Jantung Terbaru',
-                author: 'Arif Wibowo',
-                cat: 'Kesehatan',
-                date: '25 Mar 2026',
-                status: 'pending',
-                emoji: '🏥',
-                content: `<p>BPJS Kesehatan resmi mengumumkan perluasan cakupan layanan dengan menanggung biaya prosedur operasi jantung terbaru, termasuk pemasangan ring koroner generasi terbaru dan operasi bypass arteri. Kebijakan ini berlaku mulai 1 April 2026.</p>
-    <p>Direktur Utama BPJS Kesehatan menjelaskan bahwa perluasan manfaat ini merupakan bagian dari komitmen pemerintah untuk memberikan akses layanan kesehatan berkualitas bagi seluruh masyarakat Indonesia tanpa terkecuali.</p>
-    <p>Peserta BPJS Kesehatan yang membutuhkan layanan ini cukup mendapatkan rujukan dari fasilitas kesehatan tingkat pertama (FKTP) dan mengikuti prosedur yang berlaku.</p>`
+            {
+                id: 2,
+                judul_berita: "Harga Beras Turun Drastis",
+                penulis: "Siti Aminah",
+                slug: "harga-beras-turun",
+                kategori: "Ekonomi",
+                status_berita: "Pending",
+                created_at: "2026-04-05T08:30:00"
             },
-            asean: {
-                title: 'KTT ASEAN 2026 Bahas Krisis Pangan dan Energi Regional',
-                author: 'Budi Santoso',
-                cat: 'Internasional',
-                date: '24 Mar 2026',
-                status: 'pending',
-                emoji: '🌐',
-                content: `<p>Konferensi Tingkat Tinggi (KTT) ASEAN 2026 yang berlangsung di Jakarta resmi dibuka pada Senin (23/3). Para pemimpin dari 10 negara anggota ASEAN berkumpul untuk membahas isu-isu krusial, terutama krisis pangan dan energi yang melanda kawasan Asia Tenggara.</p>
-    <p>Indonesia selaku tuan rumah mengusulkan pembentukan cadangan pangan bersama ASEAN (ASEAN Food Reserve) sebagai langkah konkret menghadapi ancaman ketahanan pangan regional. Presiden menegaskan pentingnya solidaritas kawasan dalam menghadapi tantangan global.</p>
-    <p>Isu transisi energi juga menjadi agenda utama, dengan beberapa negara anggota mendorong percepatan pengembangan energi terbarukan dan kerja sama dalam jaringan transmisi listrik regional.</p>`
+            {
+                id: 3,
+                judul_berita: "Review Gadget Terbaru 2026",
+                penulis: "Andi Wijaya",
+                slug: "review-gadget",
+                kategori: "Teknologi",
+                status_berita: "Pending",
+                created_at: "2026-04-04T15:20:00"
             },
-            brin: {
-                title: 'Peneliti BRIN Temukan Spesies Baru di Hutan Papua',
-                author: 'Dewi Puspita',
-                cat: 'Sains',
-                date: '23 Mar 2026',
-                status: 'pending',
-                emoji: '🔬',
-                content: `<p>Tim peneliti dari Badan Riset dan Inovasi Nasional (BRIN) mengumumkan penemuan spesies baru amfibi di kawasan hutan hujan pegunungan Papua Tengah. Spesies katak yang diberi nama ilmiah <em>Litoria papuaensis fnm</em> ini ditemukan pada ketinggian sekitar 1.800 meter di atas permukaan laut.</p>
-    <p>Dr. Ratna Dewi selaku ketua tim riset menjelaskan bahwa spesies ini memiliki pola warna unik bercak emas di punggungnya yang belum pernah ditemukan sebelumnya. "Penemuan ini membuktikan Papua masih menyimpan kekayaan biodiversitas yang luar biasa," ungkapnya.</p>
-    <p>Penelitian ini dilakukan selama 18 bulan dan merupakan bagian dari program pemetaan keanekaragaman hayati Indonesia yang diinisiasi oleh BRIN bekerja sama dengan berbagai lembaga internasional.</p>`
+            {
+                id: 4,
+                judul_berita: "Pemilu Daerah Aman Terkendali",
+                penulis: "Budi Santoso",
+                slug: "pemilu-aman",
+                kategori: "Politik",
+                status_berita: "Published",
+                created_at: "2026-04-03T09:10:00"
             },
-            lrt: {
-                title: 'Proyek LRT Jabodebek Fase 2 Mulai Konstruksi April 2026',
-                author: 'Arif Wibowo',
-                cat: 'Infrastruktur',
-                date: '22 Mar 2026',
-                status: 'pending',
-                emoji: '🏙️',
-                content: `<p>Kementerian Perhubungan resmi mengumumkan dimulainya konstruksi LRT Jabodebek Fase 2 yang akan memperluas jaringan ke wilayah Bogor dan Tangerang Selatan. Peletakan batu pertama dijadwalkan pada awal April 2026 dan ditargetkan beroperasi penuh pada 2029.</p>
-    <p>Proyek senilai Rp 42 triliun ini akan menambah 3 jalur baru sepanjang total 47 kilometer dengan 28 stasiun baru. Kapasitas angkut diperkirakan mencapai 1,2 juta penumpang per hari, jauh meningkat dari kapasitas fase 1.</p>
-    <p>Menteri Perhubungan optimistis proyek ini akan mengurangi kemacetan di koridor Jabodetabek secara signifikan dan mendorong masyarakat beralih dari kendaraan pribadi ke transportasi publik.</p>`
+            {
+                id: 5,
+                judul_berita: "Kasus DBD Meningkat di Jakarta",
+                penulis: "Siti Aminah",
+                slug: "kasus-dbd",
+                kategori: "Kesehatan",
+                status_berita: "Rejected",
+                created_at: "2026-04-02T14:00:00"
             },
-            kebijakan: {
-                title: 'Pemerintah Umumkan Kebijakan Ekonomi Baru untuk 2026',
-                author: 'Budi Santoso',
-                cat: 'Politik',
-                date: '15 Mar 2026',
-                status: 'approved',
-                emoji: '🏛️',
-                content: `<p>Pemerintah Indonesia secara resmi meluncurkan paket kebijakan ekonomi baru untuk tahun 2026 yang mencakup 12 langkah strategis. Kebijakan ini dirancang untuk mendorong pertumbuhan ekonomi, menciptakan lapangan kerja, dan memperkuat ketahanan fiskal nasional.</p>
-    <p>Beberapa poin utama kebijakan meliputi pemotongan pajak bagi UMKM hingga 50%, insentif investasi di sektor manufaktur berbasis teknologi tinggi, serta program hilirisasi sumber daya alam yang diperluas ke 14 komoditas strategis.</p>
-    <p>Para ekonom menilai paket kebijakan ini cukup komprehensif dan diharapkan mampu menjaga laju pertumbuhan ekonomi di kisaran 5,2–5,5% sepanjang 2026.</p>`
+            {
+                id: 6,
+                judul_berita: "Festival Budaya Nusantara",
+                penulis: "Andi Wijaya",
+                slug: "festival-budaya",
+                kategori: "Budaya",
+                status_berita: "Published",
+                created_at: "2026-04-01T11:45:00"
             },
-            garuda: {
-                title: 'Timnas Garuda Menang Telak 3-0 Lawan Vietnam',
-                author: 'Sari Maharani',
-                cat: 'Olahraga',
-                date: '14 Mar 2026',
-                status: 'approved',
-                emoji: '⚽',
-                content: `<p>Timnas Indonesia menunjukkan performa gemilang dengan mengalahkan Vietnam 3-0 dalam laga kualifikasi Piala Dunia 2026 zona Asia di Stadion Utama Gelora Bung Karno, Jakarta. Tiga gol kemenangan dicetak oleh Marselino Ferdinan (menit 23), Egy Maulana Vikri (menit 51), dan Rafael Struick (menit 78).</p>
-    <p>Pelatih Shin Tae-yong menyebut kemenangan ini sebagai buah dari kerja keras para pemain dan keyakinan penuh terhadap proses yang dibangun bersama. "Kami masih fokus ke pertandingan berikutnya," ujarnya usai laga.</p>
-    <p>Dengan kemenangan ini, Indonesia kini memimpin klasemen Grup C dengan 13 poin dari 6 pertandingan dan berpeluang besar melaju ke babak berikutnya.</p>`
+            {
+                id: 7,
+                judul_berita: "Saham Teknologi Anjlok",
+                penulis: "Budi Santoso",
+                slug: "saham-anjlok",
+                kategori: "Ekonomi",
+                status_berita: "Pending",
+                created_at: "2026-03-31T16:30:00"
             },
-            film: {
-                title: 'Film Indonesia Raih Penghargaan di Festival Berlin',
-                author: 'Sari Maharani',
-                cat: 'Hiburan',
-                date: '12 Mar 2026',
-                status: 'approved',
-                emoji: '🎬',
-                content: `<p>Film Indonesia berjudul "Tanah di Ujung Dunia" berhasil meraih penghargaan Silver Bear untuk kategori Best Director di Berlinale 2026. Sutradara Kamila Andini menjadi perempuan Indonesia pertama yang meraih penghargaan bergengsi tersebut.</p>
-    <p>Film yang mengangkat kisah komunitas nelayan di pesisir timur Indonesia ini mendapat sambutan luar biasa dari penonton dan kritikus internasional. Kamila menyebut penghargaan ini adalah milik seluruh insan perfilman Indonesia.</p>
-    <p>Keberhasilan ini diharapkan membuka lebih banyak pintu bagi film-film Indonesia untuk bersaing di kancah festival internasional dan mendorong pertumbuhan industri perfilman tanah air.</p>`
+            {
+                id: 8,
+                judul_berita: "Piala Dunia 2026 Dimulai",
+                penulis: "Siti Aminah",
+                slug: "piala-dunia",
+                kategori: "Olahraga",
+                status_berita: "Published",
+                created_at: "2026-03-30T19:00:00"
             },
-            hoaks: {
-                title: 'Aplikasi Medsos Baru Diklaim Lebih Privat dari WhatsApp',
-                author: 'Dewi Puspita',
-                cat: 'Teknologi',
-                date: '10 Mar 2026',
-                status: 'rejected',
-                emoji: '📱',
-                rejectReason: 'Sumber data tidak terverifikasi dan klaim teknis dalam artikel tidak didukung oleh bukti ilmiah yang cukup. Mohon perbaiki dengan melampirkan sumber resmi dan hasil audit keamanan independen sebelum dikirim ulang.',
-                content: `<p>Sebuah aplikasi media sosial baru bernama "PrivaChat" yang dikembangkan oleh startup lokal mengklaim memiliki tingkat privasi lebih tinggi dibandingkan WhatsApp dan platform sejenis. Aplikasi ini diklaim menggunakan enkripsi quantum yang tidak dapat ditembus.</p>
-    <p>Pengembang aplikasi menyatakan bahwa data pengguna tidak pernah meninggalkan perangkat pengguna dan tidak ada server terpusat yang menyimpan percakapan. Namun demikian, klaim ini belum diverifikasi oleh pihak independen.</p>
-    <p>Sejak diluncurkan dua minggu lalu, aplikasi ini diklaim telah diunduh lebih dari 500.000 kali meskipun verifikasi angka tersebut belum dapat dikonfirmasi.</p>`
-            }
-        };
+            {
+                id: 9,
+                judul_berita: "Vaksin Baru Ditemukan",
+                penulis: "Andi Wijaya",
+                slug: "vaksin-baru",
+                kategori: "Kesehatan",
+                status_berita: "Pending",
+                created_at: "2026-03-29T08:15:00"
+            },
+            {
+                id: 10,
+                judul_berita: "Korupsi Dana Desa Terungkap",
+                penulis: "Budi Santoso",
+                slug: "korupsi-dana",
+                kategori: "Politik",
+                status_berita: "Rejected",
+                created_at: "2026-03-28T13:40:00"
+            },
+            {
+                id: 11,
+                judul_berita: "Pameran Seni Lukis Internasional",
+                penulis: "Siti Aminah",
+                slug: "pameran-seni",
+                kategori: "Budaya",
+                status_berita: "Pending",
+                created_at: "2026-03-27T10:50:00"
+            },
+            {
+                id: 12,
+                judul_berita: "AI Gantikan Pekerjaan Manusia?",
+                penulis: "Andi Wijaya",
+                slug: "ai-gantikan",
+                kategori: "Teknologi",
+                status_berita: "Published",
+                created_at: "2026-03-26T14:20:00"
+            },
+        ];
 
-        const BADGE_CLASS = {
-            pending: 'b-pending',
-            approved: 'b-approved',
-            rejected: 'b-rejected'
-        };
-        const LABEL = {
-            pending: 'Pending',
-            approved: 'Disetujui',
-            rejected: 'Ditolak'
-        };
-        const TITLES = {
-            all: ['Manajeman Berita', 'Redaksi / Manajemen Berita'],
-            pending: ['Manajeman Berita', 'Redaksi / Manajemen Berita'],
-            approved: ['Manajeman Berita', 'Redaksi / Manajemen Berita'],
-            rejected: ['Manajeman Berita', 'Redaksi / Manajemen Berita']
-        };
-        const CARD_TITLES = {
-            all: 'Daftar Artikel Masuk dari Editor',
-            pending: 'Artikel Menunggu Keputusan',
-            approved: 'Artikel Telah Disetujui',
-            rejected: 'Artikel Telah Ditolak'
-        };
+        let currentPage = 1;
+        const perPage = 10;
+        let statusAktif = 'all';
 
-        let currentTab = 'all';
+        // 2. INISIALISASI SAAT HALAMAN DIBUKA
+        $(document).ready(function() {
+            populateKategori();
+            jalankanFilter(); // Render pertama kali
+        });
 
-        /* ── TAB / FILTER ── */
-        function showTab(status) {
-            currentTab = status;
-
-            // Update topbar
-            const [title, crumb] = TITLES[status];
-            document.getElementById('tbTitle').textContent = title;
-            document.getElementById('tbCrumb').textContent = crumb;
-            document.getElementById('cardTitle').textContent = CARD_TITLES[status];
-
-            // Update tab pills (topbar)
-            document.querySelectorAll('#tabPills .tab-p').forEach(t => t.classList.remove('active'));
-            const tabEl = document.getElementById('tab-' + status);
-            if (tabEl) tabEl.classList.add('active');
-
-            applyFilters();
+        // Populate dropdown kategori dari data unik di master data
+        function populateKategori() {
+            const uniqueCategories = [...new Set(dataBeritaMaster.map(item => item.kategori))];
+            let options = '<option value="all">Semua Kategori</option>';
+            uniqueCategories.forEach(cat => {
+                options += `<option value="${cat}">${cat}</option>`;
+            });
+            $('#filterKategori').html(options);
         }
 
-        function applyFilters() {
-            const cat = document.getElementById('filterKategori').value;
-            const author = document.getElementById('filterPenulis').value;
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#newsBody tr');
-            let visible = 0;
+        // 3. LOGIKA FILTER, SEARCH, SORT
+        function filterTab(el, status) {
+            document.querySelectorAll('#tabPills .tab-p').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            statusAktif = status;
+            currentPage = 1; // Reset ke halaman 1
+            jalankanFilter();
+        }
 
-            rows.forEach(r => {
-                const matchStatus = currentTab === 'all' || r.dataset.status === currentTab;
-                const matchCat = !cat || r.dataset.cat === cat;
-                const matchAuthor = !author || r.dataset.author === author;
-                const titleText = r.querySelector('.tbl-title')?.textContent.toLowerCase() || '';
-                const matchSearch = !search || titleText.includes(search) || r.dataset.author.toLowerCase()
-                    .includes(search);
-                const show = matchStatus && matchCat && matchAuthor && matchSearch;
-                r.style.display = show ? '' : 'none';
-                if (show) visible++;
+        function jalankanFilter() {
+            const keyword = $('#searchInput').val().toLowerCase();
+            const kategoriDipilih = $('#filterKategori').val();
+            const urutanDipilih = $('#filterUrutan').val();
+
+            // A. Filter Data
+            let dataTerfilter = dataBeritaMaster.filter(val => {
+                const cocokStatus = (statusAktif === 'all' || val.status_berita.toLowerCase() === statusAktif);
+                const cocokKategori = (kategoriDipilih === 'all' || val.kategori === kategoriDipilih);
+                const cocokSearch = val.judul_berita.toLowerCase().includes(keyword) || val.penulis.toLowerCase()
+                    .includes(keyword);
+
+                return cocokStatus && cocokKategori && cocokSearch;
             });
 
-            document.getElementById('tableCount').textContent = `Menampilkan ${visible} artikel`;
-            document.getElementById('pagerInfo').textContent = `Menampilkan ${visible} dari 9 artikel`;
-            document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+            // B. Sort Data
+            dataTerfilter.sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+                return (urutanDipilih === 'baru') ? dateB - dateA : dateA - dateB;
+            });
+
+            // C. Update Angka di Tab & Sidebar
+            updateStatistik();
+
+            // D. Render Tabel
+            renderTable(dataTerfilter);
         }
 
-        function doSearch() {
-            applyFilters();
-        }
+        // 4. RENDER TABEL & PAGINATION
+        function renderTable(data) {
+            const tbody = $('#newsBody');
+            const total = data.length;
 
-        /* ── MODAL DETAIL ── */
-        function openModal(key) {
-            const a = DB[key];
-            document.getElementById('mdTitle').textContent = a.title;
-            document.getElementById('mdSub').textContent = `${a.author} · ${a.cat} · ${a.date}`;
-            document.getElementById('mdThumb').textContent = a.emoji;
-            document.getElementById('md-author').textContent = a.author;
-            document.getElementById('md-cat').textContent = a.cat;
-            document.getElementById('md-date').textContent = a.date;
-            document.getElementById('md-status').textContent = LABEL[a.status] || a.status;
-            document.getElementById('mdContent').innerHTML = a.content;
+            // Potong data buat pagination
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const paginatedData = data.slice(start, end);
 
-            const vw = document.getElementById('mdVerdictWrap');
-            const rw = document.getElementById('mdResultWrap');
-            const rb = document.getElementById('mdResultBox');
-
-            if (a.status === 'pending') {
-                vw.style.display = 'block';
-                rw.style.display = 'none';
-                document.getElementById('mdRejectNote').classList.remove('show');
-                document.getElementById('mdRejectText').value = '';
-            } else {
-                vw.style.display = 'none';
-                rw.style.display = 'block';
-                rb.className = 'info-result-box ' + a.status;
-                if (a.status === 'approved') {
-                    document.getElementById('mdResultIco').textContent = '✅';
-                    document.getElementById('mdResultTitle').textContent = 'Artikel Telah Disetujui';
-                    document.getElementById('mdResultDesc').textContent =
-                        'Artikel ini sudah disetujui oleh Redaksi dan siap untuk diterbitkan.';
+            let rows = '';
+            $.each(paginatedData, function(key, val) {
+                let badgeColor, textColor;
+                if (val.status_berita === 'Pending') {
+                    badgeColor = '#e6ecf4';
+                    textColor = 'var(--blue)';
+                } else if (val.status_berita === 'Published') {
+                    badgeColor = '#e6f4ea';
+                    textColor = '#1e8e3e';
                 } else {
-                    document.getElementById('mdResultIco').textContent = '❌';
-                    document.getElementById('mdResultTitle').textContent = 'Artikel Ditolak';
-                    document.getElementById('mdResultDesc').textContent = a.rejectReason ||
-                        'Artikel ini telah ditolak oleh Redaksi.';
+                    badgeColor = '#fde8e8';
+                    textColor = 'var(--red)';
                 }
+
+                // Cuma nampilin tombol Publish/Reject kalau statusnya Pending
+                let actionBtns = '';
+                if (val.status_berita === 'Pending') {
+                    actionBtns = `
+                    <div class="ico-btn" title="Review & Edit Minor" onclick="reviewBerita(${val.id})">👁️</div>
+                    <div class="ico-btn" title="Terbitkan" onclick="confirmPublish(${val.id})" style="color:#1e8e3e;">✅</div>
+                    <div class="ico-btn" title="Tolak" onclick="confirmReject(${val.id})" style="color:var(--red);">❌</div>
+                `;
+                } else {
+                    actionBtns =
+                        `<div class="ico-btn" title="Lihat Berita" onclick="reviewBerita(${val.id})">👁️</div>`;
+                }
+
+                rows += `
+            <tr>
+                <td><div class="tbl-img"><div style="width:40px;height:40px;background:#eee;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#aaa;">IMG</div></div></td>
+                <td>
+                    <div class="tbl-title">${val.judul_berita}</div>
+                    <div class="tbl-meta">Oleh: ${val.penulis}</div>
+                </td>
+                <td><span class="badge" style="background:#f0f0f0;color:#555;">${val.kategori}</span></td>
+                <td><span class="badge" style="background:${badgeColor};color:${textColor};">${val.status_berita}</span></td>
+                <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
+                <td><div class="act-btns">${actionBtns}</div></td>
+            </tr>`;
+            });
+
+            tbody.html(rows ||
+                '<tr><td colspan="6" style="text-align:center;padding:20px;">Data tidak ditemukan.</td></tr>');
+
+            $('#tableCount').text(`Menampilkan ${paginatedData.length} dari ${total} artikel`);
+            renderPaginationControls(total);
+        }
+
+        function renderPaginationControls(totalData) {
+            const totalPages = Math.ceil(totalData / perPage);
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<div class="pg-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</div>`;
             }
-
-            document.getElementById('modalDetail').dataset.currentKey = key;
-            document.getElementById('modalDetail').classList.add('open');
+            $('#paginationControl').html(html);
         }
 
-        function closeDetail() {
-            document.getElementById('modalDetail').classList.remove('open');
+        function changePage(page) {
+            currentPage = page;
+            jalankanFilter();
         }
 
-        function handleBackdropClick(e) {
-            if (e.target === document.getElementById('modalDetail')) closeDetail();
+        function updateStatistik() {
+            const all = dataBeritaMaster.length;
+            const pending = dataBeritaMaster.filter(b => b.status_berita === 'Pending').length;
+            const published = dataBeritaMaster.filter(b => b.status_berita === 'Published').length;
+            const rejected = dataBeritaMaster.filter(b => b.status_berita === 'Rejected').length;
+
+            const tabs = $('#tabPills .badge-count');
+            $(tabs[0]).text(all);
+            $(tabs[1]).text(pending);
+            $(tabs[2]).text(published);
+            $(tabs[3]).text(rejected);
+
+            // Update Badge Sidebar
+            $('#pendingCount').text(pending);
         }
 
-        /* ── VERDICT (dari modal) ── */
-        function verdictApprove() {
-            const key = document.getElementById('modalDetail').dataset.currentKey;
-            const row = document.querySelector(`tr[data-key="${key}"]`);
-            applyVerdict(row, key, 'approved');
-            closeDetail();
-            showToast('✅', 'Artikel berhasil disetujui!');
+        // 5. FITUR AKSI (MODALS)
+        let selectedId = null;
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            selectedId = null;
+            $('#catatanPenolakan').val(''); // Reset text area
+            $('#errorCatatan').hide(); // Sembunyikan error
         }
 
-        function verdictReject() {
-            document.getElementById('mdRejectNote').classList.add('show');
+        function confirmPublish(id) {
+            selectedId = id;
+            document.getElementById('modalPublish').style.display = 'flex';
         }
 
-        function closeRejectNote() {
-            document.getElementById('mdRejectNote').classList.remove('show');
-            document.getElementById('mdRejectText').value = '';
+        function doPublish() {
+            // Cari index data dan ubah statusnya di array dummy
+            let index = dataBeritaMaster.findIndex(b => b.id === selectedId);
+            if (index !== -1) {
+                dataBeritaMaster[index].status_berita = 'Published';
+                alert("Berita berhasil diterbitkan!");
+                closeModal('modalPublish');
+                jalankanFilter(); // Render ulang tabel
+            }
         }
 
-        function submitRejectFromDetail() {
-            const note = document.getElementById('mdRejectText').value.trim();
-            if (!note) {
-                alert('Harap isi alasan penolakan untuk Editor.');
+        function confirmReject(id) {
+            selectedId = id;
+            document.getElementById('modalReject').style.display = 'flex';
+        }
+
+        function doReject() {
+            const catatan = $('#catatanPenolakan').val().trim();
+            if (catatan === "") {
+                $('#errorCatatan').show(); // Validasi wajib isi
                 return;
             }
-            const key = document.getElementById('modalDetail').dataset.currentKey;
-            const row = document.querySelector(`tr[data-key="${key}"]`);
-            DB[key].rejectReason = note;
-            applyVerdict(row, key, 'rejected');
-            closeDetail();
-            showToast('↩️', 'Artikel ditolak & alasan dikirim ke Editor.');
-        }
 
-        /* ── APPLY VERDICT KE BARIS TABEL ── */
-        function applyVerdict(row, key, status) {
-            DB[key].status = status;
-            row.dataset.status = status;
-
-            // Update badge status (td ke-6)
-            row.cells[5].innerHTML = `<span class="badge ${BADGE_CLASS[status]}">${LABEL[status]}</span>`;
-
-            // Update meta text (td ke-2)
-            const metaDiv = row.cells[1].querySelector('.tbl-meta');
-            if (metaDiv) {
-                metaDiv.textContent = status === 'approved' ?
-                    'Disetujui oleh Redaksi' :
-                    'Ditolak · ' + (DB[key].rejectReason ? DB[key].rejectReason.substring(0, 50) + '…' : '');
+            let index = dataBeritaMaster.findIndex(b => b.id === selectedId);
+            if (index !== -1) {
+                dataBeritaMaster[index].status_berita = 'Rejected';
+                // Nanti di backend lu lempar variable catatan juga
+                alert("Berita berhasil ditolak dengan catatan: " + catatan);
+                closeModal('modalReject');
+                jalankanFilter(); // Render ulang tabel
             }
-
-            updateCounts();
-            applyFilters();
         }
 
-        /* ── UPDATE COUNTER ── */
-        function updateCounts() {
-            const rows = document.querySelectorAll('#newsBody tr');
-            let cnt = {
-                pending: 0,
-                approved: 0,
-                rejected: 0,
-                all: 0
-            };
-            rows.forEach(r => {
-                cnt[r.dataset.status]++;
-                cnt.all++;
-            });
+        function reviewBerita(id) {
+            // 1. Cari data di dummy master
+            let berita = dataBeritaMaster.find(b => b.id === id);
 
-            // Update tab counts di topbar
-            document.getElementById('cnt-all').textContent = cnt.all;
-            document.getElementById('cnt-pending').textContent = cnt.pending;
-            document.getElementById('cnt-approved').textContent = cnt.approved;
-            document.getElementById('cnt-rejected').textContent = cnt.rejected;
+            if (berita) {
+                // 2. Suapin data Meta
+                $('#viewJudul').text(berita.judul_berita);
+                $('#viewKategori').text(berita.kategori);
+                $('#viewPenulis').text(berita.penulis);
 
-            // Update sidebar count
-            document.getElementById('pendingCount').textContent = cnt.pending;
+                const tglFormatted = new Date(berita.created_at).toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                $('#viewTanggal').text(tglFormatted);
+
+                // 3. Suapin ISI BERITA PANJANG (Biar kelihatan scroll-nya cuy)
+                // Nanti di integrasi API, ganti pake: $('#viewBodyKonten').html(berita.isi_berita);
+                let sampleLongContent = `
+                <p>Ini adalah paragraf pembuka dari berita berjudul <b>${berita.judul_berita}</b>. Paragraf ini didesain cukup panjang untuk menguji kenyamanan membaca di panel review yang baru. Redaksi diharapkan membaca dengan teliti setiap detail yang disampaikan oleh editor.</p>
+
+                <h2>Analisis Masalah Utama</h2>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+                <ul>
+                    <li>Poin investigasi pertama mengenai narasumber.</li>
+                    <li>Poin kedua mengenai validitas data statistik yang disajikan.</li>
+                    <li>Poin ketiga mengenai kutipan langsung yang perlu diverifikasi ulang.</li>
+                </ul>
+
+                <blockquote>"Kutipan penting dari tokoh terkait yang harus dipastikan keasliannya oleh Redaksi sebelum Published."</blockquote>
+
+                <h2>Kesimpulan & Rekomendasi Minor</h2>
+                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <p>Paragraf penutup untuk memastikan konten mengalir dengan baik dari awal hingga akhir. Periksa ejaan dan tanda baca di bagian ini.</p>
+            `;
+                $('#viewBodyKonten').html(sampleLongContent);
+
+                // 4. Reset Scroll Body ke paling atas setiap buka modal baru
+                $('.view-body-panel').scrollTop(0);
+
+                // 5. Munculin Modal
+                document.getElementById('modalViewBerita').style.display = 'flex';
+            }
         }
 
-        /* ── NOTIF ── */
+        /* ── NOTIF (Bawaan) ── */
         function toggleNotif() {
             document.getElementById('notifPanel').classList.toggle('open');
         }
@@ -735,53 +716,5 @@
             if (!e.target.closest('.tb-icon') && !e.target.closest('.notif-panel'))
                 document.getElementById('notifPanel').classList.remove('open');
         });
-
-        /* ── TOAST ── */
-        let toastTimer;
-
-        function showToast(ico, msg) {
-            clearTimeout(toastTimer);
-            const t = document.getElementById('toast');
-            document.getElementById('toastIco').textContent = ico;
-            document.getElementById('toastMsg').textContent = msg;
-            t.style.display = 'flex';
-            t.style.opacity = '1';
-            toastTimer = setTimeout(() => {
-                t.style.opacity = '0';
-                setTimeout(() => {
-                    t.style.display = 'none';
-                }, 300);
-            }, 3000);
-        }
-
-        /* ── LOGIN / LOGOUT ── */
-        function doLogin() {
-            const e = document.getElementById('loginEmail').value;
-            const p = document.getElementById('loginPass').value;
-            if (!e || !p) {
-                alert('Masukkan email dan password!');
-                return;
-            }
-            const lv = document.getElementById('loginView');
-            lv.style.transition = 'opacity .4s';
-            lv.style.opacity = '0';
-            setTimeout(() => {
-                lv.style.display = 'none';
-            }, 400);
-        }
-
-        function doLogout() {
-            if (!confirm('Yakin ingin keluar dari panel Redaksi?')) return;
-            const lv = document.getElementById('loginView');
-            lv.style.display = 'flex';
-            lv.style.opacity = '0';
-            setTimeout(() => {
-                lv.style.transition = 'opacity .4s';
-                lv.style.opacity = '1';
-            }, 10);
-        }
-
-        // Initialize on page load
-        updateCounts();
     </script>
 @endsection
