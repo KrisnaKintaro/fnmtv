@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class BeritaController extends Controller
 {
     // Tampilkan berita milik editor yang login
-    public function index()
+    public function getDaftarBerita()
     {
         $data = Berita::where('user_id', Auth::id())->get();
 
@@ -23,8 +24,10 @@ class BeritaController extends Controller
     }
 
     // Tambah Berita Baru
-    public function store(Request $request)
+    public function tambahBeritaBaru(Request $request)
     {
+        // 1. Validasi di LUAR try-catch biar Laravel otomatis ngirim error 422 (Unprocessable Entity)
+        // Kalau ini gagal, kodingan di bawahnya nggak bakal dijalanin
         $request->validate([
             'kategori_id' => 'required|exists:kategoris,id',
             'judul_berita' => 'required|string|max:255',
@@ -32,21 +35,23 @@ class BeritaController extends Controller
             'foto_thumbnail' => 'required|image|mimes:jpg,png,jpeg|max:2048',
         ]);
 
-        // Upload Foto Thumbnail
-        $file = $request->file('foto_thumbnail');
-        $nama_file = time() . "_" . $file->getClientOriginalName();
-        $file->move(public_path('uploads/thumbnail'), $nama_file);
+        // 2. Baru pake try-catch buat urusan database & file
+        try {
+            // Upload Foto Thumbnail
+            $file = $request->file('foto_thumbnail');
+            $nama_file = time() . "_" . $file->getClientOriginalName();
+            $file->move(public_path('uploads/thumbnail'), $nama_file);
 
-        $berita = Berita::create([
-            'user_id' => Auth::id(),
-            'kategori_id' => $request->kategori_id,
-            'judul_berita' => $request->judul_berita,
-            'slug' => Str::slug($request->judul_berita) . '-' . time(),
-            'isi_berita' => $request->isi_berita,
-            'foto_thumbnail' => $nama_file,
-            'status_berita' => 'Draft',
-            'jumlah_view' => 0
-        ]);
+            $berita = Berita::create([
+                'user_id' => Auth::id() ?? 1,
+                'kategori_id' => $request->kategori_id,
+                'judul_berita' => $request->judul_berita,
+                'slug' => $request->slug ?? Str::slug($request->judul_berita) . '-' . time(),
+                'isi_berita' => $request->isi_berita,
+                'foto_thumbnail' => $nama_file,
+                'status_berita' => $request->status_berita ?? 'Draft',
+                'jumlah_view' => 0
+            ]);
 
         return response()->json([
             'status' => 'success',
@@ -56,9 +61,14 @@ class BeritaController extends Controller
     }
 
     // Update Berita (Hanya jika status Draft atau Rejected)
-    public function update(Request $request, $id)
+    public function ubahDataBerita(Request $request, $id_berita)
     {
-        $berita = Berita::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        try {
+            // 1. Validasi ringan dulu
+            $request->validate([
+                'kategori_id' => 'nullable|exists:kategoris,id',
+                'foto_thumbnail' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            ]);
 
         if (!in_array($berita->status_berita, ['Draft', 'Rejected'])) {
             return response()->json([
@@ -67,12 +77,22 @@ class BeritaController extends Controller
             ], 403);
         }
 
-        $berita->update([
-            'judul_berita' => $request->judul_berita ?? $berita->judul_berita,
-            'isi_berita' => $request->isi_berita ?? $berita->isi_berita,
-            'kategori_id' => $request->kategori_id ?? $berita->kategori_id,
-            'slug' => $request->judul_berita ? Str::slug($request->judul_berita) . '-' . time() : $berita->slug
-        ]);
+            if (!in_array($berita->status_berita, ['Draft', 'Rejected'])) {
+                return response()->json(['message' => 'Berita tidak bisa diubah'], 403);
+            }
+
+            $dataUpdate = [
+                'judul_berita' => $request->judul_berita ?? $berita->judul_berita,
+                'isi_berita'   => $request->isi_berita ?? $berita->isi_berita,
+                'kategori_id'  => $request->kategori_id ?? $berita->kategori_id,
+                'slug'         => $request->judul_berita ? Str::slug($request->judul_berita) . '-' . time() : $berita->slug
+            ];
+
+            if ($request->hasFile('foto_thumbnail')) {
+                $pathFotoLama = public_path('uploads/thumbnail/' . $berita->foto_thumbnail);
+                if (File::exists($pathFotoLama)) {
+                    File::delete($pathFotoLama);
+                }
 
         return response()->json([
             'status' => 'success',
@@ -81,11 +101,11 @@ class BeritaController extends Controller
         ], 200);
     }
 
-    // Kirim ke Redaksi
-    public function ajukan($id)
+    public function hapusDataBerita($id_berita)
     {
-        $berita = Berita::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
-        $berita->update(['status_berita' => 'Pending']);
+        try {
+            // Cari berita milik user yang login (atau ID 1 buat testing)
+            $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id() ?? 1)->firstOrFail();
 
         return response()->json([
             'status' => 'success',
