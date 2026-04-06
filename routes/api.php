@@ -128,9 +128,8 @@ Route::prefix('redaksi')->group(function () {
 Route::prefix('editor/manajemen_berita')->group(function() {
     Route::get('/ambilData', [BeritaController::class, 'getDaftarBerita']);
     Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
-    Route::post('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']); // Gunakan POST karena ada upload file
-    Route::patch('/ajukanBerita/{id_berita}', [BeritaController::class, 'ajukanKeRedaksi']);
-    Route::delete('/hapusData/{id_berita}', [BeritaController::class, 'hapusBeritaDraft']);
+    Route::put('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']);
+    Route::delete('/hapusBerita/{id_berita}', [BeritaController::class, 'hapusDataBerita']);
 });
 
 // Bagian Redaksi
