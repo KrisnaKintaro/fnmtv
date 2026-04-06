@@ -16,7 +16,8 @@
         <div class="page-header">
             <div id="backButtonContainer" class="back-button" style="display:none;">
                 <button class="btn btn-ghost btn-sm btn-pill"
-                    onclick="resetFormBerita(); showPage('my-news', document.querySelectorAll('.s-item')[1])" style="gap:6px;">
+                    onclick="resetFormBerita(); showPage('my-news', document.querySelectorAll('.s-item')[1])"
+                    style="gap:6px;">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -248,6 +249,10 @@
             loadStatistik();
         });
 
+        let dataBeritaMaster = []; // Penampung semua data dari API
+        let currentPage = 1;
+        const perPage = 10; // Sesuai request lu: 10 berita per halaman
+
         function loadKategori() {
             $.ajax({
                 url: '/api/admin/manajemen_kategori/ambilData', // URL sesuai API lu
@@ -313,45 +318,9 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    // Karena API lu langsung return array data
-                    let rows = '';
-
-                    $.each(response, function(key, val) {
-                        // Tentukan class badge berdasarkan status
-                        let badgeClass = val.status_berita.toLowerCase() === 'draft' ? 'b-draft' :
-                            val.status_berita.toLowerCase() === 'pending' ? 'b-review' : 'b-reject';
-
-                        rows += `
-                <tr data-status="${val.status_berita.toLowerCase()}">
-                    <td>
-                        <div class="tbl-img">
-                            <img src="/uploads/thumbnail/${val.foto_thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;">
-                        </div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">${val.judul_berita}</div>
-                        <div class="tbl-meta">Slug: ${val.slug}</div>
-                    </td>
-                    <td><span class="badge" style="background:#fde8e8;color:var(--red);">${val.kategori ? val.kategori.nama_kategori : 'Uncategorized'}</span></td>
-                    <td><span class="badge ${badgeClass}">${val.status_berita}</span></td>
-                    <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
-                    <td>
-                        <div class="act-btns">
-                            ${val.status_berita !== 'Pending' ?
-                                `<div class="ico-btn" title="Edit" onclick="editBerita(${val.id})">✏️</div>` :
-                                `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;" title="Pending tidak bisa diedit">✏️</div>`
-                            }
-                            ${val.status_berita !== 'Pending' ?
-                                `<div class="ico-btn" title="Hapus" onclick="confirmDelete(${val.id})">🗑</div>` :
-                                `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;" title="Berita dalam proses verifikasi tidak bisa dihapus">🗑</div>`
-                            }
-                        </div>
-                    </td>
-                </tr>`;
-                    });
-
-                    $('#newsBody').html(rows);
-                    jalankanFilter(); // Jalankan filter agar angka 'Menampilkan X artikel' terupdate
+                    dataBeritaMaster = response; // Simpan data asli dari server
+                    jalankanFilter(); // Langsung filter & render
+                    loadStatistik(); // Update angka-angka di tab & sidebar
                 },
                 error: function() {
                     console.error("Gagal mengambil daftar berita cuy!");
@@ -699,45 +668,91 @@
 
         function jalankanFilter() {
             const kategoriDipilih = document.getElementById('filterKategori').value;
-            const urutanDipilih = document.getElementById('filterUrutan').value; // Ambil nilai terbaru/terlama
-            const tbody = document.getElementById('newsBody');
-            const rows = Array.from(tbody.querySelectorAll('tr')); // Ubah NodeList jadi Array biar bisa di-sort
+            const urutanDipilih = document.getElementById('filterUrutan').value;
 
-            // 1. LOGIKA SORTING (PENGURUTAN)
-            rows.sort((a, b) => {
-                // Ambil teks tanggal dari kolom ke-5 (index 4)
-                const dateA = new Date(a.querySelector('td:nth-child(5)').textContent.trim());
-                const dateB = new Date(b.querySelector('td:nth-child(5)').textContent.trim());
-
-                if (urutanDipilih === 'baru') {
-                    return dateB - dateA; // Besar ke kecil (Terbaru)
-                } else {
-                    return dateA - dateB; // Kecil ke besar (Terlama)
-                }
-            });
-
-            // Masukkan kembali baris yang sudah di-sort ke dalam tbody
-            rows.forEach(row => tbody.appendChild(row));
-
-            // 2. LOGIKA FILTERING (TAMPIL/SEMBUNYI)
-            let visible = 0;
-            rows.forEach(r => {
-                const statusBaris = r.dataset.status;
-                const kategoriBaris = r.querySelector('td:nth-child(3)').textContent.trim();
-
-                const cocokStatus = (statusAktif === 'all' || statusBaris === statusAktif);
+            // 1. FILTERING DATA
+            let dataTerfilter = dataBeritaMaster.filter(val => {
+                const cocokStatus = (statusAktif === 'all' || val.status_berita.toLowerCase() === statusAktif);
+                const kategoriBaris = val.kategori ? val.kategori.nama_kategori : 'Uncategorized';
                 const cocokKategori = (kategoriDipilih === 'all' || kategoriBaris === kategoriDipilih);
-
-                if (cocokStatus && cocokKategori) {
-                    r.style.display = '';
-                    visible++;
-                } else {
-                    r.style.display = 'none';
-                }
+                return cocokStatus && cocokKategori;
             });
 
-            // Update angka keterangan
-            document.getElementById('tableCount').textContent = `Menampilkan ${visible} artikel`;
+            // 2. SORTING DATA
+            dataTerfilter.sort((a, b) => {
+                const dateA = new Date(a.created_at);
+                const dateB = new Date(b.created_at);
+                return (urutanDipilih === 'baru') ? dateB - dateA : dateA - dateB;
+            });
+
+            // 3. RENDER TABEL & PAGINATION
+            renderTable(dataTerfilter);
+        }
+
+        function renderTable(data) {
+            const tbody = $('#newsBody');
+            const total = data.length;
+
+            // Potong data buat halaman saat ini (Client-side Pagination)
+            const start = (currentPage - 1) * perPage;
+            const end = start + perPage;
+            const paginatedData = data.slice(start, end);
+
+            let rows = '';
+            $.each(paginatedData, function(key, val) {
+                let badgeClass = val.status_berita.toLowerCase() === 'draft' ? 'b-draft' :
+                    val.status_berita.toLowerCase() === 'pending' ? 'b-review' : 'b-reject';
+
+                rows += `
+        <tr>
+            <td><div class="tbl-img"><img src="/uploads/thumbnail/${val.foto_thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"></div></td>
+            <td>
+                <div class="tbl-title">${val.judul_berita}</div>
+                <div class="tbl-meta">Slug: ${val.slug}</div>
+            </td>
+            <td><span class="badge" style="background:#fde8e8;color:var(--red);">${val.kategori ? val.kategori.nama_kategori : 'Uncategorized'}</span></td>
+            <td><span class="badge ${badgeClass}">${val.status_berita}</span></td>
+            <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
+            <td>
+                <div class="act-btns">
+                    ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">✏️</div>`}
+                    ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">🗑</div>`}
+                </div>
+            </td>
+        </tr>`;
+            });
+
+            tbody.html(rows ||
+                '<tr><td colspan="6" style="text-align:center;padding:20px;">Data tidak ditemukan cuy.</td></tr>');
+
+            // Update Info & Tombol Pagination
+            document.getElementById('tableCount').textContent = `Menampilkan ${paginatedData.length} dari ${total} artikel`;
+            renderPaginationControls(total);
+        }
+
+        function renderPaginationControls(totalData) {
+            const totalPages = Math.ceil(totalData / perPage);
+            let html = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<div class="pg-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</div>`;
+            }
+
+            $('.pager').html(html || '');
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            jalankanFilter(); // Render ulang setelah ganti halaman
+        }
+
+        function filterTab(el, status) {
+            document.querySelectorAll('#tabPills .tab-p').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            statusAktif = status;
+
+            currentPage = 1; // RESET KE HALAMAN 1
+            jalankanFilter();
         }
 
         /* ── NOTIF ── */
