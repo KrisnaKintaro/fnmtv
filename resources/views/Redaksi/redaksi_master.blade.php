@@ -17,8 +17,14 @@
     @yield('konten')
   </main>
 
-  <script src="{{ asset('admin/js/admin_js.js') }}"></script>
   <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
+
+  <script src="{{ asset('admin/js/toast.js') }}"></script>
+  <script src="{{ asset('admin/js/modalManager.js') }}"></script>
+  <script src="{{ asset('admin/js/smartDataNotifikasi.js') }}"></script>
+  <script src="{{ asset('admin/js/dataTable_engine.js') }}"></script>
+
+  <script src="{{ asset('admin/js/admin_js.js') }}"></script>
   @yield('js')
 </body>
 </html>

@@ -68,265 +68,18 @@
                 </tr>
             </thead>
             <tbody id="newsBody">
-
-                <!-- ═══ PENDING ═══ -->
-                <tr data-status="pending" data-key="beras" data-cat="Ekonomi" data-author="Budi Santoso">
-                    <td>
-                        <div class="tbl-img">🌾</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">Harga Beras Naik Jelang Lebaran, Pemerintah Buka Impor</div>
-                        <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                    </td>
-                    <td><span class="badge b-cat">Ekonomi</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Budi Santoso</td>
-                    <td style="font-size:12px;color:var(--muted);">26 Mar 2026</td>
-                    <td><span class="badge b-pending">Pending</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('beras')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-status="pending" data-key="bpjs" data-cat="Kesehatan" data-author="Arif Wibowo">
-                    <td>
-                        <div class="tbl-img">🏥</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">BPJS Kesehatan Tanggung Biaya Operasi Jantung Terbaru</div>
-                        <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                    </td>
-                    <td><span class="badge b-cat">Kesehatan</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Arif Wibowo</td>
-                    <td style="font-size:12px;color:var(--muted);">25 Mar 2026</td>
-                    <td><span class="badge b-pending">Pending</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('bpjs')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-status="pending" data-key="asean" data-cat="Internasional" data-author="Budi Santoso">
-                    <td>
-                        <div class="tbl-img">🌐</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">KTT ASEAN 2026 Bahas Krisis Pangan dan Energi Regional</div>
-                        <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                    </td>
-                    <td><span class="badge b-cat">Internasional</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Budi Santoso</td>
-                    <td style="font-size:12px;color:var(--muted);">24 Mar 2026</td>
-                    <td><span class="badge b-pending">Pending</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('asean')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-status="pending" data-key="brin" data-cat="Sains" data-author="Dewi Puspita">
-                    <td>
-                        <div class="tbl-img">🔬</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">Peneliti BRIN Temukan Spesies Baru di Hutan Papua</div>
-                        <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                    </td>
-                    <td><span class="badge b-cat">Sains</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Dewi Puspita</td>
-                    <td style="font-size:12px;color:var(--muted);">23 Mar 2026</td>
-                    <td><span class="badge b-pending">Pending</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('brin')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-status="pending" data-key="lrt" data-cat="Infrastruktur" data-author="Arif Wibowo">
-                    <td>
-                        <div class="tbl-img">🏙️</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">Proyek LRT Jabodebek Fase 2 Mulai Konstruksi April 2026</div>
-                        <div class="tbl-meta">Menunggu keputusan Redaksi</div>
-                    </td>
-                    <td><span class="badge b-cat">Infrastruktur</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Arif Wibowo</td>
-                    <td style="font-size:12px;color:var(--muted);">22 Mar 2026</td>
-                    <td><span class="badge b-pending">Pending</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat &amp; Validasi" onclick="openModal('lrt')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- ═══ DISETUJUI ═══ -->
-                <tr data-status="published" data-key="kebijakan" data-cat="Politik" data-author="Budi Santoso">
-                    <td>
-                        <div class="tbl-img">🏛️</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">Pemerintah Umumkan Kebijakan Ekonomi Baru untuk 2026</div>
-                        <div class="tbl-meta">Disetujui oleh Redaksi · 15 Mar 2026</div>
-                    </td>
-                    <td><span class="badge b-cat">Politik</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Budi Santoso</td>
-                    <td style="font-size:12px;color:var(--muted);">15 Mar 2026</td>
-                    <td><span class="badge b-published">Disetujui</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat Detail" onclick="openModal('kebijakan')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-status="published" data-key="garuda" data-cat="Olahraga" data-author="Sari Maharani">
-                    <td>
-                        <div class="tbl-img">⚽</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">Timnas Garuda Menang Telak 3-0 Lawan Vietnam</div>
-                        <div class="tbl-meta">Disetujui oleh Redaksi · 14 Mar 2026</div>
-                    </td>
-                    <td><span class="badge b-cat">Olahraga</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Sari Maharani</td>
-                    <td style="font-size:12px;color:var(--muted);">14 Mar 2026</td>
-                    <td><span class="badge b-published">Disetujui</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat Detail" onclick="openModal('garuda')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr data-status="published" data-key="film" data-cat="Hiburan" data-author="Sari Maharani">
-                    <td>
-                        <div class="tbl-img">🎬</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">Film Indonesia Raih Penghargaan di Festival Berlin</div>
-                        <div class="tbl-meta">Disetujui oleh Redaksi · 12 Mar 2026</div>
-                    </td>
-                    <td><span class="badge b-cat">Hiburan</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Sari Maharani</td>
-                    <td style="font-size:12px;color:var(--muted);">12 Mar 2026</td>
-                    <td><span class="badge b-published">Disetujui</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat Detail" onclick="openModal('film')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- ═══ DITOLAK ═══ -->
-                <tr data-status="rejected" data-key="hoaks" data-cat="Teknologi" data-author="Dewi Puspita">
-                    <td>
-                        <div class="tbl-img">📱</div>
-                    </td>
-                    <td>
-                        <div class="tbl-title">Aplikasi Medsos Baru Diklaim Lebih Privat dari WhatsApp</div>
-                        <div class="tbl-meta">Ditolak · Sumber tidak terverifikasi</div>
-                    </td>
-                    <td><span class="badge b-cat">Teknologi</span></td>
-                    <td style="font-size:12px;color:var(--muted);">Dewi Puspita</td>
-                    <td style="font-size:12px;color:var(--muted);">10 Mar 2026</td>
-                    <td><span class="badge b-rejected">✕ Ditolak</span></td>
-                    <td>
-                        <div class="act-btns">
-                            <div class="ico-btn" title="Lihat Detail" onclick="openModal('hoaks')">
-                                <svg width="13" height="13" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-
             </tbody>
         </table>
 
         <!-- empty state -->
         <div class="empty-state" id="emptyState" style="display:none;">
             <div class="ico">📭</div>
-            <p>Tidak ada artikel ditemukan pada kategori ini.</p>
+            <p>Tidak ada artikel / Beritaditemukan pada kategori ini.</p>
         </div>
 
         <div class="pager">
             <div id="paginationControls" style="display:flex; gap:4px;">
-                </div>
+            </div>
             <div class="pg-info" id="pagerInfo">Menampilkan 0 dari 0 artikel</div>
         </div>
     </div>
@@ -335,14 +88,14 @@
 <!-- ══════════════════════════════════════
              MODAL DETAIL ARTIKEL + VALIDASI
         ══════════════════════════════════════ -->
-<div class="modal-backdrop" id="modalDetail" onclick="handleBackdropClick(event)">
+<div class="modal-backdrop" id="modalDetail" style="display:none;">
     <div class="modal">
         <div class="modal-hd">
             <div class="modal-hd-text">
                 <div class="modal-title" id="mdTitle">—</div>
                 <div class="modal-sub" id="mdSub">—</div>
             </div>
-            <div class="modal-close" onclick="closeDetail()">✕</div>
+            <div class="modal-close" onclick="ModalManager.close('modalDetail')">✕</div>
         </div>
         <div class="modal-body">
             <div class="modal-thumb" id="mdThumb">📰</div>
@@ -363,7 +116,7 @@
                     <div class="verdict-desc">Periksa artikel dengan saksama sebelum memberikan keputusan. Keputusan
                         akan langsung diteruskan ke Editor yang bersangkutan.</div>
                     <div class="verdict-actions">
-                        <button class="vbtn vbtn-publish" onclick="confirmPublishAction()">
+                        <button class="vbtn vbtn-publish" onclick="ModalManager.open('modalConfirmPublish')">
                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                             </svg>
@@ -419,13 +172,13 @@
     <span id="toastMsg"></span>
 </div>
 
-<div class="modal-backdrop" id="modalConfirmPublish" style="z-index: 600;">
+<div class="modal-backdrop" id="modalConfirmPublish" style="display:none; z-index: 600;">
     <div class="modal" style="max-width: 400px; text-align: center; padding: 30px;">
         <div style="font-size: 40px; margin-bottom: 10px;">🚀</div>
         <h3 style="font-family: 'Merriweather', serif; margin-bottom: 10px;">Yakin Publish Artikel?</h3>
         <p style="font-size: 13px; color: var(--muted); margin-bottom: 24px;">Artikel akan langsung tayang dan dapat dibaca oleh publik di portal berita.</p>
         <div style="display: flex; gap: 10px;">
-            <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeConfirmPublish()">Batal</button>
+            <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="ModalManager.close('modalConfirmPublish')">Batal</button>
             <button class="btn" style="flex:1; justify-content:center; background: var(--blue); color: white;" onclick="executePublish()">Ya, Publish</button>
         </div>
     </div>
@@ -433,9 +186,14 @@
 @endsection
 @section('js')
 <script>
-        /* ══════════════════════════════════════
-           DATABASE ARTIKEL (simulasi Dummy)
-        ══════════════════════════════════════ */
+    $(document).ready(function() {
+        loadDataTabel();
+        updateCounts();
+        SmartNotif.init({});
+    });
+    /* ══════════════════════════════════════
+       DATABASE ARTIKEL (simulasi Dummy)
+    ══════════════════════════════════════ */
     const DB = {
         beras: {
             title: 'Harga Beras Naik Jelang Lebaran, Pemerintah Buka Impor',
@@ -522,11 +280,6 @@
         }
     };
 
-
-    /* ── TAMBAHAN VARIABEL PAGINATION ── */
-    let currentPage = 1;
-    const perPage = 5;
-
     /* ── KONSTANTA & PENGATURAN UI ── */
     const BADGE_CLASS = {
         pending: 'b-pending',
@@ -553,8 +306,51 @@
 
     let currentTab = 'all';
 
-    /* ── TAB / FILTER TABEL ── */
-    function showTab(status) {
+    function filterChanged() {
+        currentPage = 1; // Balikin ke halaman 1 tiap kali ngetik search / ganti dropdown
+        applyFilters();
+    }
+
+    /* ── SETUP DATATABLE ENGINE ── */
+    const beritaTable = new DataTableEngine({
+        tableBody: '#newsBody',
+        paginationWrapper: '#paginationControls',
+        infoWrapper: '#pagerInfo',
+        emptyState: '#emptyState',
+        perPage: 5,
+        renderRowHTML: function(val) {
+            let metaText = '';
+            if (val.status === 'pending') metaText = 'Menunggu keputusan Redaksi';
+            else if (val.status === 'published') metaText = `Disetujui oleh Redaksi · ${val.date}`;
+            else metaText = `Ditolak · ${val.rejectReason ? val.rejectReason.substring(0, 50) + '…' : 'Sumber tidak terverifikasi'}`;
+
+            return `
+            <tr data-key="${val.key}">
+                <td><div class="tbl-img">${val.emoji}</div></td>
+                <td>
+                    <div class="tbl-title">${val.title}</div>
+                    <div class="tbl-meta">${metaText}</div>
+                </td>
+                <td><span class="badge b-cat">${val.cat}</span></td>
+                <td style="font-size:12px;color:var(--muted);">${val.author}</td>
+                <td style="font-size:12px;color:var(--muted);">${val.date}</td>
+                <td><span class="badge ${BADGE_CLASS[val.status]}">${LABEL[val.status]}</span></td>
+                <td>
+                    <div class="act-btns">
+                        <div class="ico-btn" title="${val.status === 'pending' ? 'Lihat & Validasi' : 'Lihat Detail'}" onclick="openModal('${val.key}')">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </div>
+                    </div>
+                </td>
+            </tr>`;
+        }
+    });
+
+    /* ── TAB & FILTER LOGIC (Versi Bersih) ── */
+    function showTab(status, el) {
         currentTab = status;
         const [title, crumb] = TITLES[status];
         document.getElementById('tbTitle').textContent = title;
@@ -562,92 +358,42 @@
         document.getElementById('cardTitle').textContent = CARD_TITLES[status];
 
         document.querySelectorAll('#tabPills .tab-p').forEach(t => t.classList.remove('active'));
-        const tabEl = document.getElementById('tab-' + status);
-        if (tabEl) tabEl.classList.add('active');
+        if(el) el.classList.add('active');
 
-        currentPage = 1; // Balikin ke halaman 1 kalau ganti tab
-        applyFilters();
+        jalankanFilter();
     }
 
-    function filterChanged() {
-        currentPage = 1; // Balikin ke halaman 1 tiap kali ngetik search / ganti dropdown
-        applyFilters();
-    }
-
-    function applyFilters() {
+    function jalankanFilter() {
         const cat = document.getElementById('filterKategori').value;
         const author = document.getElementById('filterPenulis').value;
         const search = document.getElementById('searchInput').value.toLowerCase();
 
-        // Ubah NodeList jadi Array biar gampang diproses
-        const rows = Array.from(document.querySelectorAll('#newsBody tr'));
-        let filteredRows = []; // Penampung baris yang lolos filter
+        beritaTable.setFilterAndSearch((val) => {
+            const matchStatus = currentTab === 'all' || val.status === currentTab;
+            const matchCat = !cat || val.cat === cat;
+            const matchAuthor = !author || val.author === author;
+            const matchSearch = !search || val.title.toLowerCase().includes(search) || val.author.toLowerCase().includes(search);
 
-        // 1. Saring Data Dulu
-        rows.forEach(r => {
-            let rStatus = r.dataset.status;
-            if (rStatus === 'approved') rStatus = 'published';
-
-            const matchStatus = currentTab === 'all' || rStatus === currentTab;
-            const matchCat = !cat || r.dataset.cat === cat;
-            const matchAuthor = !author || r.dataset.author === author;
-            const titleText = r.querySelector('.tbl-title')?.textContent.toLowerCase() || '';
-            const matchSearch = !search || titleText.includes(search) || r.dataset.author.toLowerCase().includes(search);
-
-            if (matchStatus && matchCat && matchAuthor && matchSearch) {
-                filteredRows.push(r);
-            } else {
-                r.style.display = 'none'; // Sembunyikan yang gak cocok
-            }
+            return matchStatus && matchCat && matchAuthor && matchSearch;
         });
-
-        // 2. Hitung Pagination
-        const totalItems = filteredRows.length;
-        const totalPages = Math.ceil(totalItems / perPage);
-
-        // Pengaman: kalau lagi di page 2 tapi datanya sisa 1 page, balikin ke page terakhir
-        if (currentPage > totalPages) currentPage = totalPages || 1;
-
-        const startIdx = (currentPage - 1) * perPage;
-        const endIdx = startIdx + perPage;
-
-        // 3. Tampilkan/Sembunyikan berdasarkan Index Pagination
-        filteredRows.forEach((r, index) => {
-            if (index >= startIdx && index < endIdx) {
-                r.style.display = ''; // Tampilkan karena masuk range halaman
-            } else {
-                r.style.display = 'none'; // Sembunyikan karena di halaman lain
-            }
-        });
-
-        // 4. Update Teks & Tombol
-        const startDisplay = totalItems === 0 ? 0 : startIdx + 1;
-        const endDisplay = Math.min(endIdx, totalItems);
-
-        document.getElementById('tableCount').textContent = `Menampilkan ${totalItems} artikel`;
-        document.getElementById('pagerInfo').textContent = `Menampilkan ${startDisplay}-${endDisplay} dari ${totalItems} artikel`;
-        document.getElementById('emptyState').style.display = totalItems === 0 ? 'block' : 'none';
-
-        renderPaginationControls(totalPages);
     }
 
-    function renderPaginationControls(totalPages) {
-        let html = '';
-        if (totalPages > 0) {
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<div class="pg-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</div>`;
-            }
-        }
-        document.getElementById('paginationControls').innerHTML = html;
+    /* ── UPDATE FUNGSI APPLY VERDICT ── */
+    // Timpa fungsi applyVerdict lama lu pakai ini:
+    function applyVerdict(row, key, status) {
+        // Update database dummy-nya
+        DB[key].status = status;
+
+        // Render ulang data tabel
+        loadDataTabel();
+        updateCounts();
     }
 
-    function changePage(page) {
-        currentPage = page;
-        applyFilters();
-    }
-
-    function doSearch() {
-        applyFilters();
+    // Fungsi buat ngubah Dummy Object 'DB' jadi Array biar bisa dibaca DataEngine
+    function loadDataTabel() {
+        const dataArray = Object.keys(DB).map(k => ({ key: k, ...DB[k] }));
+        beritaTable.loadData(dataArray);
+        jalankanFilter(); // Langsung apply filter saat ini
     }
 
     /* ── MODAL DETAIL & REVIEW ── */
@@ -691,26 +437,7 @@
         }
 
         document.getElementById('modalDetail').dataset.currentKey = key;
-        document.getElementById('modalDetail').classList.add('open');
-    }
-
-    function closeDetail() {
-        document.getElementById('modalDetail').classList.remove('open');
-    }
-
-    function handleBackdropClick(e) {
-        if (e.target === document.getElementById('modalDetail')) closeDetail();
-    }
-
-    /* ── VERDICT PUBLISH & REJECT ── */
-
-    // 1. Popup Pengaman Publish
-    function confirmPublishAction() {
-        document.getElementById('modalConfirmPublish').classList.add('open');
-    }
-
-    function closeConfirmPublish() {
-        document.getElementById('modalConfirmPublish').classList.remove('open');
+        ModalManager.open('modalDetail');
     }
 
     // 2. Eksekusi Publish
@@ -720,9 +447,9 @@
 
         applyVerdict(row, key, 'published');
 
-        closeConfirmPublish();
-        closeDetail();
-        showToast('🚀', 'Artikel berhasil di-publish ke portal!');
+        ModalManager.close('modalConfirmPublish');
+        ModalManager.close('modalDetail');
+        Toast.show('success', 'Artikel berhasil di-publish ke portal!');
     }
 
     // 3. Eksekusi Reject
@@ -747,43 +474,19 @@
         DB[key].rejectReason = note;
         applyVerdict(row, key, 'rejected');
 
-        closeDetail();
-        showToast('↩️', 'Artikel ditolak & alasan dikirim ke Editor.');
-    }
-
-    /* ── APPLY VERDICT KE BARIS TABEL HTML ── */
-    function applyVerdict(row, key, status) {
-        DB[key].status = status;
-        row.dataset.status = status;
-
-        // Update badge status di kolom tabel
-        row.cells[5].innerHTML = `<span class="badge ${BADGE_CLASS[status]}">${LABEL[status]}</span>`;
-
-        // Update meta text di bawah judul tabel
-        const metaDiv = row.cells[1].querySelector('.tbl-meta');
-        if (metaDiv) {
-            metaDiv.textContent = status === 'published' ?
-                'Disetujui dan Tayang (Published)' :
-                'Ditolak · ' + (DB[key].rejectReason ? DB[key].rejectReason.substring(0, 50) + '…' : '');
-        }
-
-        updateCounts();
-        applyFilters();
+        ModalManager.close('modalDetail');
+        Toast.show('error', 'Artikel ditolak & alasan dikirim ke Editor.');
     }
 
     /* ── UPDATE COUNTER ANGKA TAB & SIDEBAR ── */
+    /* ── UPDATE COUNTER ANGKA TAB & SIDEBAR ── */
     function updateCounts() {
-        const rows = document.querySelectorAll('#newsBody tr');
-        let cnt = {
-            pending: 0,
-            published: 0,
-            rejected: 0,
-            all: 0
-        };
+        let cnt = { pending: 0, published: 0, rejected: 0, all: 0 };
 
-        rows.forEach(r => {
-            let s = r.dataset.status;
-            if (s === 'approved') s = 'published'; // Auto map buat jaga-jaga HTML lama
+        // Hitung langsung dari object DB, bukan dari HTML
+        Object.values(DB).forEach(val => {
+            let s = val.status;
+            if (s === 'approved') s = 'published'; // Auto map
 
             if (cnt[s] !== undefined) cnt[s]++;
             cnt.all++;
@@ -799,43 +502,11 @@
         document.getElementById('pendingCount').textContent = cnt.pending;
     }
 
-    /* ── NOTIF ── */
-    function toggleNotif() {
-        document.getElementById('notifPanel').classList.toggle('open');
-    }
-    document.addEventListener('click', e => {
-        if (!e.target.closest('.tb-icon') && !e.target.closest('.notif-panel'))
-            document.getElementById('notifPanel').classList.remove('open');
-    });
-
-    /* ── TOAST ── */
-    let toastTimer;
-
-    function showToast(ico, msg) {
-        clearTimeout(toastTimer);
-        const t = document.getElementById('toast');
-        document.getElementById('toastIco').textContent = ico;
-        document.getElementById('toastMsg').textContent = msg;
-        t.style.display = 'flex';
-        t.style.opacity = '1';
-        toastTimer = setTimeout(() => {
-            t.style.opacity = '0';
-            setTimeout(() => {
-                t.style.display = 'none';
-            }, 300);
-        }, 3000);
-    }
-
     /* ── LOGIN / LOGOUT ── */
     function doLogout() {
         if (!confirm('Yakin ingin keluar dari panel Redaksi?')) return;
         // Arahin ke route logout
         alert("Proses logout jalan...");
     }
-
-    // Initialize on page load
-    $(document).ready(function() {
-        updateCounts();
-    });
 </script>
 @endsection
