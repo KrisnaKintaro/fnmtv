@@ -297,6 +297,28 @@
             loadKategori();
             loadDaftarBerita();
             loadStatistik();
+
+            // INIT NOTIFIKASI KHUSUS EDITOR
+            SmartNotif.init({
+                apiUrl: '/api/editor/manajemen_berita/ambilNotifikasi',
+                renderItemHTML: function(item) {
+                    // Logika tampilan khusus Editor
+                    const isRejected = item.type === 'rejected';
+                    const bgStyle = isRejected ? 'background: #fff5f5;' : 'background: #f6fff9;';
+                    const actionClick = isRejected ? `onclick="editBerita(${item.id})"` : '';
+
+                    return `
+                        <div class="notif-item" ${actionClick} style="cursor:pointer; padding:12px; border-bottom:1px solid #eee; display:flex; gap:12px; ${bgStyle}">
+                            <div style="font-size:20px;">${item.icon}</div>
+                            <div class="notif-txt">
+                                <div style="font-weight:700; font-size:13px; color:var(--text);">${item.title}</div>
+                                <div style="font-size:12px; color:#555; line-height:1.4;">${item.message}</div>
+                                <div style="font-size:10px; color:#999; margin-top:4px;">${item.time}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
         });
 
         // Panggil DropZone Helper
@@ -312,7 +334,7 @@
             paginationWrapper: '#paginationControls', // Target container tombol
             infoWrapper: '#pagerInfo',
             emptyState: '#emptyState',
-            perPage: 1,
+            perPage: 5,
 
             // Ini template HTML khusus untuk tabel berita
             renderRowHTML: function(val) {
@@ -417,7 +439,7 @@
                     beritaTable.loadData(response);
 
                     // Langsung jalankan filter awal
-                    terapkanAturanFilter();
+                    jalankanFilter();
 
                     loadStatistik();
                 },

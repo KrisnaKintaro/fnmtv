@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Editor;
 
 use App\Http\Controllers\Controller;
@@ -16,6 +17,7 @@ class BeritaController extends Controller
     {
         $data = Berita::with('kategori:id,nama_kategori')
             ->where('user_id', Auth::id() ?? 1)
+            ->where('status_berita', '!=', 'Published')
             ->latest()
             ->get();
         return response()->json($data);
@@ -143,5 +145,47 @@ class BeritaController extends Controller
             ], 500);
         }
     }
-}
 
+    public function ambilNotifikasi()
+    {
+        $userId = Auth::id() ?? 1; // Ambil ID Editor yang login
+
+        // 1. Ambil data REJECTED (Selama statusnya masih Rejected, tampilin terus)
+        $rejectedNotif = Berita::where('user_id', $userId)
+            ->where('status_berita', 'Rejected')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        // 2. Ambil data PUBLISHED (Maksimal 1 hari setelah updated_at/publish)
+        $publishedNotif = Berita::where('user_id', $userId)
+            ->where('status_berita', 'Published')
+            ->where('updated_at', '>=', now()->subDay()) // Filter 24 jam terakhir
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        // Gabungin datanya
+        $allNotif = $rejectedNotif->merge($publishedNotif)->sortByDesc('updated_at')->values();
+
+        $data = $allNotif->map(function ($item) {
+            $isRejected = $item->status_berita === 'Rejected';
+
+            return [
+                'id'      => $item->id,
+                'type'    => $isRejected ? 'rejected' : 'published',
+                'icon'    => $isRejected ? '⚠️' : '🎉',
+                'title'   => $isRejected ? 'Artikel Ditolak' : 'Artikel Terbit',
+                'message' => $isRejected
+                    ? "Berita '<strong>{$item->judul_berita}</strong>' dikembalikan. Klik buat benerin cuy!"
+                    : "Hore! Berita '<strong>{$item->judul_berita}</strong>' sudah tayang di publik.",
+                'time'    => $item->updated_at->diffForHumans(),
+                'status'  => $item->status_berita
+            ];
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'count'  => $data->count(),
+            'data'   => $data
+        ]);
+    }
+}

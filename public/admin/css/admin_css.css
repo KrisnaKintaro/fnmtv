@@ -677,6 +677,12 @@
             color: var(--blue);
         }
 
+        .b-reject {
+            background-color: #fde8e8 !important; /* Merah muda */
+            color: #cc0000 !important; /* Merah tua */
+            border: 1px solid #f5b8b8 !important;
+        }
+
         .b-paid {
             background: #e6f4ec;
             color: var(--success);
