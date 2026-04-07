@@ -1,37 +1,252 @@
 @extends('Admin.master_admin')
+
 @section('css')
 @endsection
+
 @section('konten')
-  <!-- ══ PAGE: CATEGORIES (UC-03) ══ -->
-  <div id="page-categories" class="page active">
+<div id="page-categories" class="page active">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div class="section-title" style="margin:0;">Manajemen Kategori</div>
-      <button class="btn btn-red" onclick="document.getElementById('modalCat').classList.add('open')">+ Tambah Kategori</button>
+        <div class="section-title" style="margin:0;">Manajemen Kategori</div>
+        <button class="btn btn-red" onclick="bukaModalCat()">+ Tambah Kategori</button>
     </div>
-    <div class="cat-grid">
-      <div class="cat-chip"><div><div class="cat-name">🏛️ Politik</div><div class="cat-count">84 artikel</div></div><div class="cat-actions"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></div>
-      <div class="cat-chip"><div><div class="cat-name">💹 Ekonomi</div><div class="cat-count">62 artikel</div></div><div class="cat-actions"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></div>
-      <div class="cat-chip"><div><div class="cat-name">⚽ Olahraga</div><div class="cat-count">55 artikel</div></div><div class="cat-actions"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></div>
-      <div class="cat-chip"><div><div class="cat-name">💻 Teknologi</div><div class="cat-count">43 artikel</div></div><div class="cat-actions"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></div>
-      <div class="cat-chip"><div><div class="cat-name">🩺 Kesehatan</div><div class="cat-count">31 artikel</div></div><div class="cat-actions"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></div>
-      <div class="cat-chip"><div><div class="cat-name">🎬 Hiburan</div><div class="cat-count">28 artikel</div></div><div class="cat-actions"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></div>
-      <div class="cat-chip"><div><div class="cat-name">🔬 Sains</div><div class="cat-count">22 artikel</div></div><div class="cat-actions"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></div>
-      <div class="cat-chip" style="border-style:dashed;cursor:pointer;justify-content:center;color:var(--muted);" onclick="document.getElementById('modalCat').classList.add('open')">
-        <div style="text-align:center"><div style="font-size:22px;">+</div><div style="font-size:12px;">Tambah Kategori</div></div>
-      </div>
+    <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: 0.5px; ">
+            📊 Statistik & Sebaran Artikel
+        </span>
+        <div style="flex: 1; height: 1px; background: #eee;"></div>
     </div>
+
+    <div class="cat-grid" id="catGridContainer">
+    </div>
+
     <div class="card">
-      <div class="card-hd"><div class="card-ht">Semua Kategori & Detail</div></div>
-      <table>
-        <thead><tr><th>Nama Kategori</th><th>Slug</th><th>Jumlah Artikel</th><th>Terakhir Diupdate</th><th>Aksi</th></tr></thead>
-        <tbody>
-          <tr><td><b>🏛️ Politik</b></td><td style="font-family:'JetBrains Mono';font-size:12px;color:var(--muted)">politik</td><td>84</td><td style="color:var(--muted);font-size:12px">10 Mar 2026</td><td><div class="act-btns"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></td></tr>
-          <tr><td><b>💹 Ekonomi</b></td><td style="font-family:'JetBrains Mono';font-size:12px;color:var(--muted)">ekonomi</td><td>62</td><td style="color:var(--muted);font-size:12px">9 Mar 2026</td><td><div class="act-btns"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></td></tr>
-          <tr><td><b>⚽ Olahraga</b></td><td style="font-family:'JetBrains Mono';font-size:12px;color:var(--muted)">olahraga</td><td>55</td><td style="color:var(--muted);font-size:12px">8 Mar 2026</td><td><div class="act-btns"><div class="ico-btn">✏️</div><div class="ico-btn">🗑</div></div></td></tr>
-        </tbody>
-      </table>
+        <div class="card-hd">
+            <div class="card-ht">Semua Kategori & Detail</div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Kategori</th>
+                    <th>Slug</th>
+                    <th>Jumlah Artikel</th>
+                    <th>Terakhir Diupdate</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="catBody">
+            </tbody>
+        </table>
+
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="ico">📭</div>
+            <p>Belum ada kategori yang ditambahkan.</p>
+        </div>
+        <div class="pager">
+            <div id="paginationControls" style="display:flex; gap:4px;"></div>
+            <div class="pg-info" id="pagerInfo">Menampilkan 0 dari 0 kategori</div>
+        </div>
     </div>
-  </div>
+</div>
+
+<div class="modal-backdrop" id="modalCat" style="display:none;">
+    <div class="modal" style="max-width:400px; position: relative;">
+        <div class="modal-hd" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 15px; border-bottom: 1px solid #eee; position: relative;">
+            <div class="modal-title" id="modalCatTitle" style="margin: 0; font-size: 18px; font-weight: 700;">Tambah Kategori</div>
+
+            <div class="modal-close" onclick="closeModalCat()" style="
+            position: absolute;
+            right: -10px;    /* Lompat 10px ke kanan */
+            top: -15px;      /* Lompat 15px ke atas */
+            cursor: pointer;
+            font-size: 22px;
+            color: #999;     /* Warna abu-abu kusam biar ga norak */
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        ">✕</div>
+        </div>
+
+        <div class="modal-body">
+            <div class="field">
+                <label>Nama Kategori</label>
+                <input type="text" id="inputNamaKategori" placeholder="Misal: Politik">
+            </div>
+            <div class="field">
+                <label>Slug Kategori</label>
+                <input type="text" id="inputSlugKategori" placeholder="misal: politik" style="font-family:'JetBrains Mono',monospace;">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button class="btn btn-outline" onclick="closeModalCat()">Batal</button>
+                <button class="btn btn-red" onclick="simpanKategori()">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
 @section('js')
+<script>
+    /* global DataTableEngine, ModalManager, Toast */
+    $(document).ready(function() {
+        // 1. "Bajak" Input Search di Navbar khusus untuk halaman ini
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.placeholder = 'Cari kategori...'; // Ubah placeholder
+            searchInput.value = ''; // Kosongin dulu pas load
+
+            // Hapus event listener lama (kalau ada) dan pasang yang baru
+            searchInput.onkeyup = function() {
+                jalankanFilter();
+            };
+        }
+
+        loadDataKategori();
+    });
+
+    // Data Dummy Sementara (Sesuai kolom Database)
+    let DBCategory = [
+        { id: 1, nama_kategori: 'Politik', slug: 'politik', count: 84, updated_at: '2026-03-10' },
+        { id: 2, nama_kategori: 'Ekonomi', slug: 'ekonomi', count: 62, updated_at: '2026-03-09' },
+        { id: 3, nama_kategori: 'Olahraga', slug: 'olahraga', count: 55, updated_at: '2026-03-08' },
+        { id: 4, nama_kategori: 'Teknologi', slug: 'teknologi', count: 43, updated_at: '2026-03-05' },
+        { id: 5, nama_kategori: 'Kesehatan', slug: 'kesehatan', count: 31, updated_at: '2026-03-01' },
+        { id: 6, nama_kategori: 'Sains', slug: 'sains', count: 12, updated_at: '2026-02-28' }
+    ];
+
+    let editCatId = null;
+
+    /* ── SETUP DATATABLE ENGINE ── */
+    const catTable = new DataTableEngine({
+        tableBody: '#catBody',
+        paginationWrapper: '#paginationControls',
+        infoWrapper: '#pagerInfo',
+        emptyState: '#emptyState',
+        perPage: 4,
+        renderRowHTML: function(val) {
+            const date = new Date(val.updated_at).toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+
+            return `
+            <tr>
+                <td><b>${val.nama_kategori}</b></td>
+                <td style="font-family:'JetBrains Mono';font-size:12px;color:var(--muted)">${val.slug}</td>
+                <td>${val.count}</td>
+                <td style="color:var(--muted);font-size:12px">${date}</td>
+                <td>
+                    <div class="act-btns">
+                        <div class="ico-btn" onclick="editKategori(${val.id})" title="Edit">✏️</div>
+                        <div class="ico-btn" onclick="hapusKategori(${val.id})" title="Hapus">🗑</div>
+                    </div>
+                </td>
+            </tr>`;
+        }
+    });
+
+    /* ── FUNGSI RENDER GRID (KOTAK ATAS) - Diubah nerima Parameter ── */
+    // Default valuenya pakai DBCategory kalau gak ada yang di-passing
+    function renderCatGrid(dataToRender = DBCategory) {
+        const container = document.getElementById('catGridContainer');
+        let html = '';
+
+        dataToRender.forEach(val => {
+            html += `
+            <div class="cat-chip">
+                <div>
+                    <div class="cat-name">${val.nama_kategori}</div>
+                    <div class="cat-count">${val.count} artikel</div>
+                </div>
+                <div class="cat-actions">
+                    <div class="ico-btn" onclick="editKategori(${val.id})">✏️</div>
+                    <div class="ico-btn" onclick="hapusKategori(${val.id})">🗑</div>
+                </div>
+            </div>`;
+        });
+
+        // Selalu tambahkan Card 'Tambah Kategori' di urutan paling belakang
+        html += `
+        <div class="cat-chip" style="border-style:dashed;cursor:pointer;justify-content:center;color:var(--muted);" onclick="bukaModalCat()">
+            <div style="text-align:center">
+                <div style="font-size:22px;">+</div>
+                <div style="font-size:12px;">Tambah Kategori</div>
+            </div>
+        </div>`;
+
+        container.innerHTML = html;
+    }
+
+    /* ── FUNGSI FILTER GLOBAL (CARD & TABLE) ── */
+    function jalankanFilter() {
+        const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
+
+        // 1. Filter Data Untuk Tabel via DataTableEngine
+        catTable.setFilterAndSearch((val) => {
+            return val.nama_kategori.toLowerCase().includes(keyword) ||
+                   val.slug.toLowerCase().includes(keyword);
+        });
+
+        // 2. Filter Data Manual Untuk Grid Card di Atas
+        const dataTerfilter = DBCategory.filter((val) => {
+            return val.nama_kategori.toLowerCase().includes(keyword) ||
+                   val.slug.toLowerCase().includes(keyword);
+        });
+
+        // Lempar data yang udah difilter ke fungsi render card
+        renderCatGrid(dataTerfilter);
+    }
+
+    /* ── FUNGSI LOAD DATA AWAL ── */
+    function loadDataKategori() {
+        catTable.loadData(DBCategory);
+        jalankanFilter(); // Panggil filter biar grid atas & tabel kerender bareng
+    }
+
+    /* ── FUNGSI MODAL & AKSI (DUMMY) ── */
+    function bukaModalCat() {
+        editCatId = null;
+        document.getElementById('modalCatTitle').textContent = 'Tambah Kategori';
+        document.getElementById('inputNamaKategori').value = '';
+        document.getElementById('inputSlugKategori').value = '';
+        ModalManager.open('modalCat');
+    }
+
+    function closeModalCat() {
+        ModalManager.close('modalCat');
+    }
+
+    function editKategori(id) {
+        const cat = DBCategory.find(c => c.id === id);
+        if (cat) {
+            editCatId = id;
+            document.getElementById('modalCatTitle').textContent = 'Edit Kategori';
+            document.getElementById('inputNamaKategori').value = cat.nama_kategori;
+            document.getElementById('inputSlugKategori').value = cat.slug;
+            ModalManager.open('modalCat');
+        }
+    }
+
+    function simpanKategori() {
+        Toast.show('success', editCatId ? 'Kategori berhasil diupdate!' : 'Kategori baru berhasil ditambahkan!');
+        closeModalCat();
+    }
+
+    function hapusKategori(id) {
+        if (confirm('Yakin ingin menghapus kategori ini? Data artikel di dalamnya mungkin terdampak.')) {
+            DBCategory = DBCategory.filter(c => c.id !== id);
+            loadDataKategori();
+            Toast.show('success', 'Kategori berhasil dihapus!');
+        }
+    }
+
+    /* ── EVENT LISTENER: AUTO-GENERATE SLUG ── */
+    document.getElementById('inputNamaKategori').addEventListener('keyup', function() {
+        if (!editCatId) {
+            let slug = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+            document.getElementById('inputSlugKategori').value = slug;
+        }
+    });
+</script>
 @endsection
