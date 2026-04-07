@@ -13,6 +13,7 @@
         .thumb-upload {
             transition: all 0.3s ease;
         }
+
         .thumb-upload.drag-over {
             border-color: var(--blue);
             background-color: #eef2ff;
@@ -63,22 +64,30 @@
                         <label>Konten Berita *</label>
                         <div class="rte-mock">
                             <div class="rte-toolbar">
-                                <button class="rte-btn" onclick="execCmd('bold')" title="Tebal (Ctrl+B)"><b>B</b></button>
-                                <button class="rte-btn" onclick="execCmd('italic')"
-                                    title="Miring (Ctrl+I)"><i>I</i></button>
-                                <button class="rte-btn" onclick="execCmd('underline')"
-                                    title="Garis Bawah (Ctrl+U)"><u>U</u></button>
+                                <button type="button" class="rte-btn rte-btn-bold" onclick="RTE.exec('bold')"
+                                    title="Tebal"><b>B</b></button>
+                                <button type="button" class="rte-btn rte-btn-italic" onclick="RTE.exec('italic')"
+                                    title="Miring"><i>I</i></button>
+                                <button type="button" class="rte-btn rte-btn-underline" onclick="RTE.exec('underline')"
+                                    title="Garis Bawah"><u>U</u></button>
+
                                 <div class="rte-sep"></div>
-                                <button class="rte-btn" onclick="execCmd('formatBlock', 'h1')" title="Heading 1">H1</button>
-                                <button class="rte-btn" onclick="execCmd('formatBlock', 'h2')" title="Heading 2">H2</button>
-                                <button class="rte-btn" onclick="execCmd('formatBlock', 'h3')" title="Heading 3">H3</button>
+
+                                <button type="button" class="rte-btn rte-btn-h1" onclick="RTE.exec('formatBlock', 'h1')"
+                                    title="Heading 1">H1</button>
+                                <button type="button" class="rte-btn rte-btn-h2" onclick="RTE.exec('formatBlock', 'h2')"
+                                    title="Heading 2">H2</button>
+                                <button type="button" class="rte-btn rte-btn-h3" onclick="RTE.exec('formatBlock', 'h3')"
+                                    title="Heading 3">H3</button>
+
                                 <div class="rte-sep"></div>
-                                <button class="rte-btn" onclick="execCmd('justifyLeft')" title="Rata Kiri">≡</button>
-                                <button class="rte-btn" onclick="execCmd('justifyCenter')" title="Rata Tengah">≣</button>
-                                <button class="rte-btn" onclick="execCmd('insertUnorderedList')"
-                                    title="Daftar Simbol">⊶</button>
-                                <div class="rte-sep"></div>
-                                <button class="rte-btn" onclick="execLink()" title="Tambah Link">🔗</button>
+
+                                <button type="button" class="rte-btn" onclick="RTE.exec('justifyLeft')"
+                                    title="Rata Kiri">≡</button>
+                                <button type="button" class="rte-btn" onclick="RTE.exec('justifyCenter')"
+                                    title="Rata Tengah">≣</button>
+                                <button type="button" class="rte-btn" onclick="RTE.insertLink()"
+                                    title="Tambah Link">🔗</button>
                             </div>
                             <div class="rte-body" id="inputKonten" contenteditable="true" required></div>
                         </div>
@@ -102,8 +111,7 @@
                 <!-- Thumbnail -->
                 <div class="form-card" style="margin-bottom:16px;">
                     <div class="form-title">Thumbnail Berita</div>
-                    <input type="file" id="inputFoto" name="foto_thumbnail" style="display:none;"
-                        onchange="previewFoto(this)">
+                    <input type="file" id="inputFoto" name="foto_thumbnail" style="display:none;">
 
                     <div class="thumb-upload" onclick="document.getElementById('inputFoto').click()"
                         style="cursor:pointer;">
@@ -187,8 +195,9 @@
 
             <!-- Pagination -->
             <div class="pager">
-                <div class="pg-btn active">1</div>
-                <div class="pg-info">Menampilkan 9 dari 9 artikel</div>
+                <div id="paginationControls" style="display:flex; gap:4px;">
+                </div>
+                <div class="pg-info" id="pagerInfo">Menampilkan 0 dari 0 artikel</div>
             </div>
         </div>
     </div>
@@ -269,8 +278,7 @@
                 <span id="teksAlasanTolak"></span>
             </div>
             <div style="display:flex;justify-content:center;">
-                <button class="btn btn-outline"
-                    onclick="document.getElementById('modalAlasanTolak').style.display='none'">Tutup</button>
+                <button class="btn btn-outline" onclick="ModalManager.close('modalAlasanTolak')">Tutup</button>
             </div>
         </div>
     </div>
@@ -289,53 +297,56 @@
             loadKategori();
             loadDaftarBerita();
             loadStatistik();
-
-            /* ── FITUR DRAG AND DROP GAMBAR ── */
-            const dropArea = document.querySelector('.thumb-upload');
-            const fileInput = document.getElementById('inputFoto');
-
-            // 1. Mencegah browser membuka gambar di tab baru saat diseret
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, preventDefaults, false);
-            });
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            // 2. Tambah efek visual (CSS) saat gambar berada di atas area
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropArea.addEventListener(eventName, () => {
-                    dropArea.classList.add('drag-over');
-                }, false);
-            });
-
-            // 3. Hilangkan efek visual saat gambar keluar area atau dibatalkan
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropArea.addEventListener(eventName, () => {
-                    dropArea.classList.remove('drag-over');
-                }, false);
-            });
-
-            // 4. Tangkap file saat di-drop dan masukkan ke input foto
-            dropArea.addEventListener('drop', function(e) {
-                let dt = e.dataTransfer;
-                let files = dt.files;
-
-                if (files && files.length > 0) {
-                    // Masukkan file yang di-drop ke input file tersembunyi
-                    fileInput.files = files;
-
-                    // Panggil fungsi preview lu yang udah ada
-                    previewFoto(fileInput);
-                }
-            });
         });
 
-        let dataBeritaMaster = []; // Penampung semua data dari API
-        let currentPage = 1;
-        const perPage = 10; // Sesuai request lu: 10 berita per halaman
+        // Panggil DropZone Helper
+        new ImageDropZone({
+            dropZoneSelector: '.thumb-upload', // Area kotak putus-putus
+            inputSelector: '#inputFoto', // Input type file-nya
+            previewSelector: '#imgPreview', // Target tag <img id="imgPreview">
+            uiToHideSelector: '.thumb-upload .ico, .thumb-upload p' // Teks yang diilangin pas gambar muncul
+        });
+
+        const beritaTable = new DataTableEngine({
+            tableBody: '#newsBody',
+            paginationWrapper: '#paginationControls', // Target container tombol
+            infoWrapper: '#pagerInfo',
+            emptyState: '#emptyState',
+            perPage: 1,
+
+            // Ini template HTML khusus untuk tabel berita
+            renderRowHTML: function(val) {
+                let badgeClass = val.status_berita.toLowerCase() === 'draft' ? 'b-draft' :
+                    val.status_berita.toLowerCase() === 'pending' ? 'b-review' : 'b-reject';
+
+                let btnInfoTolak = '';
+                if (val.status_berita === 'Rejected') {
+                    let alasan = val.catatan_penolakan ? val.catatan_penolakan.replace(/'/g, "\\'") :
+                        'Tidak ada catatan';
+                    btnInfoTolak =
+                        `<div class="ico-btn" title="Lihat Alasan Tolak" onclick="lihatAlasanTolak('${alasan}')">💬</div>`;
+                }
+
+                return `
+                <tr data-key="${val.id}">
+                    <td><div class="tbl-img"><img src="/uploads/thumbnail/${val.foto_thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"></div></td>
+                    <td>
+                        <div class="tbl-title">${val.judul_berita}</div>
+                        <div class="tbl-meta">Slug: ${val.slug}</div>
+                    </td>
+                    <td><span class="badge" style="background:#fde8e8;color:var(--red);">${val.kategori ? val.kategori.nama_kategori : 'Uncategorized'}</span></td>
+                    <td><span class="badge ${badgeClass}">${val.status_berita}</span></td>
+                    <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
+                    <td>
+                        <div class="act-btns">
+                            ${btnInfoTolak}
+                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">✏️</div>`}
+                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">🗑</div>`}
+                        </div>
+                    </td>
+                </tr>`;
+            }
+        });
 
         function loadKategori() {
             $.ajax({
@@ -402,9 +413,13 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    dataBeritaMaster = response; // Simpan data asli dari server
-                    jalankanFilter(); // Langsung filter & render
-                    loadStatistik(); // Update angka-angka di tab & sidebar
+                    // Kasih datanya ke engine
+                    beritaTable.loadData(response);
+
+                    // Langsung jalankan filter awal
+                    terapkanAturanFilter();
+
+                    loadStatistik();
                 },
                 error: function() {
                     console.error("Gagal mengambil daftar berita cuy!");
@@ -443,7 +458,7 @@
                 processData: false, // Wajib false kalau pake FormData
                 success: function(response) {
                     if (response.status === 'success') {
-                        showToast('success', response.message);
+                        Toast.show('success', response.message);
 
                         setTimeout(() => {
                             location.reload();
@@ -459,11 +474,14 @@
                         $.each(errors, function(key, value) {
                             errorMessage += value[0] + "\n";
                         });
-                        showToast('warning', errorMessage.trim());
+                        Toast.show('warning', errorMessage.trim());
                     } else if (xhr.status === 419) {
-                        showToast('error', "CSRF Token ilang cuy, coba refresh halaman!");
+                        Toast.show('error', "CSRF Token ilang cuy, coba refresh halaman!");
                     } else {
-                        showToast('error', "Error " + xhr.status + ": Ada masalah di server!");
+                        // Nangkep pesan error detail dari Laravel
+                        let errorDetail = xhr.responseJSON?.message || xhr.responseText;
+                        Toast.show('error', "Error 500: Cek Console cuy!");
+                        console.error("INI ERROR ASLINYA:", errorDetail);
                     }
                 }
             });
@@ -534,7 +552,7 @@
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    showToast('success', "Data berita berhasil diperbarui.");
+                    Toast.show('success', "Data berita berhasil diperbarui.");
 
                     setTimeout(() => {
                         location.reload();
@@ -543,7 +561,7 @@
                 error: function(xhr) {
                     // Sekarang lu bisa baca errornya di sini
                     let err = xhr.responseJSON;
-                    showToast('error', "Gagal: " + (err?.message || "Terjadi kesalahan server"));
+                    Toast.show('error', "Gagal: " + (err?.message || "Terjadi kesalahan server"));
                     console.log(err);
                 }
             });
@@ -553,12 +571,12 @@
 
         function confirmDelete(id) {
             idBeritaYangAkanDihapus = id; // Simpan ID yang mau dihapus
-            document.getElementById('modalDelete').style.display = 'flex';
+            ModalManager.open('modalDelete');
         }
 
         function closeDelete() {
-            document.getElementById('modalDelete').style.display = 'none';
-            idBeritaYangAkanDihapus = null; // Reset ID
+            ModalManager.close('modalDelete');
+            idBeritaYangAkanDihapus = null;
         }
 
         function doDelete() {
@@ -574,101 +592,21 @@
                 url: `/api/editor/manajemen_berita/hapusBerita/${idBeritaYangAkanDihapus}`,
                 type: 'DELETE',
                 success: function(response) {
-                    showToast('success', response.message);
-                    closeDelete();
-                    loadDaftarBerita(); // Refresh tabel biar data hilang
-                    // Reset state tombol
+                    Toast.show('success', response.message);
+                    closeDelete(); // Tetep panggil ini buat reset ID-nya
+                    loadDaftarBerita();
                     btnHapus.innerHTML = originalText;
                     btnHapus.disabled = false;
                 },
                 error: function(xhr) {
-                    showToast('error', "Gagal menghapus: " + (xhr.responseJSON?.message || "Terjadi kesalahan server"));
+                    Toast.show('error', "Gagal menghapus: " + (xhr.responseJSON?.message ||
+                        "Terjadi kesalahan server"));
                     btnHapus.innerHTML = originalText;
                     btnHapus.disabled = false;
                     closeDelete();
                 }
             });
         }
-
-        /* ── FUNGSI TOAST NOTIFICATION ── */
-        let toastTimer;
-
-        function showToast(type, msg) {
-            clearTimeout(toastTimer);
-            const toastEl = document.getElementById('toast');
-            const icoEl = document.getElementById('toastIco');
-
-            // Set warna dan ikon berdasarkan tipe
-            if (type === 'success') {
-                icoEl.textContent = '✅';
-                toastEl.style.background = '#1a7a3c'; // Hijau
-            } else if (type === 'error') {
-                icoEl.textContent = '❌';
-                toastEl.style.background = '#cc0000'; // Merah
-            } else if (type === 'warning') {
-                icoEl.textContent = '⚠️';
-                toastEl.style.background = '#b86200'; // Orange
-            }
-
-            document.getElementById('toastMsg').innerText = msg;
-
-            // Munculin Toast
-            toastEl.style.display = 'flex';
-            setTimeout(() => {
-                toastEl.style.opacity = '1';
-            }, 10); // Trigger animasi
-
-            // Hilangkan otomatis setelah 3.5 detik
-            toastTimer = setTimeout(() => {
-                toastEl.style.opacity = '0';
-                setTimeout(() => {
-                    toastEl.style.display = 'none';
-                }, 300);
-            }, 3500);
-        }
-
-        // Fungsi utama eksekusi
-        function execCmd(command, value = null) {
-            document.execCommand(command, false, value);
-            document.getElementById('inputKonten').focus();
-            updateToolbarState(); // Cek status tombol setelah klik
-        }
-
-        // Fungsi memantau status tombol (Bold, Italic, Underline)
-        function updateToolbarState() {
-            const commands = ['bold', 'italic', 'underline'];
-            const buttons = document.querySelectorAll('.rte-btn');
-
-            commands.forEach((cmd, index) => {
-                // queryCommandState mengecek apakah format aktif di posisi kursor
-                if (document.queryCommandState(cmd)) {
-                    buttons[index].classList.add('active');
-                } else {
-                    buttons[index].classList.remove('active');
-                }
-            });
-        }
-
-        // Jalankan updateToolbarState saat user klik atau ketik di area konten
-        document.getElementById('inputKonten').addEventListener('keyup', updateToolbarState);
-        document.getElementById('inputKonten').addEventListener('mouseup', updateToolbarState);
-        document.getElementById('inputKonten').addEventListener('click', updateToolbarState);
-
-        // Fungsi Link tetap sama
-        function execLink() {
-            const url = prompt("Masukkan URL link:", "https://");
-            if (url) {
-                document.execCommand('createLink', false, url);
-                updateToolbarState();
-            }
-        }
-
-        // Opsional: Biar pas di-paste teksnya gak bawa format aneh dari luar (Keep Text Only)
-        document.getElementById('inputKonten').addEventListener('paste', function(e) {
-            e.preventDefault();
-            const text = e.clipboardData.getData('text/plain');
-            document.execCommand('insertText', false, text);
-        });
 
         /* ── PAGE NAV ── */
         const pageTitles = {
@@ -678,7 +616,7 @@
 
         function lihatAlasanTolak(alasan) {
             document.getElementById('teksAlasanTolak').textContent = alasan || 'Tidak ada catatan dari Redaksi.';
-            document.getElementById('modalAlasanTolak').style.display = 'flex';
+            ModalManager.open('modalAlasanTolak');
         }
 
         function showPage(id, el) {
@@ -686,7 +624,7 @@
             if (id === 'write-news' && currentEditId !== null) {
                 // Jika diklik dari SIDEBAR atau NAVtopbar (bukan dari tombol edit tabel)
                 if (el !== null) {
-                    showToast('warning', "Selesaikan atau batalkan editan berita lu dulu cuy!");
+                    Toast.show('warning', "Selesaikan atau batalkan editan berita lu dulu cuy!");
                     return; // Stop, jangan pindah halaman
                 }
             }
@@ -725,43 +663,32 @@
             document.getElementById('tglPending').className = 'tgl-opt';
         }
 
-        function previewFoto(input) {
-            if (input.files && input.files[0]) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#imgPreview').attr('src', e.target.result).show();
-                    $('.thumb-upload .ico, .thumb-upload p').hide();
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
         /* ── STATUS TOGGLE (Write page) ── */
         function confirmStatus(v) {
             const d = document.getElementById('tglDraft');
             const p = document.getElementById('tglPending');
-            // Ubah warna tombol langsung dulu
+
             if (v === 'draft') {
                 d.className = 'tgl-opt sel-draft';
                 p.className = 'tgl-opt';
-                document.getElementById('modalDraft').style.display = 'flex';
+                ModalManager.open('modalDraft');
             } else {
                 d.className = 'tgl-opt';
                 p.className = 'tgl-opt sel-pending';
-                document.getElementById('modalPending').style.display = 'flex';
+                ModalManager.open('modalPending');
             }
         }
 
         function closeStatusModal(v) {
             const d = document.getElementById('tglDraft');
             const p = document.getElementById('tglPending');
-            // Batal: kembalikan visual ke posisi sebelumnya
+
             if (v === 'draft') {
-                document.getElementById('modalDraft').style.display = 'none';
+                ModalManager.close('modalDraft');
                 d.className = 'tgl-opt';
                 p.className = 'tgl-opt sel-pending';
             } else {
-                document.getElementById('modalPending').style.display = 'none';
+                ModalManager.close('modalPending');
                 d.className = 'tgl-opt sel-draft';
                 p.className = 'tgl-opt';
             }
@@ -771,148 +698,52 @@
             const status = (v === 'draft') ? 'Draft' : 'Pending';
             const modalId = (v === 'draft') ? 'modalDraft' : 'modalPending';
 
-            // Tutup modalnya dulu
-            document.getElementById(modalId).style.display = 'none';
+            // Tutup modal pakai manager
+            ModalManager.close(modalId);
 
-            // CEK DISINI: Kalau currentEditId ada isinya, berarti lagi mode EDIT
             if (currentEditId) {
                 updateBerita(status);
             } else {
-                // Kalau kosong, berarti lagi mode TULIS BARU
                 simpanBerita(status);
             }
         }
 
-        /* ── FILTER TABS ── */
-        let statusAktif = 'all'; // Variabel global buat nyimpen status tab
+        /* ── FILTER TABS & SEARCH LOGIC ── */
+        let statusAktif = 'all'; // Cukup tulis 1 kali aja cuy
 
         function filterTab(el, status) {
             // Update visual tombol tab
             document.querySelectorAll('#tabPills .tab-p').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
 
-            // Simpan status yang diklik ke variabel global
             statusAktif = status;
-
-            // Jalankan filter gabungan
-            jalankanFilter();
+            jalankanFilter(); // Panggil fungsi utama
         }
 
+        // Fungsi ini yang bakal ngasih instruksi ke DataEngine (Gue balikin namanya jadi jalankanFilter biar HTML lu ga error)
         function jalankanFilter() {
             const kategoriDipilih = document.getElementById('filterKategori').value;
             const urutanDipilih = document.getElementById('filterUrutan').value;
+            // Di HTML navbar lu input search-nya belom ada id="searchInput", pastiin lu tambahin ya!
             const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
-            // 1. FILTERING DATA
-            let dataTerfilter = dataBeritaMaster.filter(val => {
+            // Kasih tau engine cara nge-filter
+            beritaTable.setFilterAndSearch((val) => {
                 const cocokStatus = (statusAktif === 'all' || val.status_berita.toLowerCase() === statusAktif);
                 const kategoriBaris = val.kategori ? val.kategori.nama_kategori : 'Uncategorized';
                 const cocokKategori = (kategoriDipilih === 'all' || kategoriBaris === kategoriDipilih);
-
-                // Pengecekan search (Cari di judul atau slug)
-                const cocokSearch = !keyword ||
-                    val.judul_berita.toLowerCase().includes(keyword) ||
-                    (val.slug && val.slug.toLowerCase().includes(keyword));
+                const cocokSearch = !keyword || val.judul_berita.toLowerCase().includes(keyword) || (val.slug && val
+                    .slug.toLowerCase().includes(keyword));
 
                 return cocokStatus && cocokKategori && cocokSearch;
             });
 
-            // 2. SORTING DATA
-            dataTerfilter.sort((a, b) => {
+            // Kasih tau engine cara nge-sort
+            beritaTable.setSort((a, b) => {
                 const dateA = new Date(a.created_at);
                 const dateB = new Date(b.created_at);
                 return (urutanDipilih === 'baru') ? dateB - dateA : dateA - dateB;
             });
-            renderTable(dataTerfilter);
-
-            // 3. RENDER TABEL & PAGINATION
-            renderTable(dataTerfilter);
         }
-
-        function renderTable(data) {
-            const tbody = $('#newsBody');
-            const total = data.length;
-
-            // Potong data buat halaman saat ini (Client-side Pagination)
-            const start = (currentPage - 1) * perPage;
-            const end = start + perPage;
-            const paginatedData = data.slice(start, end);
-
-            let rows = '';
-            $.each(paginatedData, function(key, val) {
-                let badgeClass = val.status_berita.toLowerCase() === 'draft' ? 'b-draft' :
-                    val.status_berita.toLowerCase() === 'pending' ? 'b-review' : 'b-reject';
-
-                // Siapin tombol alasan tolak (opsional)
-                let btnInfoTolak = '';
-                if (val.status_berita === 'Rejected') {
-                    // Asumsi field dari database lu namanya 'catatan_penolakan'. Ganti kalau beda!
-                    let alasan = val.catatan_penolakan ? val.catatan_penolakan.replace(/'/g, "\\'") :
-                        'Tidak ada catatan khusus';
-                    btnInfoTolak =
-                        `<div class="ico-btn" title="Lihat Alasan Tolak" onclick="lihatAlasanTolak('${alasan}')">💬</div>`;
-                }
-
-                rows += `
-            <tr>
-                <td><div class="tbl-img"><img src="/uploads/thumbnail/${val.foto_thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"></div></td>
-                <td>
-                    <div class="tbl-title">${val.judul_berita}</div>
-                    <div class="tbl-meta">Slug: ${val.slug}</div>
-                </td>
-                <td><span class="badge" style="background:#fde8e8;color:var(--red);">${val.kategori ? val.kategori.nama_kategori : 'Uncategorized'}</span></td>
-                <td><span class="badge ${badgeClass}">${val.status_berita}</span></td>
-                <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
-                <td>
-                    <div class="act-btns">
-                        ${btnInfoTolak}
-                        ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">✏️</div>`}
-                        ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">🗑</div>`}
-                    </div>
-                </td>
-            </tr>`;
-            });
-
-            tbody.html(rows ||
-                '<tr><td colspan="6" style="text-align:center;padding:20px;">Data tidak ditemukan cuy.</td></tr>');
-
-            // Update Info & Tombol Pagination
-            document.getElementById('tableCount').textContent = `Menampilkan ${paginatedData.length} dari ${total} artikel`;
-            renderPaginationControls(total);
-        }
-
-        function renderPaginationControls(totalData) {
-            const totalPages = Math.ceil(totalData / perPage);
-            let html = '';
-
-            for (let i = 1; i <= totalPages; i++) {
-                html += `<div class="pg-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</div>`;
-            }
-
-            $('.pager').html(html || '');
-        }
-
-        function changePage(page) {
-            currentPage = page;
-            jalankanFilter(); // Render ulang setelah ganti halaman
-        }
-
-        function filterTab(el, status) {
-            document.querySelectorAll('#tabPills .tab-p').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            statusAktif = status;
-
-            currentPage = 1; // RESET KE HALAMAN 1
-            jalankanFilter();
-        }
-
-        /* ── NOTIF ── */
-        function toggleNotif() {
-            document.getElementById('notifPanel').classList.toggle('open');
-        }
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.tb-icon') && !e.target.closest('.notif-panel'))
-                document.getElementById('notifPanel').classList.remove('open');
-        });
     </script>
 @endsection
