@@ -7,14 +7,6 @@ Route::get('/', function () {
     return view('viewers.pages.home');
 });
 
-Route::get('/berita', function () {
-    return view('Admin.pages.manajemen_berita');
-});
-
-Route::get('/tulis', function () {
-    return view('Admin.pages.tulis_berita');
-});
-
 Route::get('/kategori', function () {
     return view('Admin.pages.manajemen_kategori');
 });
