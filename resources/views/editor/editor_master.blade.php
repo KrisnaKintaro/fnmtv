@@ -24,10 +24,16 @@
         @yield('konten')
     </main>
 
+    <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
     <script src="{{ asset('admin/js/admin_js.js') }}"></script>
+    <script src="{{ asset('admin/js/dataTable_engine.js') }}"></script>
+    <script src="{{ asset('admin/js/imageInputAndDropZone.js') }}"></script>
+    <script src="{{ asset('admin/js/toast.js') }}"></script>
+    <script src="{{ asset('admin/js/modalManager.js') }}"></script>
+    <script src="{{ asset('admin/js/richTextEditor.js') }}"></script>
+    <script src="{{ asset('admin/js/smartDataNotifikasi.js') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
     <script>
         $.ajaxSetup({
             headers: {
