@@ -84,8 +84,13 @@ class BeritaController extends Controller
                 'judul_berita' => $request->judul_berita ?? $berita->judul_berita,
                 'isi_berita'   => $request->isi_berita ?? $berita->isi_berita,
                 'kategori_id'  => $request->kategori_id ?? $berita->kategori_id,
-                'slug'         => $request->judul_berita ? Str::slug($request->judul_berita) . '-' . time() : $berita->slug
+                'slug'         => $request->judul_berita ? Str::slug($request->judul_berita) . '-' . time() : $berita->slug,
+                'status_berita' => $request->status_berita ?? $berita->status_berita
             ];
+
+            if ($request->status_berita === 'Pending') {
+                $dataUpdate['catatan_penolakan'] = null;
+            }
 
             if ($request->hasFile('foto_thumbnail')) {
                 $pathFotoLama = public_path('uploads/thumbnail/' . $berita->foto_thumbnail);

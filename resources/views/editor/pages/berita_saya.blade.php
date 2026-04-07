@@ -32,6 +32,13 @@
             <div>
                 <div class="form-card" style="margin-bottom:16px;">
                     <div class="form-title">Informasi Artikel</div>
+                    <div id="alertRejectBox"
+                        style="display:none; background:#fde8e8; border:1px solid #f5b8b8; padding:16px; border-radius:8px; margin-bottom:16px;">
+                        <div style="font-weight:700; color:var(--red); margin-bottom:4px;">⚠️ Artikel ini dikembalikan oleh
+                            Redaksi</div>
+                        <div style="font-size:13px; color:var(--text);"><strong>Alasan:</strong> <span
+                                id="alertRejectText"></span></div>
+                    </div>
                     <div class="field">
                         <label>Judul Berita *</label>
                         <input type="text" id="inputJudul" name="judul_berita"
@@ -237,6 +244,26 @@
             </div>
         </div>
     </div>
+
+    <div id="modalAlasanTolak"
+        style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
+        <div
+            style="background:var(--white);border-radius:12px;padding:32px;max-width:400px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
+            <div style="font-size:32px;text-align:center;margin-bottom:12px;">❌</div>
+            <div
+                style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">
+                Artikel Ditolak</div>
+            <div
+                style="font-size:13px;color:var(--text);background:#fde8e8;padding:12px;border-radius:8px;border:1px solid #f5b8b8;margin-bottom:24px;line-height:1.5;">
+                <strong>Catatan Redaksi:</strong><br>
+                <span id="teksAlasanTolak"></span>
+            </div>
+            <div style="display:flex;justify-content:center;">
+                <button class="btn btn-outline"
+                    onclick="document.getElementById('modalAlasanTolak').style.display='none'">Tutup</button>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('js')
     <script>
@@ -385,33 +412,37 @@
         let currentEditId = null; // Variabel global buat nyimpen ID yang lagi diedit
 
         function editBerita(id) {
-            currentEditId = id; // Simpan ID berita
-
+            currentEditId = id;
             $.ajax({
-                url: `/api/editor/manajemen_berita/ambilData`, // Kita pake API ambil data yang udah ada
+                url: `/api/editor/manajemen_berita/ambilData`,
                 type: 'GET',
                 success: function(response) {
-                    // Cari data berita yang ID-nya cocok
                     const berita = response.find(b => b.id === id);
-
                     if (berita) {
-                        // 1. Masukkan data ke inputan form
                         $('#inputJudul').val(berita.judul_berita);
                         $('#inputSlug').val(berita.slug);
                         $('#inputKonten').html(berita.isi_berita);
                         $('.select-kategori-ajax').val(berita.kategori_id);
 
-                        // 2. Tampilkan preview foto lama
                         if (berita.foto_thumbnail) {
                             $('#imgPreview').attr('src', `/uploads/thumbnail/${berita.foto_thumbnail}`).show();
                             $('.thumb-upload .ico, .thumb-upload p').hide();
                         }
 
-                        // 3. Ubah UI jadi mode Edit
+                        // LOGIKA BARU: Jika status Rejected, munculin alert & matikan Draft
+                        if (berita.status_berita === 'Rejected') {
+                            $('#alertRejectBox').show();
+                            $('#alertRejectText').text(berita.catatan_penolakan || 'Tidak ada catatan.');
+
+                            $('#tglDraft').hide(); // Sembunyikan tombol draft
+                            $('#tglPending').addClass('sel-pending'); // Paksa pilih "Kirim ke Redaksi"
+                        } else {
+                            $('#alertRejectBox').hide();
+                            $('#tglDraft').show(); // Munculin lagi
+                        }
+
                         document.getElementById('sectionTitle').textContent = 'Edit Berita';
                         document.getElementById('backButtonContainer').style.display = 'block';
-
-                        // 4. Pindah ke halaman tulis
                         showPage('write-news', null);
                     }
                 }
@@ -545,6 +576,11 @@
             'my-news': ['Berita Saya', 'Editor / Berita Saya'],
         };
 
+        function lihatAlasanTolak(alasan) {
+            document.getElementById('teksAlasanTolak').textContent = alasan || 'Tidak ada catatan dari Redaksi.';
+            document.getElementById('modalAlasanTolak').style.display = 'flex';
+        }
+
         function showPage(id, el) {
             // 1. CEK: Kalau mau buka halaman tulis, tapi sedang mode EDIT
             if (id === 'write-news' && currentEditId !== null) {
@@ -571,24 +607,20 @@
         }
 
         function resetFormBerita() {
-            currentEditId = null; // Penting: Balikin ke mode Tambah Baru
-
-            // Reset semua inputan teks
+            currentEditId = null;
             $('#inputJudul').val('');
             $('#inputSlug').val('');
             $('#inputKonten').html('');
             $('.select-kategori-ajax').val('');
-
-            // Reset Preview Foto
-            $('#inputFoto').val(''); // Kosongkan file input
+            $('#inputFoto').val('');
             $('#imgPreview').hide().attr('src', '');
             $('.thumb-upload .ico, .thumb-upload p').show();
 
-            // Reset UI Header
+            // KEMBALIKAN UI SEPERTI SEMULA
+            $('#alertRejectBox').hide();
+            $('#tglDraft').show();
             document.getElementById('sectionTitle').textContent = 'Tulis Berita Baru';
             document.getElementById('backButtonContainer').style.display = 'none';
-
-            // Balikin toggle ke Draft sebagai default
             document.getElementById('tglDraft').className = 'tgl-opt sel-draft';
             document.getElementById('tglPending').className = 'tgl-opt';
         }
@@ -669,13 +701,20 @@
         function jalankanFilter() {
             const kategoriDipilih = document.getElementById('filterKategori').value;
             const urutanDipilih = document.getElementById('filterUrutan').value;
+            const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
             // 1. FILTERING DATA
             let dataTerfilter = dataBeritaMaster.filter(val => {
                 const cocokStatus = (statusAktif === 'all' || val.status_berita.toLowerCase() === statusAktif);
                 const kategoriBaris = val.kategori ? val.kategori.nama_kategori : 'Uncategorized';
                 const cocokKategori = (kategoriDipilih === 'all' || kategoriBaris === kategoriDipilih);
-                return cocokStatus && cocokKategori;
+
+                // Pengecekan search (Cari di judul atau slug)
+                const cocokSearch = !keyword ||
+                    val.judul_berita.toLowerCase().includes(keyword) ||
+                    (val.slug && val.slug.toLowerCase().includes(keyword));
+
+                return cocokStatus && cocokKategori && cocokSearch;
             });
 
             // 2. SORTING DATA
@@ -684,6 +723,7 @@
                 const dateB = new Date(b.created_at);
                 return (urutanDipilih === 'baru') ? dateB - dateA : dateA - dateB;
             });
+            renderTable(dataTerfilter);
 
             // 3. RENDER TABEL & PAGINATION
             renderTable(dataTerfilter);
@@ -703,23 +743,34 @@
                 let badgeClass = val.status_berita.toLowerCase() === 'draft' ? 'b-draft' :
                     val.status_berita.toLowerCase() === 'pending' ? 'b-review' : 'b-reject';
 
+                // Siapin tombol alasan tolak (opsional)
+                let btnInfoTolak = '';
+                if (val.status_berita === 'Rejected') {
+                    // Asumsi field dari database lu namanya 'catatan_penolakan'. Ganti kalau beda!
+                    let alasan = val.catatan_penolakan ? val.catatan_penolakan.replace(/'/g, "\\'") :
+                        'Tidak ada catatan khusus';
+                    btnInfoTolak =
+                        `<div class="ico-btn" title="Lihat Alasan Tolak" onclick="lihatAlasanTolak('${alasan}')">💬</div>`;
+                }
+
                 rows += `
-        <tr>
-            <td><div class="tbl-img"><img src="/uploads/thumbnail/${val.foto_thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"></div></td>
-            <td>
-                <div class="tbl-title">${val.judul_berita}</div>
-                <div class="tbl-meta">Slug: ${val.slug}</div>
-            </td>
-            <td><span class="badge" style="background:#fde8e8;color:var(--red);">${val.kategori ? val.kategori.nama_kategori : 'Uncategorized'}</span></td>
-            <td><span class="badge ${badgeClass}">${val.status_berita}</span></td>
-            <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
-            <td>
-                <div class="act-btns">
-                    ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">✏️</div>`}
-                    ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">🗑</div>`}
-                </div>
-            </td>
-        </tr>`;
+            <tr>
+                <td><div class="tbl-img"><img src="/uploads/thumbnail/${val.foto_thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"></div></td>
+                <td>
+                    <div class="tbl-title">${val.judul_berita}</div>
+                    <div class="tbl-meta">Slug: ${val.slug}</div>
+                </td>
+                <td><span class="badge" style="background:#fde8e8;color:var(--red);">${val.kategori ? val.kategori.nama_kategori : 'Uncategorized'}</span></td>
+                <td><span class="badge ${badgeClass}">${val.status_berita}</span></td>
+                <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
+                <td>
+                    <div class="act-btns">
+                        ${btnInfoTolak}
+                        ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">✏️</div>`}
+                        ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">🗑</div>`}
+                    </div>
+                </td>
+            </tr>`;
             });
 
             tbody.html(rows ||
