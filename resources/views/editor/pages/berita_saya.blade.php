@@ -8,6 +8,16 @@
             border: 1px solid var(--blue);
             border-radius: 4px;
         }
+
+        /* ── EFEK DRAG AND DROP ── */
+        .thumb-upload {
+            transition: all 0.3s ease;
+        }
+        .thumb-upload.drag-over {
+            border-color: var(--blue);
+            background-color: #eef2ff;
+            border-style: solid;
+        }
     </style>
 @endsection
 @section('konten')
@@ -279,6 +289,48 @@
             loadKategori();
             loadDaftarBerita();
             loadStatistik();
+
+            /* ── FITUR DRAG AND DROP GAMBAR ── */
+            const dropArea = document.querySelector('.thumb-upload');
+            const fileInput = document.getElementById('inputFoto');
+
+            // 1. Mencegah browser membuka gambar di tab baru saat diseret
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // 2. Tambah efek visual (CSS) saat gambar berada di atas area
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.add('drag-over');
+                }, false);
+            });
+
+            // 3. Hilangkan efek visual saat gambar keluar area atau dibatalkan
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.remove('drag-over');
+                }, false);
+            });
+
+            // 4. Tangkap file saat di-drop dan masukkan ke input foto
+            dropArea.addEventListener('drop', function(e) {
+                let dt = e.dataTransfer;
+                let files = dt.files;
+
+                if (files && files.length > 0) {
+                    // Masukkan file yang di-drop ke input file tersembunyi
+                    fileInput.files = files;
+
+                    // Panggil fungsi preview lu yang udah ada
+                    previewFoto(fileInput);
+                }
+            });
         });
 
         let dataBeritaMaster = []; // Penampung semua data dari API
