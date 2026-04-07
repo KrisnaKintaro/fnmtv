@@ -11,7 +11,8 @@ class KategoriController extends Controller
 {
     public function getDaftarKategori()
     {
-        $kategori = Kategori::latest()->get();
+        // Pake withCount('berita') biar dapet field 'berita_count' otomatis
+        $kategori = Kategori::withCount('berita')->latest()->get();
 
         return response()->json([
             'status' => 'success',

@@ -108,12 +108,12 @@
 
     // Data Dummy Sementara (Sesuai kolom Database)
     let DBCategory = [
-        { id: 1, nama_kategori: 'Politik', slug: 'politik', count: 84, updated_at: '2026-03-10' },
-        { id: 2, nama_kategori: 'Ekonomi', slug: 'ekonomi', count: 62, updated_at: '2026-03-09' },
-        { id: 3, nama_kategori: 'Olahraga', slug: 'olahraga', count: 55, updated_at: '2026-03-08' },
-        { id: 4, nama_kategori: 'Teknologi', slug: 'teknologi', count: 43, updated_at: '2026-03-05' },
-        { id: 5, nama_kategori: 'Kesehatan', slug: 'kesehatan', count: 31, updated_at: '2026-03-01' },
-        { id: 6, nama_kategori: 'Sains', slug: 'sains', count: 12, updated_at: '2026-02-28' }
+        { id: 1, nama_kategori: 'Politik', slug: 'politik', berita_count: 84, updated_at: '2026-03-10' },
+        { id: 2, nama_kategori: 'Ekonomi', slug: 'ekonomi', berita_count: 62, updated_at: '2026-03-09' },
+        { id: 3, nama_kategori: 'Olahraga', slug: 'olahraga', berita_count: 55, updated_at: '2026-03-08' },
+        { id: 4, nama_kategori: 'Teknologi', slug: 'teknologi', berita_count: 43, updated_at: '2026-03-05' },
+        { id: 5, nama_kategori: 'Kesehatan', slug: 'kesehatan', berita_count: 31, updated_at: '2026-03-01' },
+        { id: 6, nama_kategori: 'Sains', slug: 'sains', berita_count: 12, updated_at: '2026-02-28' }
     ];
 
     let editCatId = null;
@@ -134,7 +134,7 @@
             <tr>
                 <td><b>${val.nama_kategori}</b></td>
                 <td style="font-family:'JetBrains Mono';font-size:12px;color:var(--muted)">${val.slug}</td>
-                <td>${val.count}</td>
+                <td>${val.berita_count}</td>
                 <td style="color:var(--muted);font-size:12px">${date}</td>
                 <td>
                     <div class="act-btns">
@@ -157,7 +157,7 @@
             <div class="cat-chip">
                 <div>
                     <div class="cat-name">${val.nama_kategori}</div>
-                    <div class="cat-count">${val.count} artikel</div>
+                    <div class="cat-count">${val.berita_count} artikel</div>
                 </div>
                 <div class="cat-actions">
                     <div class="ico-btn" onclick="editKategori(${val.id})">✏️</div>
