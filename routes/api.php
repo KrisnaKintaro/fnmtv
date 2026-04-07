@@ -117,6 +117,7 @@ Route::prefix('editor/manajemen_berita')->group(function() {
     Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
     Route::put('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']);
     Route::delete('/hapusBerita/{id_berita}', [BeritaController::class, 'hapusDataBerita']);
+    Route::get('/ambilNotifikasi', [BeritaController::class, 'ambilNotifikasi']);
 });
 
 // Group Redaksi
