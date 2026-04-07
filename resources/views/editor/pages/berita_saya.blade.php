@@ -264,6 +264,11 @@
             </div>
         </div>
     </div>
+    <div id="toast"
+        style="position:fixed; bottom:28px; right:28px; background:#1a1a1a; color:#fff; padding:14px 20px; border-radius:8px; font-size:13px; font-weight:600; display:none; align-items:center; gap:12px; box-shadow:0 8px 30px rgba(0,0,0,.3); z-index:9999; min-width:280px; max-width:400px; transition:opacity .3s; opacity:0;">
+        <span id="toastIco" style="font-size:20px;">✅</span>
+        <span id="toastMsg" style="line-height:1.4;">Pesan notifikasi di sini...</span>
+    </div>
 @endsection
 @section('js')
     <script>
@@ -386,8 +391,11 @@
                 processData: false, // Wajib false kalau pake FormData
                 success: function(response) {
                     if (response.status === 'success') {
-                        alert(response.message);
-                        location.reload(); // Refresh buat liat hasil di tabel
+                        showToast('success', response.message);
+
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     }
                 },
                 error: function(xhr) {
@@ -399,11 +407,11 @@
                         $.each(errors, function(key, value) {
                             errorMessage += value[0] + "\n";
                         });
-                        alert(errorMessage);
+                        showToast('warning', errorMessage.trim());
                     } else if (xhr.status === 419) {
-                        alert("CSRF Token ilang cuy, coba refresh halaman!");
+                        showToast('error', "CSRF Token ilang cuy, coba refresh halaman!");
                     } else {
-                        alert("Error " + xhr.status + ": Ada masalah di server!");
+                        showToast('error', "Error " + xhr.status + ": Ada masalah di server!");
                     }
                 }
             });
@@ -474,13 +482,16 @@
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    alert("Data berita berhasil diperbarui.");
-                    location.reload();
+                    showToast('success', "Data berita berhasil diperbarui.");
+
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
                 },
                 error: function(xhr) {
                     // Sekarang lu bisa baca errornya di sini
                     let err = xhr.responseJSON;
-                    alert("Gagal: " + (err.message || "Terjadi kesalahan"));
+                    showToast('error', "Gagal: " + (err?.message || "Terjadi kesalahan server"));
                     console.log(err);
                 }
             });
@@ -511,7 +522,7 @@
                 url: `/api/editor/manajemen_berita/hapusBerita/${idBeritaYangAkanDihapus}`,
                 type: 'DELETE',
                 success: function(response) {
-                    alert(response.message);
+                    showToast('success', response.message);
                     closeDelete();
                     loadDaftarBerita(); // Refresh tabel biar data hilang
                     // Reset state tombol
@@ -519,12 +530,49 @@
                     btnHapus.disabled = false;
                 },
                 error: function(xhr) {
-                    alert("Gagal menghapus: " + (xhr.responseJSON.message || "Terjadi kesalahan server"));
+                    showToast('error', "Gagal menghapus: " + (xhr.responseJSON?.message || "Terjadi kesalahan server"));
                     btnHapus.innerHTML = originalText;
                     btnHapus.disabled = false;
                     closeDelete();
                 }
             });
+        }
+
+        /* ── FUNGSI TOAST NOTIFICATION ── */
+        let toastTimer;
+
+        function showToast(type, msg) {
+            clearTimeout(toastTimer);
+            const toastEl = document.getElementById('toast');
+            const icoEl = document.getElementById('toastIco');
+
+            // Set warna dan ikon berdasarkan tipe
+            if (type === 'success') {
+                icoEl.textContent = '✅';
+                toastEl.style.background = '#1a7a3c'; // Hijau
+            } else if (type === 'error') {
+                icoEl.textContent = '❌';
+                toastEl.style.background = '#cc0000'; // Merah
+            } else if (type === 'warning') {
+                icoEl.textContent = '⚠️';
+                toastEl.style.background = '#b86200'; // Orange
+            }
+
+            document.getElementById('toastMsg').innerText = msg;
+
+            // Munculin Toast
+            toastEl.style.display = 'flex';
+            setTimeout(() => {
+                toastEl.style.opacity = '1';
+            }, 10); // Trigger animasi
+
+            // Hilangkan otomatis setelah 3.5 detik
+            toastTimer = setTimeout(() => {
+                toastEl.style.opacity = '0';
+                setTimeout(() => {
+                    toastEl.style.display = 'none';
+                }, 300);
+            }, 3500);
         }
 
         // Fungsi utama eksekusi
@@ -586,7 +634,7 @@
             if (id === 'write-news' && currentEditId !== null) {
                 // Jika diklik dari SIDEBAR atau NAVtopbar (bukan dari tombol edit tabel)
                 if (el !== null) {
-                    alert("Selesaikan atau batalkan editan berita lu dulu cuy!");
+                    showToast('warning', "Selesaikan atau batalkan editan berita lu dulu cuy!");
                     return; // Stop, jangan pindah halaman
                 }
             }
