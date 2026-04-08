@@ -89,4 +89,32 @@ class VerifikasiBeritaController extends Controller
             ]
         ], 200);
     }
+
+    public function getNotifikasi()
+    {
+        // Cari semua berita yang statusnya masih 'Pending'
+        // Kita join (with) relasi user biar bisa nampilin nama Editornya
+        $beritaPending = Berita::with('user')
+            ->where('status_berita', 'Pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Format datanya biar sesuai sama ekspektasi SmartNotif.js
+        $notifData = $beritaPending->map(function ($berita) {
+            return [
+                'id' => $berita->id,
+                'type' => 'pending',
+                'icon' => '📋',
+                'title' => 'Perlu Ditinjau: ' . ($berita->user->username ?? 'Editor'),
+                'message' => 'Artikel "' . $berita->judul_berita . '" menunggu persetujuan.',
+                'time' => $berita->created_at->diffForHumans(), // Pake Carbon biar jadi "5 menit lalu"
+            ];
+        });
+
+        // Return dalam bentuk JSON
+        return response()->json([
+            'status' => 'success',
+            'data' => $notifData
+        ]);
+    }
 }

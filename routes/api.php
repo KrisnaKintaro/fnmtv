@@ -124,5 +124,6 @@ Route::prefix('editor/manajemen_berita')->group(function() {
 Route::prefix('redaksi')->group(function () {
     Route::get('/getBeritaMasuk', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
     Route::patch('/verifikasiBerita/{id_berita}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
+    Route::get('/getNotifikasi', [VerifikasiBeritaController::class, 'getNotifikasi']);
 });
 
