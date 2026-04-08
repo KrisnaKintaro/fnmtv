@@ -126,6 +126,15 @@ Route::prefix('redaksi')->group(function () {
     Route::get('/getBeritaMasuk', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
     Route::patch('/verifikasiBerita/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
     Route::get('/getNotifikasi', [VerifikasiBeritaController::class, 'getNotifikasi']);
+    Route::patch('/verifikasiBerita/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
+});
+
+// API untuk Viewers (Frontend)
+Route::prefix('viewers')->group(function() {
+    Route::get('/berita', [ViewerController::class, 'getBerita']);
+    Route::get('/kategori', [ViewerController::class, 'getKategori']);
+    Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
+    Route::get('/search', [ViewerController::class, 'searchBerita']);
 });
 
 // API untuk Viewers (Frontend)
