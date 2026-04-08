@@ -281,15 +281,20 @@
     }
 
     function hitungStats(data) {
-        let total = 0, paid = 0, unpaid = 0;
+        let totalPendapatan = 0, paid = 0, unpaid = 0;
+
         data.forEach(item => {
             let nom = parseInt(item.nominal_pendapatan) || 0;
-            total += nom;
-            if (item.status_pembayaran === 'Paid') paid += nom;
-            else unpaid += nom;
+
+            if (item.status_pembayaran === 'Paid') {
+                paid += nom;
+                totalPendapatan += nom; // Cuma duit yang beneran cair yang diitung!
+            } else {
+                unpaid += nom; // Duit halu (belum cair) ngumpul di sini aja
+            }
         });
 
-        document.getElementById('statTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+        document.getElementById('statTotal').innerText = 'Rp ' + totalPendapatan.toLocaleString('id-ID');
         document.getElementById('statPaid').innerText = 'Rp ' + paid.toLocaleString('id-ID');
         document.getElementById('statUnpaid').innerText = 'Rp ' + unpaid.toLocaleString('id-ID');
         document.getElementById('financeCount').innerText = `Menampilkan ${data.length} transaksi`;
