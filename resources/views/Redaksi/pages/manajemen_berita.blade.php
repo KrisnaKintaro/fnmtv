@@ -213,8 +213,36 @@
         loadDataTabel(); // Load pertama (muncul tulisan memuat)
         pollData(); // Mulai polling data berkala
         updateCounts();
-        SmartNotif.init({});
+        SmartNotif.init({
+            apiUrl: '/api/redaksi/getNotifikasi', // Nembak ke API yang baru lu bikin
+            renderItemHTML: function(item) {
+                // Semua notif Redaksi (Pending) kita kasih background sedikit kuning/orange biar keliatan butuh aksi
+                // Kalau di-klik, langsung buka modal review berdasarkan item.id!
+                return `
+                    <div class="notif-item" onclick="bukaNotifReview(${item.id})" style="cursor:pointer; padding:12px; border-bottom:1px solid #eee; display:flex; gap:12px; background: #fffaf0; transition: background 0.2s;">
+                        <div style="font-size:20px;">${item.icon}</div>
+                        <div class="notif-txt">
+                            <div style="font-weight:700; font-size:13px; color:var(--text);">${item.title}</div>
+                            <div style="font-size:12px; color:#555; line-height:1.4;">${item.message}</div>
+                            <div style="font-size:10px; color:#999; margin-top:4px;">${item.time}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
     });
+
+    function bukaNotifReview(id) {
+        if (DB[id]) {
+            openModal(id);
+        } else {
+            Toast.show('info', 'Sedang memuat data artikel, tunggu sebentar...');
+            loadDataTabel(true); // Paksa narik data
+            setTimeout(() => {
+                if(DB[id]) openModal(id);
+            }, 1000);
+        }
+    }
 
     function pollData() {
         loadDataTabel(true); // Panggil fungsi loadDataTabel yang silent tadi
