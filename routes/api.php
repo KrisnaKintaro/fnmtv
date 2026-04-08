@@ -109,6 +109,7 @@ Route::prefix('admin/top_performance')->group(function () {
 
 use App\Http\Controllers\Editor\BeritaController;
 use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
+use App\Http\Controllers\ViewerController;
 
 
 // Bagian Editor
@@ -123,7 +124,15 @@ Route::prefix('editor/manajemen_berita')->group(function() {
 // Group Redaksi
 Route::prefix('redaksi')->group(function () {
     Route::get('/getBeritaMasuk', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
-    Route::patch('/verifikasiBerita/{id_berita}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
+    Route::patch('/verifikasiBerita/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
     Route::get('/getNotifikasi', [VerifikasiBeritaController::class, 'getNotifikasi']);
+});
+
+// API untuk Viewers (Frontend)
+Route::prefix('viewers')->group(function() {
+    Route::get('/berita', [ViewerController::class, 'getBerita']);
+    Route::get('/kategori', [ViewerController::class, 'getKategori']);
+    Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
+    Route::get('/search', [ViewerController::class, 'searchBerita']);
 });
 

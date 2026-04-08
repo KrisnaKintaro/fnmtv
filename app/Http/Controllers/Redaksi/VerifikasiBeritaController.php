@@ -9,12 +9,36 @@ use Illuminate\Http\Request;
 
 class VerifikasiBeritaController extends Controller
 {
-    // List berita yang masuk (status Pending)
+    // List berita yang masuk (Pending, Published, dan Rejected untuk monitoring)
     public function getBeritaMasuk()
     {
-        $data = Berita::where('status_berita', 'Pending')
-                ->with(['user:id,username', 'kategori:id,nama_kategori'])
-                ->get();
+        $data = Berita::whereIn('status_berita', ['Pending', 'Published', 'Rejected'])
+                ->with(['user:id,id,username', 'kategori:id,id,nama_kategori'])
+                ->orderBy('created_at', 'DESC')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'judul_berita' => $item->judul_berita,
+                        'slug' => $item->slug,
+                        'isi_berita' => $item->isi_berita,
+                        'foto_thumbnail' => $item->foto_thumbnail,
+                        'status_berita' => $item->status_berita,
+                        'catatan_penolakan' => $item->catatan_penolakan,
+                        'created_at' => $item->created_at,
+                        'waktu_publikasi' => $item->waktu_publikasi,
+                        'user' => [
+                            'id' => $item->user?->id,
+                            'username' => $item->user?->username,
+                            'name' => $item->user?->name
+                        ],
+                        'kategori' => [
+                            'id' => $item->kategori?->id,
+                            'nama_kategori' => $item->kategori?->nama_kategori,
+                            'slug' => $item->kategori?->slug
+                        ]
+                    ];
+                });
 
         return response()->json([
             'status' => 'success',
