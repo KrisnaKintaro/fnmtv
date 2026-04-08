@@ -26,8 +26,7 @@
         <div class="fin-card">
             <div class="fin-ico">💰</div>
             <div class="fin-val fin-green" id="statTotal">Rp 0</div>
-            <div class="fin-lbl">Total Pendapatan (Filter)</div>
-        </div>
+            <div class="fin-lbl">Total Estimasi Omset</div> </div>
         <div class="fin-card">
             <div class="fin-ico">✅</div>
             <div class="fin-val fin-green" id="statPaid">Rp 0</div>
@@ -281,20 +280,21 @@
     }
 
     function hitungStats(data) {
-        let totalPendapatan = 0, paid = 0, unpaid = 0;
+        let totalOmset = 0, paid = 0, unpaid = 0;
 
         data.forEach(item => {
             let nom = parseInt(item.nominal_pendapatan) || 0;
 
+            totalOmset += nom; // Masukin semua duit (Paid + Unpaid) ke omset kotor
+
             if (item.status_pembayaran === 'Paid') {
                 paid += nom;
-                totalPendapatan += nom; // Cuma duit yang beneran cair yang diitung!
             } else {
-                unpaid += nom; // Duit halu (belum cair) ngumpul di sini aja
+                unpaid += nom;
             }
         });
 
-        document.getElementById('statTotal').innerText = 'Rp ' + totalPendapatan.toLocaleString('id-ID');
+        document.getElementById('statTotal').innerText = 'Rp ' + totalOmset.toLocaleString('id-ID');
         document.getElementById('statPaid').innerText = 'Rp ' + paid.toLocaleString('id-ID');
         document.getElementById('statUnpaid').innerText = 'Rp ' + unpaid.toLocaleString('id-ID');
         document.getElementById('financeCount').innerText = `Menampilkan ${data.length} transaksi`;
