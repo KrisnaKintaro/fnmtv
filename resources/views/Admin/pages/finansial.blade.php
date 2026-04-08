@@ -348,7 +348,7 @@
         if (data) {
             // Validasi: Gabisa di-Paid kalau nominalnya masih 0
             if (ubahStatusTargetVal === 'Paid' && (!data.nominal_pendapatan || data.nominal_pendapatan <= 0)) {
-                Toast.show('warning', 'Isi nominal pendapatannya dulu cuy sebelum di-Paid!');
+                Toast.show('warning', 'Isi nominal pendapatannya dulu sebelum di-Paid!');
                 ModalManager.close('modalUbahStatus');
                 return;
             }
