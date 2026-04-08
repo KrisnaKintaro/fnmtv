@@ -27,7 +27,7 @@ class UserController extends Controller
             'username' => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role'     => 'required|in:admin,redaksi,editor,viewer'
+            'role'     => 'required|in:Admin,Redaksi,Editor,Viewer'
         ], [
             'email.unique' => 'Email ini sudah dipakai cuy, gunakan email lain.',
             'role.in'      => 'Role tidak valid!'
@@ -58,7 +58,7 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $id_user, // Boleh email sama asal punya dia sendiri
-            'role'     => 'required|in:admin,redaksi,editor,viewer'
+            'role'     => 'required|in:Admin,Redaksi,Editor,Viewer'
         ]);
 
         $pengguna->username = $request->username;
@@ -77,7 +77,7 @@ class UserController extends Controller
             'data' => $pengguna
         ]);
     }
-  
+
     public function hapusPengguna($id_user)
     {
         $pengguna = User::find($id_user);
@@ -98,6 +98,31 @@ class UserController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Akun berhasil dihapus permanen!'
+        ]);
+    }
+    public function ubahStatusUser(Request $request, $idUser)
+    {
+        $user = User::find($idUser);
+
+        if (!$user) {
+            return response()->json(['status' => 'error', 'message' => 'User nggak ketemu cuy!'], 404);
+        }
+
+        // Lu gak boleh nonaktifin akun lu sendiri pas lagi login
+        if (Auth::id() == $idUser && $request->status == 'Nonaktif') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Masa lu mau matiin akun sendiri? Gak bisa gitu cuy!'
+            ], 403);
+        }
+
+        $user->status = $request->status; // 'Aktif' atau 'Nonaktif'
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status ' . $user->username . ' sekarang ' . $user->status . '!',
+            'data' => $user
         ]);
     }
 }

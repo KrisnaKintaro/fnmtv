@@ -90,13 +90,15 @@
 @section('js')
 <script>
     /* global DataTableEngine, ModalManager, Toast */
-    
+
     // Data akan di-load dari API
     let DBCategory = [];
     let editCatId = null;
 
     $(document).ready(function() {
         // 1. "Bajak" Input Search di Navbar khusus untuk halaman ini
+        $('#tbTitle').text('Manajemen Kategori');
+        $('#tbCrumb').text('Admin / Manajemen Kategori');
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.placeholder = 'Cari kategori...'; // Ubah placeholder
@@ -120,7 +122,9 @@
         perPage: 4,
         renderRowHTML: function(val) {
             const date = new Date(val.updated_at).toLocaleDateString('id-ID', {
-                day: 'numeric', month: 'short', year: 'numeric'
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
             });
 
             return `
@@ -144,7 +148,7 @@
         try {
             const response = await fetch('/api/admin/manajemen_kategori/ambilData');
             const result = await response.json();
-            
+
             if (result.status === 'success') {
                 DBCategory = result.data;
                 catTable.loadData(DBCategory);
@@ -196,13 +200,13 @@
         // 1. Filter Data Untuk Tabel via DataTableEngine
         catTable.setFilterAndSearch((val) => {
             return val.nama_kategori.toLowerCase().includes(keyword) ||
-                   val.slug.toLowerCase().includes(keyword);
+                val.slug.toLowerCase().includes(keyword);
         });
 
         // 2. Filter Data Manual Untuk Grid Card di Atas
         const dataTerfilter = DBCategory.filter((val) => {
             return val.nama_kategori.toLowerCase().includes(keyword) ||
-                   val.slug.toLowerCase().includes(keyword);
+                val.slug.toLowerCase().includes(keyword);
         });
 
         renderCatGrid(dataTerfilter);
@@ -234,7 +238,7 @@
 
     async function simpanKategori() {
         const nama = document.getElementById('inputNamaKategori').value.trim();
-        
+
         if (!nama) {
             Toast.show('error', 'Nama kategori tidak boleh kosong!');
             return;
@@ -247,12 +251,16 @@
                 // Update kategori
                 url = `/api/admin/manajemen_kategori/ubahData/${editCatId}`;
                 method = 'PUT';
-                payload = { nama_kategori: nama };
+                payload = {
+                    nama_kategori: nama
+                };
             } else {
                 // Tambah kategori baru
                 url = '/api/admin/manajemen_kategori/tambahData';
                 method = 'POST';
-                payload = { nama_kategori: nama };
+                payload = {
+                    nama_kategori: nama
+                };
             }
 
             const response = await fetch(url, {
@@ -311,6 +319,5 @@
             document.getElementById('inputSlugKategori').value = slug;
         }
     });
-
 </script>
 @endsection

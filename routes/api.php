@@ -39,6 +39,7 @@ Route::prefix('admin/manajemen_user')->group(function() {
     Route::post('/tambahData', [UserController::class, 'tambahPenggunaBaru']);
     Route::put('/ubahData/{id_user}', [UserController::class, 'ubahDataPengguna']);
     Route::delete('/hapusData/{id_user}', [UserController::class, 'hapusPengguna']);
+    Route::patch('/ubahStatus/{idUser}', [UserController::class, 'ubahStatusUser']);
 });
 
 Route::prefix('admin/manajemen_komentar')->group(function(){

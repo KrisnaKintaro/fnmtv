@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['Admin', 'Viewer', 'Editor', 'Redaksi'])->default('Viewer');
+            $table->enum('status', ['Aktif', 'Nonaktif'])->default('Aktif');
             $table->rememberToken();
             $table->timestamps();
         });
