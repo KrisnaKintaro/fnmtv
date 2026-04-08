@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+#================= VIEWERS =================
+Route::get('/', function () {
+    return view('viewers.pages.home');
+});
+
 #================= ADMIN =================
 Route::get('/', function () {
     return view('viewers.pages.home');
