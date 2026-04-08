@@ -1,4 +1,4 @@
-<!-- TOAST -->
+<!-- TOAST VIew -->
 <div class="toast" id="toast"></div>
 
 <!-- TOP STRIP -->
