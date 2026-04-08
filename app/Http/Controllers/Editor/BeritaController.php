@@ -90,10 +90,6 @@ class BeritaController extends Controller
                 'status_berita' => $request->status_berita ?? $berita->status_berita
             ];
 
-            if ($request->status_berita === 'Pending') {
-                $dataUpdate['catatan_penolakan'] = null;
-            }
-
             if ($request->hasFile('foto_thumbnail')) {
                 $pathFotoLama = public_path('uploads/thumbnail/' . $berita->foto_thumbnail);
                 if (File::exists($pathFotoLama)) {

@@ -36,11 +36,11 @@ class VerifikasiBeritaController extends Controller
         if ($request->status_berita === 'Published') {
             // Skenario 1: Redaksi ACC Berita -> Buat Tagihan Otomatis
             Pendapatan::firstOrCreate(
-                ['berita_id' => $berita->id], 
+                ['berita_id' => $berita->id],
                 [
                     'user_id' => $berita->user_id, // Editor yang punya berita
-                    'nominal_pendapatan' => 0,     
-                    'status_pembayaran' => 'Unpaid' 
+                    'nominal_pendapatan' => 0,
+                    'status_pembayaran' => 'Unpaid'
                 ]
             );
         } else {
@@ -68,6 +68,12 @@ class VerifikasiBeritaController extends Controller
 
         if ($request->status_berita == 'Published') {
             $updateData['waktu_publikasi'] = now();
+            // Kalau di-acc, bersihin catatan penolakan lama biar gak nyangkut
+            $updateData['catatan_penolakan'] = null;
+        } else if ($request->status_berita == 'Rejected') {
+            // Nah, ini kuncinya! Ambil dari request AJAX tadi
+            $updateData['catatan_penolakan'] = $request->catatan_penolakan;
+            $updateData['waktu_publikasi'] = null;
         }
 
         $berita->update($updateData);
@@ -78,7 +84,8 @@ class VerifikasiBeritaController extends Controller
             'data' => [
                 'id' => $berita->id,
                 'status_berita' => $berita->status_berita,
-                'waktu_publikasi' => $berita->waktu_publikasi
+                'waktu_publikasi' => $berita->waktu_publikasi,
+                'catatan_penolakan' => $berita->catatan_penolakan // Balikin juga datanya biar JS bisa baca
             ]
         ], 200);
     }

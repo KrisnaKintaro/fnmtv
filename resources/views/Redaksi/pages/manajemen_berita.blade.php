@@ -74,7 +74,7 @@
         <!-- empty state -->
         <div class="empty-state" id="emptyState" style="display:none;">
             <div class="ico">📭</div>
-            <p>Tidak ada artikel / Beritaditemukan pada kategori ini.</p>
+            <p>Tidak ada artikel / Berita ditemukan pada kategori ini.</p>
         </div>
 
         <div class="pager">
@@ -210,103 +210,20 @@
 @section('js')
 <script>
     $(document).ready(function() {
-        loadDataTabel();
+        loadDataTabel(); // Load pertama (muncul tulisan memuat)
+        pollData(); // Mulai polling data berkala
         updateCounts();
         SmartNotif.init({});
     });
-    /* ══════════════════════════════════════
-       DATABASE ARTIKEL (Dummy Format API Baru)
-    ══════════════════════════════════════ */
-    /* ══════════════════════════════════════
-       DATABASE ARTIKEL (Dummy Format API Baru)
-    ══════════════════════════════════════ */
-    const DB = {
-        beras: {
-            id: 1,
-            judul_berita: 'Harga Beras Naik Jelang Lebaran, Pemerintah Buka Impor',
-            slug: 'harga-beras-naik-jelang-lebaran',
-            user: {
-                username: 'Budi Santoso'
-            },
-            kategori: {
-                nama_kategori: 'Ekonomi'
-            },
-            created_at: '26 Mar 2026',
-            status_berita: 'Pending',
-            foto_thumbnail: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&q=80',
-            emoji: '🌾',
-            isi_berita: `<p>Harga beras di berbagai pasar tradisional Indonesia mengalami kenaikan signifikan menjelang Hari Raya Idul Fitri 2026. Berdasarkan data dari Badan Pangan Nasional, harga beras medium kini menyentuh Rp16.500 per kilogram.</p>`,
-            catatan_penolakan: null
-        },
-        bpjs: {
-            id: 2,
-            judul_berita: 'BPJS Kesehatan Tanggung Biaya Operasi Jantung Terbaru',
-            slug: 'bpjs-kesehatan-tanggung-biaya-operasi-jantung',
-            user: {
-                username: 'Arif Wibowo'
-            },
-            kategori: {
-                nama_kategori: 'Kesehatan'
-            },
-            created_at: '25 Mar 2026',
-            status_berita: 'Pending',
-            foto_thumbnail: 'https://images.unsplash.com/photo-1538108149393-ceb66fa1e528?w=400&q=80',
-            emoji: '🏥',
-            isi_berita: `<p>BPJS Kesehatan resmi mengumumkan perluasan cakupan layanan dengan menanggung biaya prosedur operasi jantung terbaru, termasuk pemasangan ring koroner generasi terbaru dan operasi bypass arteri.</p>`,
-            catatan_penolakan: null
-        },
-        garuda: {
-            id: 3,
-            judul_berita: 'Timnas Garuda Menang Telak 3-0 Lawan Vietnam',
-            slug: 'timnas-garuda-menang-telak-3-0',
-            user: {
-                username: 'Sari Maharani'
-            },
-            kategori: {
-                nama_kategori: 'Olahraga'
-            },
-            created_at: '14 Mar 2026',
-            status_berita: 'Published',
-            foto_thumbnail: 'https://images.unsplash.com/photo-1518605368461-1e12d1b74730?w=400&q=80',
-            emoji: '⚽',
-            isi_berita: `<p>Timnas Indonesia menunjukkan performa gemilang dengan mengalahkan Vietnam 3-0 dalam laga kualifikasi Piala Dunia 2026 zona Asia di Stadion Utama Gelora Bung Karno.</p>`,
-            catatan_penolakan: null
-        },
-        film: {
-            id: 4,
-            judul_berita: 'Film Indonesia Raih Penghargaan di Festival Berlin',
-            slug: 'film-indonesia-raih-penghargaan-berlin',
-            user: {
-                username: 'Dewi Puspita'
-            },
-            kategori: {
-                nama_kategori: 'Hiburan'
-            },
-            created_at: '12 Mar 2026',
-            status_berita: 'Published',
-            foto_thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80',
-            emoji: '🎬',
-            isi_berita: `<p>Film Indonesia berjudul "Tanah di Ujung Dunia" berhasil meraih penghargaan Silver Bear untuk kategori Best Director di Berlinale 2026.</p>`,
-            catatan_penolakan: null
-        },
-        hoaks: {
-            id: 5,
-            judul_berita: 'Aplikasi Medsos Baru Diklaim Lebih Privat dari WhatsApp',
-            slug: 'aplikasi-medsos-baru-diklaim-lebih-privat',
-            user: {
-                username: 'Budi Santoso'
-            },
-            kategori: {
-                nama_kategori: 'Teknologi'
-            },
-            created_at: '10 Mar 2026',
-            status_berita: 'Rejected',
-            foto_thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80',
-            emoji: '📱',
-            isi_berita: `<p>Sebuah aplikasi media sosial baru bernama "PrivaChat" yang dikembangkan oleh startup lokal mengklaim memiliki tingkat privasi lebih tinggi dibandingkan WhatsApp.</p>`,
-            catatan_penolakan: 'Sumber data tidak terverifikasi dan klaim teknis dalam artikel tidak didukung oleh bukti ilmiah yang cukup.'
-        }
-    };
+
+    function pollData() {
+        loadDataTabel(true); // Panggil fungsi loadDataTabel yang silent tadi
+
+        // Tunggu 5 detik baru panggil lagi diri sendiri
+        setTimeout(pollData, 5000);
+    }
+
+    let DB = {};
 
     /* ── KONSTANTA & PENGATURAN UI ── */
     const BADGE_CLASS = {
@@ -352,7 +269,12 @@
             const judul = val.judul_berita || val.title;
             const penulis = val.user ? val.user.username : (val.author || 'Unknown');
             const kategori = val.kategori ? val.kategori.nama_kategori : (val.cat || 'Uncategorized');
-            const tanggal = val.created_at || val.date;
+            const rawDate = val.created_at || val.date || '';
+            const tanggal = rawDate ? new Date(rawDate).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }) : '-';
             const alasanTolak = val.catatan_penolakan || val.rejectReason;
 
             let metaText = '';
@@ -360,9 +282,18 @@
             else if (status === 'published') metaText = `Disetujui oleh Redaksi · ${tanggal}`;
             else metaText = `Ditolak · ${alasanTolak ? alasanTolak.substring(0, 50) + '…' : 'Sumber tidak terverifikasi'}`;
 
+            // ── LOGIKA GAMBAR KHUSUS TABEL (Biar sama kayak modal) ──
+            let imgUrl = val.foto_thumbnail;
+            if (imgUrl && !imgUrl.startsWith('http')) {
+                imgUrl = `/uploads/thumbnail/${imgUrl}`; // Path folder asli lu
+            }
+            const thumbHTML = imgUrl ?
+                `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
+                `<div style="font-size:24px; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">${val.emoji || '📰'}</div>`;
+
             return `
             <tr data-key="${val.key || val.id}">
-                <td><div class="tbl-img">${val.foto_berita ? `<img src="/uploads/${val.foto_berita}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` : (val.emoji || '📰')}</div></td>
+                <td><div class="tbl-img">${thumbHTML}</div></td>
                 <td>
                     <div class="tbl-title">${judul}</div>
                     <div class="tbl-meta">${metaText}</div>
@@ -421,30 +352,82 @@
         });
     }
 
-    /* ── UPDATE FUNGSI APPLY VERDICT ── */
-    // Timpa fungsi applyVerdict lama lu pakai ini:
     function applyVerdict(row, key, status) {
-        // Update database dummy-nya (Pakai format API baru)
-        DB[key].status_berita = status;
-        DB[key].status = status; // Fallback
+        // 1. Normalisasi status biar sinkron sama LABEL & BADGE_CLASS
+        const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+        const lowerStatus = status.toLowerCase();
 
-        // Render ulang data tabel
-        loadDataTabel();
+        // 2. Update data di memori lokal (DB)
+        if (DB[key]) {
+            DB[key].status_berita = capitalizedStatus;
+            DB[key].status = lowerStatus; // Jaga-jaga buat logic filter
+        }
+
+        // 3. KUNCI UTAMA: Paksa DataTableEngine buat render ulang data yang udah diupdate
+        // Kita ambil semua nilai dari DB yang udah berubah tadi
+        const dataTerupdate = Object.values(DB);
+        beritaTable.loadData(dataTerupdate);
+
+        // 4. Jalankan filter (biar kalau lagi di tab 'Pending', artikelnya langsung ilang pindah tab)
+        jalankanFilter();
+
+        // 5. Update angka counter di atas (Semua, Pending, Terbit, Ditolak)
         updateCounts();
     }
 
     // Fungsi buat ngubah Dummy Object 'DB' jadi Array biar bisa dibaca DataEngine
-    function loadDataTabel() {
-        const dataArray = Object.keys(DB).map(k => ({
-            key: k,
-            ...DB[k]
-        }));
-        beritaTable.loadData(dataArray);
-        jalankanFilter(); // Langsung apply filter saat ini
+    function loadDataTabel(isSilent = false) {
+        // Cuma tampilin "Memuat" kalau BUKAN update otomatis (isSilent = false)
+        if (!isSilent) {
+            document.getElementById('newsBody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Memuat data dari server...</td></tr>';
+        }
+
+        $.ajax({
+            url: '/api/redaksi/getBeritaMasuk',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    DB = {};
+                    let dataArray = [];
+                    let listKategori = new Set();
+                    let listPenulis = new Set();
+
+                    response.data.forEach(item => {
+                        DB[item.id] = item;
+                        dataArray.push(item);
+                        if (item.kategori && item.kategori.nama_kategori) listKategori.add(item.kategori.nama_kategori);
+                        if (item.user && item.user.username) listPenulis.add(item.user.username);
+                    });
+
+                    // Update dropdown cuma kalau dipanggil pertama kali (biar pilihan user gak keganti pas ngetik)
+                    if (!isSilent) {
+                        renderFilterOptions(listKategori, listPenulis);
+                    }
+
+                    beritaTable.loadData(dataArray);
+                    jalankanFilter();
+                    updateCounts();
+                }
+            },
+            error: function(xhr) {
+                if (!isSilent) Toast.show('error', 'Gagal sinkronisasi data.');
+            }
+        });
+    }
+
+    // Pisahin fungsi render filter biar rapi
+    function renderFilterOptions(kategoriSet, penulisSet) {
+        let htmlKategori = '<option value="">Semua Kategori</option>';
+        kategoriSet.forEach(k => htmlKategori += `<option value="${k}">${k}</option>`);
+        document.getElementById('filterKategori').innerHTML = htmlKategori;
+
+        let htmlPenulis = '<option value="">Semua Penulis</option>';
+        penulisSet.forEach(p => htmlPenulis += `<option value="${p}">${p}</option>`);
+        document.getElementById('filterPenulis').innerHTML = htmlPenulis;
     }
 
     /* ── FUNGSI MODAL DETAIL & REVIEW (UPDATE API) ── */
-    /* ── FUNGSI MODAL DETAIL & REVIEW ── */
     function openModal(key) {
         const a = DB[key];
 
@@ -454,11 +437,48 @@
         const slug = a.slug;
         const konten = a.isi_berita;
         const status = (a.status_berita || a.status).toLowerCase();
-        const tgl = a.created_at || a.date || 'Baru Saja';
-        const alasanTolak = a.catatan_penolakan || a.rejectReason;
+        const rawTgl = a.created_at || a.date || '';
+        const tgl = rawTgl ? new Date(rawTgl).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        }) : 'Baru Saja';
+        const alasanTolak = a.catatan_penolakan || null; // Ambil catatan asli dari API
 
         document.getElementById('mdTitle').textContent = judul;
         document.getElementById('mdSub').textContent = `${penulis} · ${kategori} · ${tgl}`;
+
+        // ── [BARU] LOGIKA TAMPILKAN CATATAN PENOLAKAN SEBELUMNYA ──
+        // Hapus elemen lama kalau ada biar gak duplikat saat pindah-pindah modal
+        const oldAlert = document.getElementById('mdPrevRejectAlert');
+        if (oldAlert) oldAlert.remove();
+
+        if (alasanTolak) {
+            // Buat elemen alert box baru
+            const alertBox = document.createElement('div');
+            alertBox.id = 'mdPrevRejectAlert';
+            alertBox.style = `
+                background: #fff5f5;
+                border: 1px solid #feb2b2;
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                font-size: 13px;
+                color: #c53030;
+                display: flex;
+                gap: 12px;
+                align-items: flex-start;
+            `;
+            alertBox.innerHTML = `
+                <div style="font-size: 18px;">⚠️</div>
+                <div>
+                    <strong style="display:block; margin-bottom:2px;">Catatan Penolakan Sebelumnya:</strong>
+                    <span style="color: var(--text); line-height: 1.5;">${alasanTolak}</span>
+                </div>
+            `;
+            // Sisipkan di bawah Header (mdSub) dan di atas Gambar (mdThumb)
+            document.getElementById('mdThumb').before(alertBox);
+        }
 
         // LOGIKA EMOJI & GAMBAR MODAL
         let imgUrl = a.foto_thumbnail;
@@ -541,14 +561,34 @@
         const key = document.getElementById('modalDetail').dataset.currentKey;
         const row = document.querySelector(`tr[data-key="${key}"]`);
 
-        // Ubah status jadi pending
-        applyVerdict(row, key, 'pending');
+        $.ajax({
+            url: `/api/redaksi/verifikasiBerita/${key}`,
+            type: 'PATCH',
+            data: {
+                status_berita: 'Pending'
+            },
+            success: function(response) {
+                applyVerdict(row, key, 'pending');
 
-        // Tutup semua modalnya
-        ModalManager.close('modalConfirmUnpublish');
-        ModalManager.close('modalDetail');
+                ModalManager.close('modalConfirmUnpublish');
+                ModalManager.close('modalDetail');
+                Toast.show('warning', 'Publikasi ditarik. Artikel kembali ke status Pending.');
+            },
+            error: function(xhr) {
+                handleApiError(xhr);
+            }
+        });
+    }
 
-        Toast.show('warning', 'Publikasi ditarik. Artikel kembali ke status Pending.');
+    // Fungsi Helper buat nangkep Error API (Biar ga duplikat kodenya)
+    function handleApiError(xhr) {
+        if (xhr.status === 403) {
+            // Error khusus: Berita sudah dibayar Admin
+            Toast.show('error', xhr.responseJSON.message || "Aksi ditolak oleh sistem.");
+        } else {
+            Toast.show('error', "Gagal memperbarui status berita. Cek koneksi!");
+        }
+        console.error("API Error:", xhr.responseText);
     }
 
     // 2. Eksekusi Publish
@@ -556,11 +596,24 @@
         const key = document.getElementById('modalDetail').dataset.currentKey;
         const row = document.querySelector(`tr[data-key="${key}"]`);
 
-        applyVerdict(row, key, 'published');
+        $.ajax({
+            url: `/api/redaksi/verifikasiBerita/${key}`,
+            type: 'PATCH', // Sesuai spek lu pakai PATCH
+            data: {
+                status_berita: 'Published'
+            },
+            success: function(response) {
+                // Update UI lokal
+                applyVerdict(row, key, 'published');
 
-        ModalManager.close('modalConfirmPublish');
-        ModalManager.close('modalDetail');
-        Toast.show('success', 'Artikel berhasil di-publish ke portal!');
+                ModalManager.close('modalConfirmPublish');
+                ModalManager.close('modalDetail');
+                Toast.show('success', response.message || 'Artikel berhasil diterbitkan!');
+            },
+            error: function(xhr) {
+                handleApiError(xhr);
+            }
+        });
     }
 
     // 3. Eksekusi Reject
@@ -576,17 +629,34 @@
     function submitRejectFromDetail() {
         const note = document.getElementById('mdRejectText').value.trim();
         if (!note) {
-            alert('Harap isi alasan penolakan untuk Editor.');
+            Toast.show('warning', 'Harap isi alasan penolakan untuk Editor.');
             return;
         }
+
         const key = document.getElementById('modalDetail').dataset.currentKey;
         const row = document.querySelector(`tr[data-key="${key}"]`);
 
-        DB[key].rejectReason = note;
-        applyVerdict(row, key, 'rejected');
+        // ── PROSES TEMBAK API PATCH ──
+        $.ajax({
+            url: `/api/redaksi/verifikasiBerita/${key}`,
+            type: 'PATCH',
+            data: {
+                status_berita: 'Rejected',
+                catatan_penolakan: note
+            },
+            success: function(response) {
+                // Update state di memori JS biar tabel & counter langsung berubah
+                DB[key].catatan_penolakan = note;
+                applyVerdict(row, key, 'rejected');
 
-        ModalManager.close('modalDetail');
-        Toast.show('error', 'Artikel ditolak & alasan dikirim ke Editor.');
+                ModalManager.close('modalDetail');
+                Toast.show('error', 'Artikel ditolak & alasan dikirim ke Editor.');
+            },
+            error: function(xhr) {
+                // Nangkep error 403 (sudah lunas) atau error lainnya
+                handleApiError(xhr);
+            }
+        });
     }
 
     /* ── UPDATE COUNTER ANGKA TAB & SIDEBAR ── */
