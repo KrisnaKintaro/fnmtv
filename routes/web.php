@@ -2,11 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 
-#================= ADMIN =================
+#================= VIEWERS =================
 Route::get('/', function () {
     return view('viewers.pages.home');
 });
 
+#================= ADMIN =================
 Route::get('/berita', function () {
     return view('Admin.pages.manajemen_berita');
 });
