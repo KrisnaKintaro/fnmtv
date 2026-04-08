@@ -176,7 +176,7 @@
         <div class="card">
             <div class="card-hd">
                 <div class="card-ht">Daftar Berita</div>
-                <div class="card-hm" id="tableCount">Menampilkan 9 artikel</div>
+                <div class="card-hm" id="tableCount"></div>
             </div>
             <table id="newsTable">
                 <thead>
@@ -296,7 +296,12 @@
             // Jalankan fungsi saat halaman pertama kali dimuat
             loadKategori();
             loadDaftarBerita();
-            loadStatistik();
+
+            // Polling buat update tabel & notif setiap 10 detik
+            setInterval(function() {
+                // Kita panggil loadData secara silent (tanpa ngerusak ketikan user)
+                loadDaftarBerita(true);
+            }, 5000);
 
             // INIT NOTIFIKASI KHUSUS EDITOR
             SmartNotif.init({
@@ -372,34 +377,34 @@
 
         function loadKategori() {
             $.ajax({
-                url: '/api/admin/manajemen_kategori/ambilData', // URL sesuai API lu
+                url: '/api/admin/manajemen_kategori/ambilData',
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    // Cek apakah status dari Controller bernilai 'success'
                     if (response.status === 'success') {
                         let optionsForm = '<option value="">-- Pilih Kategori --</option>';
                         let optionsFilter = '<option value="all">Semua Kategori</option>';
 
-                        // Alur Looping: Mengubah Array Data menjadi tag <option>
                         $.each(response.data, function(key, val) {
-                            // val.id_kategori dan val.nama_kategori diambil dari respons API
-                            optionsForm +=
-                                `<option value="${val.id}">${val.nama_kategori}</option>`;
-                            optionsFilter +=
-                                `<option value="${val.nama_kategori}">${val.nama_kategori}</option>`;
+                            optionsForm += `<option value="${val.id}">${val.nama_kategori}</option>`;
+                            optionsFilter += `<option value="${val.nama_kategori}">${val.nama_kategori}</option>`;
                         });
 
-                        // Masukkan hasil looping ke semua elemen dengan class tersebut
-                        $('.select-kategori-ajax').each(function() {
-                            // Jika elemen ini adalah filter, kasih optionsFilter (ada pilihan 'all')
-                            if ($(this).attr('id') === 'filterKategori') {
-                                $(this).html(optionsFilter);
-                            } else {
-                                // Jika untuk form tulis, kasih optionsForm
-                                $(this).html(optionsForm);
-                            }
-                        });
+                        // Update Filter Kategori (Aman dari blank)
+                        const filterEl = $('#filterKategori');
+                        let currentFilter = filterEl.val(); // Simpan pilihan lama
+                        filterEl.html(optionsFilter);
+                        // Paksa pilih 'all' kalau sebelumnya kosong/blank gara-gara glitch browser
+                        filterEl.val(currentFilter ? currentFilter : 'all');
+
+                        // Update Form Kategori
+                        const formEl = $('select[name="kategori_id"]');
+                        let currentForm = formEl.val();
+                        formEl.html(optionsForm);
+                        formEl.val(currentForm);
+
+                        // KUNCI: Senggol tabel buat refresh setelah kategori siap!
+                        jalankanFilter();
                     }
                 },
                 error: function(xhr) {
@@ -408,43 +413,39 @@
             });
         }
 
-        function loadStatistik() {
+        // Fungsi Super: Sekali narik data, tabel & statistik langsung update!
+        function loadDaftarBerita(isSilent = false) {
             $.ajax({
-                url: '/api/editor/manajemen_berita/ambilData',
-                type: 'GET',
-                success: function(response) {
-                    const all = response.length;
-                    const draft = response.filter(b => b.status_berita === 'Draft').length;
-                    const pending = response.filter(b => b.status_berita === 'Pending').length;
-                    const rejected = response.filter(b => b.status_berita === 'Rejected').length;
-
-                    $('.s-badge').text(all);
-                    // Targetkan span di dalam tab-pills
-                    const tabs = $('#tabPills .tab-p span');
-                    $(tabs[0]).text(all);
-                    $(tabs[1]).text(draft);
-                    $(tabs[2]).text(pending);
-                    $(tabs[3]).text(rejected);
-                }
-            });
-        }
-
-        function loadDaftarBerita() {
-            $.ajax({
-                url: '/api/editor/manajemen_berita/ambilData',
+                // Tambahin "?t=" + waktu sekarang biar browser kapok nge-cache
+                url: '/api/editor/manajemen_berita/ambilData?t=' + new Date().getTime(),
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    // Kasih datanya ke engine
+                    // 1. Masukin data ke engine tabel
                     beritaTable.loadData(response);
 
-                    // Langsung jalankan filter awal
+                    // 2. Render ulang (Trigger UI)
                     jalankanFilter();
 
-                    loadStatistik();
+                    // 3. Update Statistik LANGSUNG di sini (Gak usah 2x AJAX!)
+                    if (response && Array.isArray(response)) {
+                        const all = response.length;
+                        const draft = response.filter(b => b.status_berita === 'Draft').length;
+                        const pending = response.filter(b => b.status_berita === 'Pending').length;
+                        const rejected = response.filter(b => b.status_berita === 'Rejected').length;
+
+                        $('.s-badge').text(all);
+                        const tabs = $('#tabPills .tab-p span');
+                        if (tabs.length >= 4) {
+                            $(tabs[0]).text(all);
+                            $(tabs[1]).text(draft);
+                            $(tabs[2]).text(pending);
+                            $(tabs[3]).text(rejected);
+                        }
+                    }
                 },
-                error: function() {
-                    console.error("Gagal mengambil daftar berita cuy!");
+                error: function(xhr) {
+                    if(!isSilent) console.error("Gagal mengambil daftar berita cuy!");
                 }
             });
         }
@@ -482,9 +483,12 @@
                     if (response.status === 'success') {
                         Toast.show('success', response.message);
 
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1500);
+                        // ── KUNCI UTAMA DI SINI ──
+                        resetFormBerita();
+                        showPage('my-news', document.querySelectorAll('.s-item')[1]);
+
+                        // Tarik ulang SEMUA data berita dari server biar tabel penuh lagi
+                        loadDaftarBerita(true);
                     }
                 },
                 error: function(xhr) {
@@ -543,7 +547,13 @@
 
                         document.getElementById('sectionTitle').textContent = 'Edit Berita';
                         document.getElementById('backButtonContainer').style.display = 'block';
+
+                        // 1. Pindah halaman dulu (ini bakal ngeset title default "Tulis Berita")
                         showPage('write-news', null);
+
+                        // ── 2. [BARU] OVERRIDE NAVBAR SESUAI JUDUL BERITA ──
+                        document.getElementById('tbTitle').textContent = `Edit Berita - ${berita.judul_berita}`;
+                        document.getElementById('tbCrumb').textContent = `Editor / Berita Saya / Edit Berita / ${berita.judul_berita}`;
                     }
                 }
             });
@@ -576,9 +586,12 @@
                 success: function(response) {
                     Toast.show('success', "Data berita berhasil diperbarui.");
 
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
+                    // ── KUNCI UTAMA DI SINI ──
+                    resetFormBerita();
+                    showPage('my-news', document.querySelectorAll('.s-item')[1]);
+
+                    // Tarik ulang SEMUA data berita biar statusnya ter-update di tabel
+                    loadDaftarBerita(true);
                 },
                 error: function(xhr) {
                     // Sekarang lu bisa baca errornya di sini
@@ -632,7 +645,7 @@
 
         /* ── PAGE NAV ── */
         const pageTitles = {
-            'write-news': ['Tulis Berita Baru', 'Editor / Berita / Tulis'],
+            'write-news': ['Tulis Berita Baru', 'Editor / Tulis Berita Baru'],
             'my-news': ['Berita Saya', 'Editor / Berita Saya'],
         };
 
@@ -671,7 +684,11 @@
             $('#inputJudul').val('');
             $('#inputSlug').val('');
             $('#inputKonten').html('');
-            $('.select-kategori-ajax').val('');
+
+            // ── INI KUNCI FIX-NYA ──
+            // Ganti $('.select-kategori-ajax') pakai atribut name biar spesifik ke form aja
+            $('select[name="kategori_id"]').val('');
+
             $('#inputFoto').val('');
             $('#imgPreview').hide().attr('src', '');
             $('.thumb-upload .ico, .thumb-upload p').show();
@@ -744,18 +761,26 @@
 
         // Fungsi ini yang bakal ngasih instruksi ke DataEngine (Gue balikin namanya jadi jalankanFilter biar HTML lu ga error)
         function jalankanFilter() {
-            const kategoriDipilih = document.getElementById('filterKategori').value;
+            let kategoriDipilih = document.getElementById('filterKategori').value;
             const urutanDipilih = document.getElementById('filterUrutan').value;
-            // Di HTML navbar lu input search-nya belom ada id="searchInput", pastiin lu tambahin ya!
             const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
+
+            // KUNCI UTAMA: Kalau browser nge-glitch dan value-nya kosong, kita amankan ke 'all'
+            if (!kategoriDipilih || kategoriDipilih === "") {
+                kategoriDipilih = 'all';
+                document.getElementById('filterKategori').value = 'all'; // Paksa UI balik normal
+            }
 
             // Kasih tau engine cara nge-filter
             beritaTable.setFilterAndSearch((val) => {
-                const cocokStatus = (statusAktif === 'all' || val.status_berita.toLowerCase() === statusAktif);
+                const cocokStatus = (statusAktif === 'all' || (val.status_berita || '').toLowerCase() === statusAktif);
                 const kategoriBaris = val.kategori ? val.kategori.nama_kategori : 'Uncategorized';
                 const cocokKategori = (kategoriDipilih === 'all' || kategoriBaris === kategoriDipilih);
-                const cocokSearch = !keyword || val.judul_berita.toLowerCase().includes(keyword) || (val.slug && val
-                    .slug.toLowerCase().includes(keyword));
+
+                // Tambah pengaman buat val.judul_berita biar ga error undefined
+                const cocokSearch = !keyword ||
+                                    (val.judul_berita || '').toLowerCase().includes(keyword) ||
+                                    (val.slug && val.slug.toLowerCase().includes(keyword));
 
                 return cocokStatus && cocokKategori && cocokSearch;
             });
