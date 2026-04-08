@@ -55,6 +55,11 @@
     <div class="main">
         @include('Admin.layout.navbar')
         @yield('konten')
+        <div id="toast"
+            style="position:fixed; bottom:28px; right:28px; background:#1a1a1a; color:#fff; padding:14px 20px; border-radius:8px; font-size:13px; font-weight:600; display:none; align-items:center; gap:12px; box-shadow:0 8px 30px rgba(0,0,0,.3); z-index:9999; min-width:280px; max-width:400px; transition:opacity .3s; opacity:0;">
+            <span id="toastIco" style="font-size:20px;">✅</span>
+            <span id="toastMsg" style="line-height:1.4;">Pesan notifikasi di sini...</span>
+        </div>
     </div>
 
     <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
