@@ -122,7 +122,7 @@ Route::prefix('editor/manajemen_berita')->group(function() {
 
 // Group Redaksi
 Route::prefix('redaksi')->group(function () {
-    Route::get('/masuk', [VerifikasiBeritaController::class, 'index']);
-    Route::patch('/verifikasi/{id}', [VerifikasiBeritaController::class, 'verifikasi']);
+    Route::get('/getBeritaMasuk', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
+    Route::patch('/verifikasiBerita/{id_berita}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
 });
 

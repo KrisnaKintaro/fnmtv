@@ -99,11 +99,14 @@
         </div>
         <div class="modal-body">
             <div class="modal-thumb" id="mdThumb">📰</div>
-            <div class="modal-chips" id="mdChips">
+            <div class="modal-chips" id="mdChips" style="flex-wrap: wrap;">
                 <div class="chip">Penulis: <b id="md-author">—</b></div>
                 <div class="chip">Kategori: <b id="md-cat">—</b></div>
                 <div class="chip">Dikirim: <b id="md-date">—</b></div>
                 <div class="chip">Status: <b id="md-status">—</b></div>
+                <div class="chip" style="width: 100%; margin-top:4px;">
+                    Slug: <b id="md-slug" style="font-family:'JetBrains Mono',monospace; color:var(--blue);">—</b>
+                </div>
             </div>
             <div class="modal-sec">Isi Artikel</div>
             <div class="modal-article-body" id="mdContent"></div>
@@ -158,10 +161,30 @@
                     <div class="txt" style="flex:1;">
                         <div id="mdResultTitle" style="font-weight:bold; font-size:16px; color:var(--text); margin-bottom:6px;"></div>
                         <div id="mdResultDesc" style="font-size:13.5px; color:var(--muted); line-height:1.5;"></div>
+
+                        <button id="btnUnpublish" class="btn btn-outline btn-sm" style="margin-top:12px; display:none;" onclick="cancelPublish()">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Batalkan Publish
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
+<div class="modal-backdrop" id="modalConfirmUnpublish" style="display:none; z-index: 600;">
+    <div class="modal" style="max-width: 400px; text-align: center; padding: 30px; position: relative;">
+        <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+        <h3 style="font-family: 'Merriweather', serif; margin-bottom: 10px;">Batalkan Publikasi?</h3>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 24px;">
+            Artikel ini akan ditarik dari portal publik dan dikembalikan ke status <b>Pending</b>. Yakin ingin melanjutkan?
+        </p>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="ModalManager.close('modalConfirmUnpublish')">Kembali</button>
+            <button class="btn btn-red" style="flex:1; justify-content:center;" onclick="executeUnpublish()">Ya, Tarik Artikel</button>
         </div>
     </div>
 </div>
@@ -192,91 +215,96 @@
         SmartNotif.init({});
     });
     /* ══════════════════════════════════════
-       DATABASE ARTIKEL (simulasi Dummy)
+       DATABASE ARTIKEL (Dummy Format API Baru)
+    ══════════════════════════════════════ */
+    /* ══════════════════════════════════════
+       DATABASE ARTIKEL (Dummy Format API Baru)
     ══════════════════════════════════════ */
     const DB = {
         beras: {
-            title: 'Harga Beras Naik Jelang Lebaran, Pemerintah Buka Impor',
-            author: 'Budi Santoso',
-            cat: 'Ekonomi',
-            date: '26 Mar 2026',
-            status: 'pending',
+            id: 1,
+            judul_berita: 'Harga Beras Naik Jelang Lebaran, Pemerintah Buka Impor',
+            slug: 'harga-beras-naik-jelang-lebaran',
+            user: {
+                username: 'Budi Santoso'
+            },
+            kategori: {
+                nama_kategori: 'Ekonomi'
+            },
+            created_at: '26 Mar 2026',
+            status_berita: 'Pending',
+            foto_thumbnail: 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&q=80',
             emoji: '🌾',
-            content: `<p>Harga beras di berbagai pasar tradisional Indonesia mengalami kenaikan signifikan menjelang Hari Raya Idul Fitri 2026. Berdasarkan data dari Badan Pangan Nasional, harga beras medium kini menyentuh Rp16.500 per kilogram, naik sekitar 12% dari bulan sebelumnya.</p>
-    <p>Pemerintah melalui Kementerian Perdagangan mengumumkan kebijakan buka impor beras sebanyak 500.000 ton untuk menstabilkan pasokan dalam negeri.</p>`
+            isi_berita: `<p>Harga beras di berbagai pasar tradisional Indonesia mengalami kenaikan signifikan menjelang Hari Raya Idul Fitri 2026. Berdasarkan data dari Badan Pangan Nasional, harga beras medium kini menyentuh Rp16.500 per kilogram.</p>`,
+            catatan_penolakan: null
         },
         bpjs: {
-            title: 'BPJS Kesehatan Tanggung Biaya Operasi Jantung Terbaru',
-            author: 'Arif Wibowo',
-            cat: 'Kesehatan',
-            date: '25 Mar 2026',
-            status: 'pending',
+            id: 2,
+            judul_berita: 'BPJS Kesehatan Tanggung Biaya Operasi Jantung Terbaru',
+            slug: 'bpjs-kesehatan-tanggung-biaya-operasi-jantung',
+            user: {
+                username: 'Arif Wibowo'
+            },
+            kategori: {
+                nama_kategori: 'Kesehatan'
+            },
+            created_at: '25 Mar 2026',
+            status_berita: 'Pending',
+            foto_thumbnail: 'https://images.unsplash.com/photo-1538108149393-ceb66fa1e528?w=400&q=80',
             emoji: '🏥',
-            content: `<p>BPJS Kesehatan resmi mengumumkan perluasan cakupan layanan dengan menanggung biaya prosedur operasi jantung terbaru, termasuk pemasangan ring koroner generasi terbaru dan operasi bypass arteri.</p>`
-        },
-        asean: {
-            title: 'KTT ASEAN 2026 Bahas Krisis Pangan dan Energi Regional',
-            author: 'Budi Santoso',
-            cat: 'Internasional',
-            date: '24 Mar 2026',
-            status: 'pending',
-            emoji: '🌐',
-            content: `<p>Konferensi Tingkat Tinggi (KTT) ASEAN 2026 yang berlangsung di Jakarta resmi dibuka pada Senin (23/3). Para pemimpin dari 10 negara anggota ASEAN berkumpul untuk membahas isu-isu krusial.</p>`
-        },
-        brin: {
-            title: 'Peneliti BRIN Temukan Spesies Baru di Hutan Papua',
-            author: 'Dewi Puspita',
-            cat: 'Sains',
-            date: '23 Mar 2026',
-            status: 'pending',
-            emoji: '🔬',
-            content: `<p>Tim peneliti dari Badan Riset dan Inovasi Nasional (BRIN) mengumumkan penemuan spesies baru amfibi di kawasan hutan hujan pegunungan Papua Tengah.</p>`
-        },
-        lrt: {
-            title: 'Proyek LRT Jabodebek Fase 2 Mulai Konstruksi April 2026',
-            author: 'Arif Wibowo',
-            cat: 'Infrastruktur',
-            date: '22 Mar 2026',
-            status: 'pending',
-            emoji: '🏙️',
-            content: `<p>Kementerian Perhubungan resmi mengumumkan dimulainya konstruksi LRT Jabodebek Fase 2 yang akan memperluas jaringan ke wilayah Bogor dan Tangerang Selatan.</p>`
-        },
-        kebijakan: {
-            title: 'Pemerintah Umumkan Kebijakan Ekonomi Baru untuk 2026',
-            author: 'Budi Santoso',
-            cat: 'Politik',
-            date: '15 Mar 2026',
-            status: 'published', // Berubah dari approved
-            emoji: '🏛️',
-            content: `<p>Pemerintah Indonesia secara resmi meluncurkan paket kebijakan ekonomi baru untuk tahun 2026 yang mencakup 12 langkah strategis.</p>`
+            isi_berita: `<p>BPJS Kesehatan resmi mengumumkan perluasan cakupan layanan dengan menanggung biaya prosedur operasi jantung terbaru, termasuk pemasangan ring koroner generasi terbaru dan operasi bypass arteri.</p>`,
+            catatan_penolakan: null
         },
         garuda: {
-            title: 'Timnas Garuda Menang Telak 3-0 Lawan Vietnam',
-            author: 'Sari Maharani',
-            cat: 'Olahraga',
-            date: '14 Mar 2026',
-            status: 'published', // Berubah dari approved
+            id: 3,
+            judul_berita: 'Timnas Garuda Menang Telak 3-0 Lawan Vietnam',
+            slug: 'timnas-garuda-menang-telak-3-0',
+            user: {
+                username: 'Sari Maharani'
+            },
+            kategori: {
+                nama_kategori: 'Olahraga'
+            },
+            created_at: '14 Mar 2026',
+            status_berita: 'Published',
+            foto_thumbnail: 'https://images.unsplash.com/photo-1518605368461-1e12d1b74730?w=400&q=80',
             emoji: '⚽',
-            content: `<p>Timnas Indonesia menunjukkan performa gemilang dengan mengalahkan Vietnam 3-0 dalam laga kualifikasi Piala Dunia 2026 zona Asia di Stadion Utama Gelora Bung Karno.</p>`
+            isi_berita: `<p>Timnas Indonesia menunjukkan performa gemilang dengan mengalahkan Vietnam 3-0 dalam laga kualifikasi Piala Dunia 2026 zona Asia di Stadion Utama Gelora Bung Karno.</p>`,
+            catatan_penolakan: null
         },
         film: {
-            title: 'Film Indonesia Raih Penghargaan di Festival Berlin',
-            author: 'Sari Maharani',
-            cat: 'Hiburan',
-            date: '12 Mar 2026',
-            status: 'published', // Berubah dari approved
+            id: 4,
+            judul_berita: 'Film Indonesia Raih Penghargaan di Festival Berlin',
+            slug: 'film-indonesia-raih-penghargaan-berlin',
+            user: {
+                username: 'Dewi Puspita'
+            },
+            kategori: {
+                nama_kategori: 'Hiburan'
+            },
+            created_at: '12 Mar 2026',
+            status_berita: 'Published',
+            foto_thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&q=80',
             emoji: '🎬',
-            content: `<p>Film Indonesia berjudul "Tanah di Ujung Dunia" berhasil meraih penghargaan Silver Bear untuk kategori Best Director di Berlinale 2026.</p>`
+            isi_berita: `<p>Film Indonesia berjudul "Tanah di Ujung Dunia" berhasil meraih penghargaan Silver Bear untuk kategori Best Director di Berlinale 2026.</p>`,
+            catatan_penolakan: null
         },
         hoaks: {
-            title: 'Aplikasi Medsos Baru Diklaim Lebih Privat dari WhatsApp',
-            author: 'Dewi Puspita',
-            cat: 'Teknologi',
-            date: '10 Mar 2026',
-            status: 'rejected',
+            id: 5,
+            judul_berita: 'Aplikasi Medsos Baru Diklaim Lebih Privat dari WhatsApp',
+            slug: 'aplikasi-medsos-baru-diklaim-lebih-privat',
+            user: {
+                username: 'Budi Santoso'
+            },
+            kategori: {
+                nama_kategori: 'Teknologi'
+            },
+            created_at: '10 Mar 2026',
+            status_berita: 'Rejected',
+            foto_thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400&q=80',
             emoji: '📱',
-            rejectReason: 'Sumber data tidak terverifikasi dan klaim teknis dalam artikel tidak didukung oleh bukti ilmiah yang cukup.',
-            content: `<p>Sebuah aplikasi media sosial baru bernama "PrivaChat" yang dikembangkan oleh startup lokal mengklaim memiliki tingkat privasi lebih tinggi dibandingkan WhatsApp.</p>`
+            isi_berita: `<p>Sebuah aplikasi media sosial baru bernama "PrivaChat" yang dikembangkan oleh startup lokal mengklaim memiliki tingkat privasi lebih tinggi dibandingkan WhatsApp.</p>`,
+            catatan_penolakan: 'Sumber data tidak terverifikasi dan klaim teknis dalam artikel tidak didukung oleh bukti ilmiah yang cukup.'
         }
     };
 
@@ -308,7 +336,7 @@
 
     function filterChanged() {
         currentPage = 1; // Balikin ke halaman 1 tiap kali ngetik search / ganti dropdown
-        applyFilters();
+        jalankanFilter();
     }
 
     /* ── SETUP DATATABLE ENGINE ── */
@@ -319,25 +347,33 @@
         emptyState: '#emptyState',
         perPage: 5,
         renderRowHTML: function(val) {
+            // Mapping penyesuaian (karena ini ntar dari API)
+            const status = (val.status_berita || val.status).toLowerCase();
+            const judul = val.judul_berita || val.title;
+            const penulis = val.user ? val.user.username : (val.author || 'Unknown');
+            const kategori = val.kategori ? val.kategori.nama_kategori : (val.cat || 'Uncategorized');
+            const tanggal = val.created_at || val.date;
+            const alasanTolak = val.catatan_penolakan || val.rejectReason;
+
             let metaText = '';
-            if (val.status === 'pending') metaText = 'Menunggu keputusan Redaksi';
-            else if (val.status === 'published') metaText = `Disetujui oleh Redaksi · ${val.date}`;
-            else metaText = `Ditolak · ${val.rejectReason ? val.rejectReason.substring(0, 50) + '…' : 'Sumber tidak terverifikasi'}`;
+            if (status === 'pending') metaText = 'Menunggu keputusan Redaksi';
+            else if (status === 'published') metaText = `Disetujui oleh Redaksi · ${tanggal}`;
+            else metaText = `Ditolak · ${alasanTolak ? alasanTolak.substring(0, 50) + '…' : 'Sumber tidak terverifikasi'}`;
 
             return `
-            <tr data-key="${val.key}">
-                <td><div class="tbl-img">${val.emoji}</div></td>
+            <tr data-key="${val.key || val.id}">
+                <td><div class="tbl-img">${val.foto_berita ? `<img src="/uploads/${val.foto_berita}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` : (val.emoji || '📰')}</div></td>
                 <td>
-                    <div class="tbl-title">${val.title}</div>
+                    <div class="tbl-title">${judul}</div>
                     <div class="tbl-meta">${metaText}</div>
                 </td>
-                <td><span class="badge b-cat">${val.cat}</span></td>
-                <td style="font-size:12px;color:var(--muted);">${val.author}</td>
-                <td style="font-size:12px;color:var(--muted);">${val.date}</td>
-                <td><span class="badge ${BADGE_CLASS[val.status]}">${LABEL[val.status]}</span></td>
+                <td><span class="badge b-cat">${kategori}</span></td>
+                <td style="font-size:12px;color:var(--muted);">${penulis}</td>
+                <td style="font-size:12px;color:var(--muted);">${tanggal}</td>
+                <td><span class="badge ${BADGE_CLASS[status]}">${LABEL[status] || status}</span></td>
                 <td>
                     <div class="act-btns">
-                        <div class="ico-btn" title="${val.status === 'pending' ? 'Lihat & Validasi' : 'Lihat Detail'}" onclick="openModal('${val.key}')">
+                        <div class="ico-btn" title="${status === 'pending' ? 'Lihat & Validasi' : 'Lihat Detail'}" onclick="openModal('${val.key || val.id}')">
                             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -358,7 +394,7 @@
         document.getElementById('cardTitle').textContent = CARD_TITLES[status];
 
         document.querySelectorAll('#tabPills .tab-p').forEach(t => t.classList.remove('active'));
-        if(el) el.classList.add('active');
+        if (el) el.classList.add('active');
 
         jalankanFilter();
     }
@@ -366,13 +402,20 @@
     function jalankanFilter() {
         const cat = document.getElementById('filterKategori').value;
         const author = document.getElementById('filterPenulis').value;
-        const search = document.getElementById('searchInput').value.toLowerCase();
+        const searchInput = document.getElementById('searchInput');
+        const search = searchInput ? searchInput.value.toLowerCase() : '';
 
         beritaTable.setFilterAndSearch((val) => {
-            const matchStatus = currentTab === 'all' || val.status === currentTab;
-            const matchCat = !cat || val.cat === cat;
-            const matchAuthor = !author || val.author === author;
-            const matchSearch = !search || val.title.toLowerCase().includes(search) || val.author.toLowerCase().includes(search);
+            // MAPPING FORMAT BARU BIAR GAK UNDEFINED ERROR
+            const statusBaris = (val.status_berita || val.status || '').toLowerCase();
+            const kategoriBaris = val.kategori ? val.kategori.nama_kategori : (val.cat || '');
+            const penulisBaris = val.user ? val.user.username : (val.author || '');
+            const judulBaris = (val.judul_berita || val.title || '').toLowerCase();
+
+            const matchStatus = currentTab === 'all' || statusBaris === currentTab;
+            const matchCat = !cat || kategoriBaris === cat;
+            const matchAuthor = !author || penulisBaris === author;
+            const matchSearch = !search || judulBaris.includes(search) || penulisBaris.toLowerCase().includes(search);
 
             return matchStatus && matchCat && matchAuthor && matchSearch;
         });
@@ -381,8 +424,9 @@
     /* ── UPDATE FUNGSI APPLY VERDICT ── */
     // Timpa fungsi applyVerdict lama lu pakai ini:
     function applyVerdict(row, key, status) {
-        // Update database dummy-nya
-        DB[key].status = status;
+        // Update database dummy-nya (Pakai format API baru)
+        DB[key].status_berita = status;
+        DB[key].status = status; // Fallback
 
         // Render ulang data tabel
         loadDataTabel();
@@ -391,53 +435,120 @@
 
     // Fungsi buat ngubah Dummy Object 'DB' jadi Array biar bisa dibaca DataEngine
     function loadDataTabel() {
-        const dataArray = Object.keys(DB).map(k => ({ key: k, ...DB[k] }));
+        const dataArray = Object.keys(DB).map(k => ({
+            key: k,
+            ...DB[k]
+        }));
         beritaTable.loadData(dataArray);
         jalankanFilter(); // Langsung apply filter saat ini
     }
 
-    /* ── MODAL DETAIL & REVIEW ── */
+    /* ── FUNGSI MODAL DETAIL & REVIEW (UPDATE API) ── */
+    /* ── FUNGSI MODAL DETAIL & REVIEW ── */
     function openModal(key) {
         const a = DB[key];
-        document.getElementById('mdTitle').textContent = a.title;
-        document.getElementById('mdSub').textContent = `${a.author} · ${a.cat} · ${a.date}`;
-        document.getElementById('mdThumb').textContent = a.emoji;
-        document.getElementById('md-author').textContent = a.author;
-        document.getElementById('md-cat').textContent = a.cat;
-        document.getElementById('md-date').textContent = a.date;
-        document.getElementById('md-status').textContent = LABEL[a.status] || a.status;
-        document.getElementById('mdContent').innerHTML = a.content;
+
+        const judul = a.judul_berita;
+        const penulis = a.user ? a.user.username : 'Unknown';
+        const kategori = a.kategori ? a.kategori.nama_kategori : 'Uncategorized';
+        const slug = a.slug;
+        const konten = a.isi_berita;
+        const status = (a.status_berita || a.status).toLowerCase();
+        const tgl = a.created_at || a.date || 'Baru Saja';
+        const alasanTolak = a.catatan_penolakan || a.rejectReason;
+
+        document.getElementById('mdTitle').textContent = judul;
+        document.getElementById('mdSub').textContent = `${penulis} · ${kategori} · ${tgl}`;
+
+        // LOGIKA EMOJI & GAMBAR MODAL
+        let imgUrl = a.foto_thumbnail;
+        if (imgUrl && !imgUrl.startsWith('http')) {
+            imgUrl = `/uploads/thumbnail/${imgUrl}`;
+        }
+
+        // Kalau gambar ada, render gambar. Kalau gada, besarin emojinya
+        document.getElementById('mdThumb').innerHTML = imgUrl ?
+            `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
+            `<div style="font-size:36px; display:flex; align-items:center; justify-content:center; height:100%; width:100%;">${a.emoji || '📰'}</div>`;
+
+        document.getElementById('md-author').textContent = penulis;
+        document.getElementById('md-cat').textContent = kategori;
+        document.getElementById('md-date').textContent = tgl;
+        document.getElementById('md-slug').textContent = slug;
+        document.getElementById('md-status').textContent = LABEL[status] || status;
+        document.getElementById('mdContent').innerHTML = konten;
 
         const vw = document.getElementById('mdVerdictWrap');
         const rw = document.getElementById('mdResultWrap');
         const rb = document.getElementById('mdResultBox');
+        const btnUnpublish = document.getElementById('btnUnpublish');
 
-        // Reset box penolakan
         document.getElementById('mdRejectNote').classList.remove('show');
         document.getElementById('mdRejectText').value = '';
 
-        if (a.status === 'pending') {
+        if (status === 'pending') {
             vw.style.display = 'block';
             rw.style.display = 'none';
         } else {
             vw.style.display = 'none';
             rw.style.display = 'block';
-            rb.className = 'info-result-box ' + a.status;
+            rb.className = 'info-result-box ' + status;
 
-            if (a.status === 'published') {
+            if (status === 'published') {
                 document.getElementById('mdResultIco').textContent = '✅';
                 document.getElementById('mdResultTitle').textContent = 'Artikel Telah Diterbitkan';
                 document.getElementById('mdResultDesc').innerHTML = 'Artikel ini telah disetujui dan tayang ke publik.';
+                btnUnpublish.style.display = 'inline-flex';
             } else {
                 document.getElementById('mdResultIco').textContent = '❌';
                 document.getElementById('mdResultTitle').textContent = 'Artikel Ditolak';
-                // Tambahin label Alasan biar rapi
-                document.getElementById('mdResultDesc').innerHTML = '<strong style="color:var(--text);">Alasan:</strong> ' + (a.rejectReason || 'Ditolak oleh Redaksi.');
+                document.getElementById('mdResultDesc').innerHTML = '<strong style="color:var(--text);">Alasan:</strong> ' + (alasanTolak || 'Ditolak oleh Redaksi.');
+                btnUnpublish.style.display = 'none';
             }
         }
 
         document.getElementById('modalDetail').dataset.currentKey = key;
         ModalManager.open('modalDetail');
+    }
+
+    /* ── FUNGSI: BUKA MODAL BATAL PUBLISH ── */
+    function cancelPublish() {
+        ModalManager.open('modalConfirmUnpublish');
+    }
+
+    /* ── FUNGSI BARU: EKSEKUSI BATAL PUBLISH ── */
+    function executeUnpublish() {
+        const key = document.getElementById('modalDetail').dataset.currentKey;
+        const row = document.querySelector(`tr[data-key="${key}"]`);
+
+        // Ubah status jadi pending
+        applyVerdict(row, key, 'pending');
+
+        // Tutup semua modalnya
+        ModalManager.close('modalConfirmUnpublish');
+        ModalManager.close('modalDetail');
+
+        Toast.show('warning', 'Publikasi ditarik. Artikel kembali ke status Pending.');
+    }
+
+    function cancelPublish() {
+        // Kita panggil modal custom kita, bukan confirm() web lagi
+        ModalManager.open('modalConfirmUnpublish');
+    }
+
+    /* ── FUNGSI BARU: EKSEKUSI BATAL PUBLISH ── */
+    function executeUnpublish() {
+        const key = document.getElementById('modalDetail').dataset.currentKey;
+        const row = document.querySelector(`tr[data-key="${key}"]`);
+
+        // Ubah status jadi pending
+        applyVerdict(row, key, 'pending');
+
+        // Tutup semua modalnya
+        ModalManager.close('modalConfirmUnpublish');
+        ModalManager.close('modalDetail');
+
+        Toast.show('warning', 'Publikasi ditarik. Artikel kembali ke status Pending.');
     }
 
     // 2. Eksekusi Publish
@@ -479,13 +590,17 @@
     }
 
     /* ── UPDATE COUNTER ANGKA TAB & SIDEBAR ── */
-    /* ── UPDATE COUNTER ANGKA TAB & SIDEBAR ── */
     function updateCounts() {
-        let cnt = { pending: 0, published: 0, rejected: 0, all: 0 };
+        let cnt = {
+            pending: 0,
+            published: 0,
+            rejected: 0,
+            all: 0
+        };
 
-        // Hitung langsung dari object DB, bukan dari HTML
+        // Hitung langsung dari object DB, MAPPING KE FORMAT BARU
         Object.values(DB).forEach(val => {
-            let s = val.status;
+            let s = (val.status_berita || val.status || '').toLowerCase();
             if (s === 'approved') s = 'published'; // Auto map
 
             if (cnt[s] !== undefined) cnt[s]++;
@@ -493,13 +608,13 @@
         });
 
         // Update tab counts di topbar
-        document.getElementById('cnt-all').textContent = cnt.all;
-        document.getElementById('cnt-pending').textContent = cnt.pending;
-        document.getElementById('cnt-published').textContent = cnt.published;
-        document.getElementById('cnt-rejected').textContent = cnt.rejected;
+        if (document.getElementById('cnt-all')) document.getElementById('cnt-all').textContent = cnt.all;
+        if (document.getElementById('cnt-pending')) document.getElementById('cnt-pending').textContent = cnt.pending;
+        if (document.getElementById('cnt-published')) document.getElementById('cnt-published').textContent = cnt.published;
+        if (document.getElementById('cnt-rejected')) document.getElementById('cnt-rejected').textContent = cnt.rejected;
 
         // Update sidebar count
-        document.getElementById('pendingCount').textContent = cnt.pending;
+        if (document.getElementById('pendingCount')) document.getElementById('pendingCount').textContent = cnt.pending;
     }
 
     /* ── LOGIN / LOGOUT ── */
