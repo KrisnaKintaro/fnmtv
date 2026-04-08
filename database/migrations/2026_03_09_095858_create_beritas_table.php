@@ -21,9 +21,10 @@ return new class extends Migration
             $table->longText('isi_berita');
             $table->string('foto_thumbnail');
             $table->string('foto_isi_berita')->nullable();
+            $table->text('catatan_penolakan')->nullable();
 
             // Pake index biar pas pengunjung cari berita "Published" loadingnya cepet
-            $table->enum('status_berita', ['Draft', 'Published'])->default('Draft')->index();
+            $table->enum('status_berita', ['Draft', 'Pending','Published', 'Rejected'])->default('Draft')->index();
             $table->integer('jumlah_view')->default(0); // Buat nampilin angka total aja
             $table->timestamp('waktu_publikasi')->nullable();
             $table->softDeletes();
