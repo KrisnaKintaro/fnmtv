@@ -1509,62 +1509,6 @@
         <!-- TOAST -->
         <div class="toast" id="toast"></div>
 
-        <!-- ═══ TOP STRIP ═══ -->
-        <div class="topstrip">
-            <div class="ts-inner">
-                <div class="ts-links">
-                    <div class="ts-link active" id="ts-terkini" onclick="filterTopStrip('terkini',this)">Berita Terkini
-                    </div>
-                    <div class="ts-link" id="ts-populer" onclick="filterTopStrip('populer',this)">Berita Populer</div>
-                    <div class="ts-link" id="ts-editor" onclick="filterTopStrip('editor',this)">Pilihan Editor</div>
-                    <div class="ts-link" id="ts-artikel" onclick="filterTopStrip('artikel',this)">Artikel</div>
-                </div>
-                <div class="ts-socials">
-                    <div class="ts-social" title="Facebook" onclick="openSocial('facebook')">f</div>
-                    <div class="ts-social" title="Instagram" onclick="openSocial('instagram')">📷</div>
-                    <div class="ts-social" title="WhatsApp" onclick="openSocial('whatsapp')">📱</div>
-                    <div class="ts-social" title="Akun">👤</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ HEADER ═══ -->
-        <div class="header">
-            <div class="header-inner">
-                <div class="logo" onclick="goHome()">FNM</div>
-                <div class="header-tagline">Fenomena News Media<br>Delivering unbiased, in-depth reporting</div>
-                <div class="header-search" id="searchWrap">
-                    <input class="search-input" type="text" placeholder="Cari berita, topik, penulis..." id="searchInput"
-                        oninput="liveSearch(this.value)" onkeydown="handleSearchKey(event)" autocomplete="off">
-                    <button class="search-btn" onclick="doSearch()">🔍</button>
-                    <div class="search-dropdown" id="searchDropdown"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ NAV ═══ -->
-        <div class="nav">
-            <div class="nav-inner">
-                <div class="nav-item active" data-cat="home" onclick="setNav(this,'home')">HOME</div>
-                <div class="nav-item" data-cat="terkini" onclick="setNav(this,'terkini')">Terkini</div>
-                <div class="nav-item" data-cat="politik" onclick="setNav(this,'politik')">Politik</div>
-                <div class="nav-item" data-cat="ekonomi" onclick="setNav(this,'ekonomi')">Ekonomi</div>
-                <div class="nav-item" data-cat="olahraga" onclick="setNav(this,'olahraga')">Olahraga</div>
-                <div class="nav-item" data-cat="teknologi" onclick="setNav(this,'teknologi')">Teknologi</div>
-                <div class="nav-item" data-cat="kesehatan" onclick="setNav(this,'kesehatan')">Kesehatan</div>
-                <div class="nav-more" id="navMore" onclick="toggleNavMore()">
-                    Lainnya <span>▾</span>
-                    <div class="nav-more-dropdown" id="navMoreDropdown">
-                        <div class="nmd-item" onclick="setNav(null,'hukum')">⚖️ Hukum</div>
-                        <div class="nmd-item" onclick="setNav(null,'lingkungan')">🌿 Lingkungan</div>
-                        <div class="nmd-item" onclick="setNav(null,'budaya')">🎭 Budaya</div>
-                        <div class="nmd-item" onclick="setNav(null,'pendidikan')">🎓 Pendidikan</div>
-                        <div class="nmd-item" onclick="setNav(null,'bencana')">🌊 Bencana</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- ═══════════════════════════════════════════════════════ -->
         <!-- HOME VIEW -->
         <!-- ═══════════════════════════════════════════════════════ -->
@@ -1862,272 +1806,54 @@
     @section('js')
         <script>
             // ═══════════════════════════════════════════════════
-            // DATA LAYER — Siap diganti dengan API fetch Laravel
-            // Struktur: articles[slug] = { ...fields }
+            // DATA LAYER — Loaded from API
             // ═══════════════════════════════════════════════════
-            const articles = {
-                'berkas-epstein': {
-                    cat: 'Pilihan Editor',
-                    category: 'politik',
-                    type: 'editor',
-                    title: 'Berkas Epstein memicu era baru teori konspirasi global',
-                    author: 'Budi Santoso',
-                    avatar: 'B',
-                    hero: '🕵️',
-                    views: 84200,
-                    cmt: 47,
-                    date: '10 Mar 2026',
-                    tags: ['politik', 'konspirasi', 'internasional'],
-                    body: `<p>Dokumen rahasia yang selama ini dikubur rapat kini tersebar ke publik, membuka babak baru dalam perdebatan soal jaringan kekuasaan global yang melibatkan nama-nama besar.</p>
-    <h2>Apa yang Terungkap?</h2>
-    <p>Berkas setebal lebih dari 800 halaman itu mengandung catatan pertemuan, transaksi finansial, dan daftar nama yang selama ini disebut-sebut dalam dugaan jaringan perdagangan manusia internasional.</p>
-    <blockquote>"Ini bukan sekadar skandal individu. Ini adalah cermin dari sistem yang membiarkan orang berkuasa berlindung di balik uang dan pengaruh." — Pengamat Hukum Internasional</blockquote>
-    <p>Reaksi dunia pun tak terbendung. Dalam 24 jam setelah bocoran pertama, tagar terkait meledak di berbagai platform media sosial, memaksa sejumlah pemerintah memberikan pernyataan resmi.</p>
-    <h2>Dampak Politik</h2>
-    <p>Di Washington, sejumlah senator dari kedua partai menuntut investigasi independen segera dibuka. Di London, tekanan serupa muncul dari anggota parlemen. Sementara di Indonesia, para pengamat menyoroti implikasinya terhadap hubungan bilateral dengan negara-negara yang nama pejabatnya disebut.</p>`
-                },
-                'komisi-x': {
-                    cat: 'Politik',
-                    category: 'politik',
-                    type: 'terkini',
-                    title: 'Komisi X DPR Ingatkan Alumni: "LPDP Dana Publik, Bukan Hak Segelintir Elite"',
-                    author: 'Rina Agustina',
-                    avatar: 'R',
-                    hero: '🏛️',
-                    views: 18400,
-                    cmt: 12,
-                    date: '10 Mar 2026',
-                    tags: ['politik', 'dpr', 'pendidikan', 'lpdp'],
-                    body: `<p>Anggota Komisi X DPR RI menegaskan bahwa dana beasiswa LPDP berasal dari APBN, sehingga penggunaannya harus kembali untuk kepentingan bangsa secara luas, bukan dinikmati segelintir kalangan.</p>
-    <h2>Konteks Pernyataan</h2>
-    <p>Pernyataan ini muncul setelah viralnya diskusi di media sosial soal alumni LPDP yang tidak kembali ke Indonesia usai studi, atau bekerja di lembaga internasional tanpa kontribusi nyata ke negeri asal.</p>
-    <blockquote>"Negara sudah investasi ratusan juta per orang. Wajar kalau publik bertanya: apa yang sudah kamu berikan kembali?" ujar anggota Komisi X dalam rapat dengar pendapat.</blockquote>
-    <p>LPDP sendiri mencatat lebih dari 40.000 alumni tersebar di berbagai penjuru dunia dengan sebagian besar telah kembali dan berkontribusi di tanah air.</p>`
-                },
-                'gajah-sumatera': {
-                    cat: 'Lingkungan',
-                    category: 'lingkungan',
-                    type: 'terkini',
-                    title: 'Gajah Sumatera Ditemukan Mati Terlilit Kawat Listrik di Aceh',
-                    author: 'Dewi Puspita',
-                    avatar: 'D',
-                    hero: '🐘',
-                    views: 9700,
-                    cmt: 8,
-                    date: '10 Mar 2026',
-                    tags: ['lingkungan', 'konservasi', 'aceh', 'satwa'],
-                    body: `<p>Seekor gajah sumatera jantan berusia sekitar 20 tahun ditemukan mati di perkebunan sawit kawasan Aceh Timur. Berdasarkan pemeriksaan awal, kematian diduga akibat terlilit kawat besi berlistrik yang dipasang warga untuk menghalau hama.</p>
-    <h2>Kondisi Populasi</h2>
-    <p>Gajah sumatera (Elephas maximus sumatranus) berstatus kritis terancam punah dengan populasi diperkirakan hanya tersisa 1.300–2.800 ekor di alam liar. Setiap kematian individu memiliki dampak signifikan terhadap kelangsungan spesies.</p>
-    <blockquote>"Konflik manusia-gajah adalah dampak langsung dari deforestasi masif. Ketika hutan mereka hilang, mereka masuk ke wilayah manusia." — Peneliti KLHK</blockquote>
-    <p>Balai Konservasi Sumber Daya Alam (BKSDA) Aceh menyatakan sedang menyelidiki kasus ini dan berkoordinasi dengan kepolisian setempat untuk mengusut pemasangan kawat berlistrik yang ilegal.</p>`
-                },
-                'seskab-teddy': {
-                    cat: 'Politik',
-                    category: 'politik',
-                    type: 'terkini',
-                    title: 'Seskab Teddy: Tidak Benar Produk AS Masuk Indonesia Tanpa Sertifikasi Halal',
-                    author: 'Budi Santoso',
-                    avatar: 'B',
-                    hero: '👔',
-                    views: 12300,
-                    cmt: 31,
-                    date: '10 Mar 2026',
-                    tags: ['politik', 'halal', 'perdagangan', 'as'],
-                    body: `<p>Sekretaris Kabinet (Seskab) Teddy Indra Wijaya membantah tegas beredarnya kabar yang menyebut produk impor dari Amerika Serikat mendapat pengecualian dari kewajiban sertifikasi halal MUI.</p>
-    <h2>Klarifikasi Resmi</h2>
-    <p>Dalam pernyataan resminya, Seskab Teddy menegaskan bahwa seluruh produk pangan, kosmetik, dan obat-obatan yang beredar di Indonesia — tanpa terkecuali asal negaranya — tetap wajib memenuhi regulasi halal yang berlaku.</p>
-    <blockquote>"Tidak ada kesepakatan apa pun yang memberikan pengecualian sertifikasi halal kepada produk negara tertentu. Itu informasi yang keliru dan menyesatkan." — Seskab Teddy</blockquote>`
-                },
-                'aksi-brimob': {
-                    cat: 'Hukum',
-                    category: 'hukum',
-                    type: 'terkini',
-                    title: 'Aksi Brutal Oknum Brimob Aniaya Siswa Pakai Helm hingga Tewas di Tual',
-                    author: 'Rina Agustina',
-                    avatar: 'R',
-                    hero: '👮',
-                    views: 14200,
-                    cmt: 64,
-                    date: '10 Mar 2026',
-                    tags: ['hukum', 'kriminal', 'brimob', 'tual'],
-                    body: `<p>Seorang pelajar SMA berusia 17 tahun di Kota Tual, Maluku, meninggal dunia setelah diduga dianiaya oleh oknum anggota Brimob Polda Maluku menggunakan helm. Kejadian ini memicu kecaman dari berbagai pihak.</p>
-    <h2>Kronologi Kejadian</h2>
-    <p>Peristiwa terjadi pada malam hari ketika korban bersama sejumlah temannya berada di area parkir pusat perbelanjaan. Menurut saksi mata, terjadi cekcok verbal yang berujung pada kekerasan fisik oleh pelaku yang mengenakan seragam dinas.</p>
-    <blockquote>"Anak saya tidak pernah terlibat masalah. Dia hanya ada di tempat yang salah, di waktu yang salah." — Orang tua korban</blockquote>
-    <p>Kapolda Maluku menyatakan pelaku telah diamankan dan akan diproses sesuai hukum yang berlaku, termasuk melalui sidang Propam.</p>`
-                },
-                'polisi-muda': {
-                    cat: 'Kriminal',
-                    category: 'hukum',
-                    type: 'terkini',
-                    title: 'Polisi Muda di Sulsel Tewas di Barak, Kompolnas Desak Pengusutan Menyeluruh',
-                    author: 'Dewi Puspita',
-                    avatar: 'D',
-                    hero: '🚔',
-                    views: 9800,
-                    cmt: 22,
-                    date: '10 Mar 2026',
-                    tags: ['hukum', 'polisi', 'sulsel'],
-                    body: `<p>Seorang anggota Polri berpangkat Bripda ditemukan tewas di dalam kamarnya di asrama kepolisian Sulawesi Selatan. Komisi Kepolisian Nasional (Kompolnas) langsung meminta penyelidikan menyeluruh dan transparan.</p>
-    <h2>Permintaan Kompolnas</h2>
-    <p>Kompolnas mendesak agar autopsi dilakukan secara independent dengan melibatkan tim dokter forensik dari luar institusi kepolisian. Hal ini untuk memastikan tidak ada konflik kepentingan dalam proses penyelidikan.</p>
-    <blockquote>"Keluarga berhak mendapatkan jawaban yang jelas. Tidak boleh ada yang ditutup-tutupi." — Komisioner Kompolnas</blockquote>`
-                },
-                'guru-honorer': {
-                    cat: 'Pendidikan',
-                    category: 'pendidikan',
-                    type: 'artikel',
-                    title: 'Ketika Guru Honorer Dipecat, Rangkap Jabatan Elite Pendidikan Tetap Dibiarkan',
-                    author: 'Sari Maharani',
-                    avatar: 'S',
-                    hero: '🎓',
-                    views: 7300,
-                    cmt: 19,
-                    date: '9 Mar 2026',
-                    tags: ['pendidikan', 'honorer', 'guru'],
-                    body: `<p>Di satu sisi, ribuan guru honorer kehilangan pekerjaan setiap tahun dengan pesangon yang minim. Di sisi lain, pejabat-pejabat di lingkungan Kemendikbud masih leluasa merangkap berbagai jabatan dengan gaji berlipat.</p>
-    <h2>Paradoks Sistem Pendidikan</h2>
-    <p>Data Federasi Guru Independen mencatat lebih dari 120.000 guru honorer diberhentikan dalam tiga tahun terakhir. Mayoritas tanpa uang pesangon, asuransi kesehatan, atau jaminan hari tua yang layak.</p>
-    <blockquote>"Kami mendidik generasi penerus bangsa, tapi kami sendiri tidak punya kepastian hidup." — Guru honorer di Jawa Timur</blockquote>`
-                },
-                'rupiah-as': {
-                    cat: 'Ekonomi',
-                    category: 'ekonomi',
-                    type: 'populer',
-                    title: 'Rupiah Dibuka Menguat Pagi Ini, AS Batalkan Sebagian Tarif Trump',
-                    author: 'Arif Wibowo',
-                    avatar: 'A',
-                    hero: '💵',
-                    views: 42100,
-                    cmt: 87,
-                    date: '10 Mar 2026',
-                    tags: ['ekonomi', 'rupiah', 'dollar', 'tarif'],
-                    body: `<p>Nilai tukar rupiah terhadap dolar AS menguat signifikan di pembukaan perdagangan hari ini setelah pemerintahan Biden mengumumkan penundaan pemberlakuan kembali sebagian tarif impor era Trump.</p>
-    <h2>Pergerakan Pasar</h2>
-    <p>Rupiah berhasil menguat ke level Rp15.720 per dolar AS dari posisi sebelumnya Rp15.890. Penguatan ini juga ditopang oleh sentimen positif dari data ekonomi domestik yang lebih baik dari ekspektasi.</p>
-    <blockquote>"Pelonggaran tarif ini membuka peluang ekspor Indonesia ke AS. Ini katalis positif jangka pendek untuk rupiah." — Ekonom Bank Mandiri</blockquote>`
-                },
-                'prabowo-bilateral': {
-                    cat: 'Politik',
-                    category: 'politik',
-                    type: 'populer',
-                    title: 'Seskab Teddy: Prabowo Satu-satunya Kepala Negara yang Gelar Bilateral di Sela KTT',
-                    author: 'Budi Santoso',
-                    avatar: 'B',
-                    hero: '🤝',
-                    views: 38700,
-                    cmt: 53,
-                    date: '10 Mar 2026',
-                    tags: ['politik', 'prabowo', 'diplomasi', 'ktt'],
-                    body: `<p>Sekretaris Kabinet Teddy Indra Wijaya mengungkapkan bahwa Presiden Prabowo Subianto menjadi satu-satunya kepala negara yang berhasil menyelenggarakan pertemuan bilateral di sela-sela Konferensi Tingkat Tinggi G20 di Brasil.</p>
-    <h2>Pencapaian Diplomasi</h2>
-    <p>Dalam rangkaian KTT tersebut, Presiden Prabowo berhasil menggelar tidak kurang dari 12 pertemuan bilateral dengan kepala negara dan kepala pemerintahan dari berbagai belahan dunia.</p>
-    <blockquote>"Ini bukan kebetulan. Ini hasil dari lobi diplomatik yang intensif dalam beberapa bulan terakhir." — Seskab Teddy</blockquote>`
-                },
-                'ucapan-imlek': {
-                    cat: 'Budaya',
-                    category: 'budaya',
-                    type: 'populer',
-                    title: '100 Ucapan Imlek 2026 Penuh Harapan, Kebahagiaan, dan Keberuntungan',
-                    author: 'Sari Maharani',
-                    avatar: 'S',
-                    hero: '🧧',
-                    views: 35200,
-                    cmt: 29,
-                    date: '9 Mar 2026',
-                    tags: ['budaya', 'imlek', '2026'],
-                    body: `<p>Tahun Baru Imlek 2577 Kongzili yang jatuh pada 29 Januari 2026 menjadi momen kebersamaan bagi jutaan warga Tionghoa dan masyarakat Indonesia yang merayakannya.</p>
-    <h2>Ucapan Populer</h2>
-    <p>Berikut kumpulan ucapan selamat Imlek yang bisa Anda gunakan untuk keluarga, sahabat, dan rekan bisnis. Mulai dari ungkapan tradisional Mandarin hingga terjemahan indah dalam Bahasa Indonesia.</p>
-    <blockquote>"Gong Xi Fa Cai — Semoga Anda mendapatkan banyak kemakmuran dan keberuntungan di tahun yang baru."</blockquote>`
-                },
-                'ihsg-menguat': {
-                    cat: 'Ekonomi',
-                    category: 'ekonomi',
-                    type: 'terkini',
-                    title: 'Update Harga Emas Hartatinata Abadi: Naik Rp8.000 per Gram',
-                    author: 'Arif Wibowo',
-                    avatar: 'A',
-                    hero: '📈',
-                    views: 8400,
-                    cmt: 7,
-                    date: '10 Mar 2026',
-                    tags: ['ekonomi', 'emas', 'investasi'],
-                    body: `<p>Harga emas di gerai Hartatinata Abadi mencatat kenaikan signifikan sebesar Rp8.000 per gram pada hari ini, mengikuti tren global seiring melemahnya dolar AS di pasar internasional.</p>
-    <h2>Detail Harga</h2>
-    <p>Emas ukuran 1 gram kini dibanderol Rp1.065.000, sementara ukuran 5 gram berada di angka Rp5.225.000 dan 10 gram seharga Rp10.400.000.</p>
-    <blockquote>"Emas kembali menjadi pilihan safe haven di tengah ketidakpastian ekonomi global." — Analis komoditas</blockquote>`
-                },
-                'psm-dihukum': {
-                    cat: 'Olahraga',
-                    category: 'olahraga',
-                    type: 'terkini',
-                    title: 'Persebaya Dihantam Dua Kekalahan Beruntun, Strategi Baru Siap Diterapkan',
-                    author: 'Rina Agustina',
-                    avatar: 'R',
-                    hero: '⚽',
-                    views: 22100,
-                    cmt: 41,
-                    date: '10 Mar 2026',
-                    tags: ['olahraga', 'sepakbola', 'persebaya', 'bri-liga'],
-                    body: `<p>Persebaya Surabaya mengalami dua kekalahan berturut-turut di BRI Liga 1, membuat posisi mereka di klasemen semakin tertekan. Pelatih kepala langsung menggelar rapat evaluasi intensif bersama tim.</p>
-    <h2>Evaluasi Tim</h2>
-    <p>Kelemahan di lini pertahanan menjadi sorotan utama. Dalam dua laga terakhir, Persebaya kebobolan total 7 gol dari situasi set piece — sebuah angka yang tidak bisa diterima oleh manajemen.</p>
-    <blockquote>"Pemain tahu di mana masalahnya. Sekarang saatnya kita perbaiki di lapangan, bukan di media." — Pelatih Persebaya</blockquote>`
-                },
-                'sulawesi-gempa': {
-                    cat: 'Bencana',
-                    category: 'bencana',
-                    type: 'terkini',
-                    title: 'Rehabilitasi 32 Daerah Terdampak Bencana Sumatera Butuh Waktu Panjang',
-                    author: 'Dewi Puspita',
-                    avatar: 'D',
-                    hero: '🌊',
-                    views: 11300,
-                    cmt: 15,
-                    date: '9 Mar 2026',
-                    tags: ['bencana', 'sumatera', 'rehabilitasi', 'bnpb'],
-                    body: `<p>BNPB menyatakan proses rehabilitasi dan rekonstruksi di 32 daerah yang terdampak bencana alam di Sumatera membutuhkan waktu setidaknya 18 hingga 24 bulan ke depan, dengan total kebutuhan anggaran mencapai Rp4,7 triliun.</p>
-    <h2>Prioritas Pemulihan</h2>
-    <p>Infrastruktur dasar seperti jalan, jembatan, dan fasilitas kesehatan menjadi prioritas pertama yang harus segera dipulihkan untuk mendukung mobilitas warga dan distribusi bantuan.</p>
-    <blockquote>"Kami tidak hanya membangun kembali fisik, tapi juga memulihkan psikologi warga yang terdampak." — Kepala BNPB</blockquote>`
-                },
-                'teknologi-ai': {
-                    cat: 'Teknologi',
-                    category: 'teknologi',
-                    type: 'artikel',
-                    title: 'Peneliti Dunia Sepakati Regulasi AI Baru untuk Cegah Penyalahgunaan Data',
-                    author: 'Arif Wibowo',
-                    avatar: 'A',
-                    hero: '🤖',
-                    views: 6700,
-                    cmt: 18,
-                    date: '9 Mar 2026',
-                    tags: ['teknologi', 'ai', 'regulasi', 'data'],
-                    body: `<p>Lebih dari 150 peneliti AI dari 40 negara menandatangani deklarasi bersama yang menyerukan pembentukan badan regulasi internasional untuk mengawasi pengembangan dan penerapan kecerdasan buatan.</p>
-    <h2>Poin Utama Deklarasi</h2>
-    <p>Deklarasi tersebut mencakup tiga poin utama: transparansi algoritma, perlindungan data pengguna, dan mekanisme audit independen bagi sistem AI yang berdampak pada hajat hidup publik.</p>
-    <blockquote>"AI tidak boleh hanya menguntungkan segelintir korporasi. Ia harus bermanfaat bagi seluruh umat manusia." — Ketua Panitia Deklarasi</blockquote>`
-                },
-                'kesehatan-jantung': {
-                    cat: 'Kesehatan',
-                    category: 'kesehatan',
-                    type: 'populer',
-                    title: 'Studi Terbaru: Jalan Kaki 30 Menit Sehari Turunkan Risiko Jantung hingga 40%',
-                    author: 'Sari Maharani',
-                    avatar: 'S',
-                    hero: '❤️',
-                    views: 19400,
-                    cmt: 33,
-                    date: '9 Mar 2026',
-                    tags: ['kesehatan', 'jantung', 'olahraga', 'riset'],
-                    body: `<p>Sebuah penelitian berskala besar yang dipublikasikan dalam jurnal medis internasional menemukan bahwa rutinitas jalan kaki selama 30 menit setiap hari secara konsisten mampu menurunkan risiko penyakit jantung koroner sebesar 38–42 persen.</p>
-    <h2>Metodologi Penelitian</h2>
-    <p>Studi ini melibatkan lebih dari 85.000 partisipan dari 12 negara yang dipantau selama rata-rata 7,4 tahun. Hasil ini konsisten di semua kelompok usia dan jenis kelamin.</p>
-    <blockquote>"Yang mengejutkan adalah efektivitasnya yang setara dengan banyak obat-obatan pencegahan, tanpa efek samping apa pun." — Lead Researcher, Universitas Oxford</blockquote>`
-                },
-            };
+            let articles = {};
+            let categories = [];
+
+            // Load data from API
+            async function loadArticles(filter = '') {
+                try {
+                    const url = filter ? `/api/viewers/berita?filter=${filter}` : '/api/viewers/berita';
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    data.data.forEach(article => {
+                        articles[article.slug] = {
+                            cat: article.kategori ? article.kategori.nama_kategori : 'Umum',
+                            category: article.kategori ? article.kategori.slug : 'umum',
+                            type: filter === 'populer' ? 'populer' : (filter === 'editor' ? 'editor' : 'terkini'),
+                            title: article.judul_berita,
+                            author: article.user ? article.user.name : 'Anonim',
+                            avatar: article.user ? article.user.name[0].toUpperCase() : 'A',
+                            hero: '📰', // Default icon, bisa diganti berdasarkan kategori
+                            views: article.jumlah_view,
+                            cmt: 0, // Belum ada komentar di API
+                            date: new Date(article.created_at).toLocaleDateString('id-ID'),
+                            tags: [article.kategori ? article.kategori.slug : 'umum'],
+                            body: article.isi_berita
+                        };
+                    });
+                    // After loading, render the page
+                    showHomeView();
+                } catch (error) {
+                    console.error('Error loading articles:', error);
+                }
+            }
+
+            async function loadCategories() {
+                try {
+                    const response = await fetch('/api/viewers/kategori');
+                    categories = await response.json();
+                } catch (error) {
+                    console.error('Error loading categories:', error);
+                }
+            }
+
+            // Load data on page load
+            window.addEventListener('DOMContentLoaded', async () => {
+                await loadCategories();
+                await loadArticles();
+            });
 
             // ═══════════════════════════════════════════════════
             // STATE MANAGEMENT

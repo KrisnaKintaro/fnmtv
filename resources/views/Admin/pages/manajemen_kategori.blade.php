@@ -90,6 +90,11 @@
 @section('js')
 <script>
     /* global DataTableEngine, ModalManager, Toast */
+    
+    // Data akan di-load dari API
+    let DBCategory = [];
+    let editCatId = null;
+
     $(document).ready(function() {
         // 1. "Bajak" Input Search di Navbar khusus untuk halaman ini
         const searchInput = document.getElementById('searchInput');
@@ -103,22 +108,10 @@
             };
         }
 
-        loadDataKategori();
+        loadDataKategoriFromAPI();
     });
 
-    // Data Dummy Sementara (Sesuai kolom Database)
-    let DBCategory = [
-        { id: 1, nama_kategori: 'Politik', slug: 'politik', berita_count: 84, updated_at: '2026-03-10' },
-        { id: 2, nama_kategori: 'Ekonomi', slug: 'ekonomi', berita_count: 62, updated_at: '2026-03-09' },
-        { id: 3, nama_kategori: 'Olahraga', slug: 'olahraga', berita_count: 55, updated_at: '2026-03-08' },
-        { id: 4, nama_kategori: 'Teknologi', slug: 'teknologi', berita_count: 43, updated_at: '2026-03-05' },
-        { id: 5, nama_kategori: 'Kesehatan', slug: 'kesehatan', berita_count: 31, updated_at: '2026-03-01' },
-        { id: 6, nama_kategori: 'Sains', slug: 'sains', berita_count: 12, updated_at: '2026-02-28' }
-    ];
-
-    let editCatId = null;
-
-    /* ── SETUP DATATABLE ENGINE ── */
+    // Setup DataTable Engine
     const catTable = new DataTableEngine({
         tableBody: '#catBody',
         paginationWrapper: '#paginationControls',
@@ -134,7 +127,7 @@
             <tr>
                 <td><b>${val.nama_kategori}</b></td>
                 <td style="font-family:'JetBrains Mono';font-size:12px;color:var(--muted)">${val.slug}</td>
-                <td>${val.berita_count}</td>
+                <td>${val.berita_count || 0}</td>
                 <td style="color:var(--muted);font-size:12px">${date}</td>
                 <td>
                     <div class="act-btns">
@@ -146,8 +139,26 @@
         }
     });
 
-    /* ── FUNGSI RENDER GRID (KOTAK ATAS) - Diubah nerima Parameter ── */
-    // Default valuenya pakai DBCategory kalau gak ada yang di-passing
+    // Load data dari API
+    async function loadDataKategoriFromAPI() {
+        try {
+            const response = await fetch('/api/admin/manajemen_kategori/ambilData');
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                DBCategory = result.data;
+                catTable.loadData(DBCategory);
+                jalankanFilter();
+            } else {
+                Toast.show('error', 'Gagal memuat data kategori');
+            }
+        } catch (error) {
+            console.error('Error loading categories:', error);
+            Toast.show('error', 'Terjadi kesalahan saat memuat data');
+        }
+    }
+
+    // Render Grid (Kotak Atas)
     function renderCatGrid(dataToRender = DBCategory) {
         const container = document.getElementById('catGridContainer');
         let html = '';
@@ -157,7 +168,7 @@
             <div class="cat-chip">
                 <div>
                     <div class="cat-name">${val.nama_kategori}</div>
-                    <div class="cat-count">${val.berita_count} artikel</div>
+                    <div class="cat-count">${val.berita_count || 0} artikel</div>
                 </div>
                 <div class="cat-actions">
                     <div class="ico-btn" onclick="editKategori(${val.id})">✏️</div>
@@ -178,7 +189,7 @@
         container.innerHTML = html;
     }
 
-    /* ── FUNGSI FILTER GLOBAL (CARD & TABLE) ── */
+    // Filter Global (CARD & TABLE)
     function jalankanFilter() {
         const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
 
@@ -194,17 +205,10 @@
                    val.slug.toLowerCase().includes(keyword);
         });
 
-        // Lempar data yang udah difilter ke fungsi render card
         renderCatGrid(dataTerfilter);
     }
 
-    /* ── FUNGSI LOAD DATA AWAL ── */
-    function loadDataKategori() {
-        catTable.loadData(DBCategory);
-        jalankanFilter(); // Panggil filter biar grid atas & tabel kerender bareng
-    }
-
-    /* ── FUNGSI MODAL & AKSI (DUMMY) ── */
+    // Modal & Aksi
     function bukaModalCat() {
         editCatId = null;
         document.getElementById('modalCatTitle').textContent = 'Tambah Kategori';
@@ -228,25 +232,85 @@
         }
     }
 
-    function simpanKategori() {
-        Toast.show('success', editCatId ? 'Kategori berhasil diupdate!' : 'Kategori baru berhasil ditambahkan!');
-        closeModalCat();
-    }
+    async function simpanKategori() {
+        const nama = document.getElementById('inputNamaKategori').value.trim();
+        
+        if (!nama) {
+            Toast.show('error', 'Nama kategori tidak boleh kosong!');
+            return;
+        }
 
-    function hapusKategori(id) {
-        if (confirm('Yakin ingin menghapus kategori ini? Data artikel di dalamnya mungkin terdampak.')) {
-            DBCategory = DBCategory.filter(c => c.id !== id);
-            loadDataKategori();
-            Toast.show('success', 'Kategori berhasil dihapus!');
+        try {
+            let url, method, payload;
+
+            if (editCatId) {
+                // Update kategori
+                url = `/api/admin/manajemen_kategori/ubahData/${editCatId}`;
+                method = 'PUT';
+                payload = { nama_kategori: nama };
+            } else {
+                // Tambah kategori baru
+                url = '/api/admin/manajemen_kategori/tambahData';
+                method = 'POST';
+                payload = { nama_kategori: nama };
+            }
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                Toast.show('success', result.message);
+                closeModalCat();
+                loadDataKategoriFromAPI();
+            } else {
+                Toast.show('error', result.message || 'Gagal menyimpan kategori');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Toast.show('error', 'Terjadi kesalahan saat menyimpan');
         }
     }
 
-    /* ── EVENT LISTENER: AUTO-GENERATE SLUG ── */
+    async function hapusKategori(id) {
+        if (confirm('Yakin ingin menghapus kategori ini? Data artikel di dalamnya mungkin terdampak.')) {
+            try {
+                const response = await fetch(`/api/admin/manajemen_kategori/hapusData/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    Toast.show('success', result.message);
+                    loadDataKategoriFromAPI();
+                } else {
+                    Toast.show('error', result.message || 'Gagal menghapus kategori');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Toast.show('error', 'Terjadi kesalahan saat menghapus');
+            }
+        }
+    }
+
+    // AUTO-GENERATE SLUG
     document.getElementById('inputNamaKategori').addEventListener('keyup', function() {
         if (!editCatId) {
             let slug = this.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
             document.getElementById('inputSlugKategori').value = slug;
         }
     });
+
 </script>
 @endsection

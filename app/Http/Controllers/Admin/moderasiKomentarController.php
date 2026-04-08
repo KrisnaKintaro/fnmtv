@@ -10,7 +10,7 @@ class moderasiKomentarController extends Controller
 {
     public function getDaftarKomentar(Request $request)
     {
-        $query = Komentar::latest();
+        $query = Komentar::with('berita', 'user')->latest();
 
         if ($request->has('status')) {
             $query->where('status_moderasi', $request->status);
