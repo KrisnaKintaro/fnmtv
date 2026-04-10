@@ -18,6 +18,7 @@ return new class extends Migration
 
             $table->text('isi_komentar');
             $table->enum('status_moderasi', ['Pending', 'Approved', 'Spam'])->default('Pending')->index();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
