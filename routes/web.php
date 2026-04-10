@@ -7,13 +7,17 @@ Route::get('/', function () {
     return view('viewers.pages.home');
 });
 
-#================= ADMIN =================
+#================= ADMIN ===================
 Route::get('/kategori', function () {
     return view('Admin.pages.manajemen_kategori');
 });
 
 Route::get('/komentar', function () {
     return view('Admin.pages.komentar');
+});
+
+Route::get('/analitik_statistik_berita', function(){
+    return view('Admin.pages.analitikStatistikBerita');
 });
 
 Route::get('/finansial', function () {

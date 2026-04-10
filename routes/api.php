@@ -7,6 +7,10 @@ use App\Http\Controllers\Admin\StatistikInteraksiBeritaController;
 use App\Http\Controllers\Admin\TopPerformanceController;
 use App\Http\Controllers\Admin\TrackingPembayaranController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Viewer\KomentarController;
+use App\Http\Controllers\Editor\BeritaController;
+use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
+use App\Http\Controllers\ViewerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -65,6 +69,9 @@ Route::prefix('admin/top_performance')->group(function () {
     Route::get('/ambilData', [TopPerformanceController::class, 'getTopPerformance']);
 });
 
+Route::prefix('viewers/')->group(function() {
+    Route::post('/tambahKomentar', [KomentarController::class, ]);
+});
 
 
 
@@ -108,9 +115,7 @@ Route::prefix('admin/top_performance')->group(function () {
 
 
 
-use App\Http\Controllers\Editor\BeritaController;
-use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
-use App\Http\Controllers\ViewerController;
+
 
 
 // Bagian Editor
