@@ -16,6 +16,10 @@ Route::get('/komentar', function () {
     return view('Admin.pages.komentar');
 });
 
+Route::get('/analitik_statistik_berita', function(){
+    return view('Admin.pages.analitikStatistikBerita');
+});
+
 Route::get('/finansial', function () {
     return view('Admin.pages.finansial');
 });
