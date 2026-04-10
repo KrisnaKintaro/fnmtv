@@ -138,14 +138,22 @@ Route::prefix('editor/manajemen_berita')->group(function() {
 // Group Redaksi
 Route::prefix('redaksi')->group(function () {
     Route::get('/getBeritaMasuk', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
-    Route::patch('/verifikasiBerita/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
+    Route::patch('/verifikasiBerita/{id_berita}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
     Route::get('/getNotifikasi', [VerifikasiBeritaController::class, 'getNotifikasi']);
+    Route::patch('/verifikasiBerita/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
     Route::patch('/verifikasiBerita/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
 });
 
 // API untuk Viewers (Frontend)
 Route::prefix('viewers')->group(function() {
 
+// API untuk Viewers (Frontend)
+Route::prefix('viewers')->group(function() {
+    Route::get('/berita', [ViewerController::class, 'getBerita']);
+    Route::get('/kategori', [ViewerController::class, 'getKategori']);
+    Route::get('/kategori/{slug}', [ViewerController::class, 'getBeritaByKategori']);
+    Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
+    Route::get('/search', [ViewerController::class, 'searchBerita']);
+    Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar']);
+    Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
 });
-
-
