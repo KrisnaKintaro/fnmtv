@@ -50,3 +50,18 @@ Route::get('/redaksi-manajemen-berita', function () {
     return view('Redaksi.pages.manajemen_berita');
 });
 
+#================= AUTH =================
+Route::get('/login', function () {
+    return view('Login.Register.login.Login');
+})->name('login');
+
+Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+
+Route::get('/register', function () {
+    return view('Login.Register.login.register');
+})->name('register');
+
+Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
+
+Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+
