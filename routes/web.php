@@ -5,6 +5,12 @@ use Illuminate\Support\Facades\Route;
 #================= VIEWERS =================
 Route::get('/', function () {
     return view('viewers.pages.home');
+    // return view('viewers.pages.tampilanDetilBerita');
+    // return view('viewers.pages.tampilanTiapKategori');
+});
+
+Route::get('/search', function () {
+    return view('Viewers.pages.beritaHasilSearch');
 });
 
 #================= ADMIN ===================

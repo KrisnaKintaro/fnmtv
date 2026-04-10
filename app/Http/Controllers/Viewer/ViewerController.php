@@ -124,9 +124,6 @@ class ViewerController extends Controller
         ]);
     }
 
-    /**
-     * 5. Pencarian Murni Berdasarkan Teks (Dari Navbar)
-     */
     public function searchBerita(Request $request)
     {
         $query = Berita::with(['kategori', 'user'])->where('status_berita', 'Published');
