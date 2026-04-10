@@ -10,12 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class KomentarController extends Controller
 {
-    /**
-     * Viewers ngirim komentar ke berita tertentu
-     */
     public function kirimKomentar(Request $request)
     {
-        // 1. Validasi inputan dari viewers
         $request->validate([
             'berita_id'    => 'required|exists:beritas,id',
             'isi_komentar' => 'required|string|min:3|max:500',
@@ -25,8 +21,6 @@ class KomentarController extends Controller
             'isi_komentar.max'      => 'Komentarnya kepanjangan bjir, maksimal 500 karakter aja.'
         ]);
 
-        // 2. Cek apakah berita yang dikomentari itu statusnya 'Published'
-        // Gamau kan berita draft tiba-tiba ada komentarnya?
         $berita = Berita::find($request->berita_id);
         if ($berita->status_berita !== 'Published') {
             return response()->json([
@@ -35,8 +29,6 @@ class KomentarController extends Controller
             ], 403);
         }
 
-        // 3. Eksekusi simpan ke database
-        // status_moderasi otomatis 'Pending' sesuai migration
         $komentarBaru = Komentar::create([
             'berita_id'    => $request->berita_id,
             'user_id'      => Auth::id() || 1, // Diambil dari session user yang login
