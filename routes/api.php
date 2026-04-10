@@ -7,10 +7,11 @@ use App\Http\Controllers\Admin\StatistikInteraksiBeritaController;
 use App\Http\Controllers\Admin\TopPerformanceController;
 use App\Http\Controllers\Admin\TrackingPembayaranController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Viewer\KomentarController;
 use App\Http\Controllers\Editor\BeritaController;
 use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
-use App\Http\Controllers\ViewerController;
+use App\Http\Controllers\Viewer\KomentarController;
+use App\Http\Controllers\Viewer\ReaksiController;
+use App\Http\Controllers\Viewer\ViewerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -69,8 +70,15 @@ Route::prefix('admin/top_performance')->group(function () {
     Route::get('/ambilData', [TopPerformanceController::class, 'getTopPerformance']);
 });
 
-Route::prefix('viewers/')->group(function() {
-    Route::post('/tambahKomentar', [KomentarController::class, ]);
+// API untuk Viewers (Frontend)
+Route::prefix('viewers')->group(function() {
+    Route::get('/berita', [ViewerController::class, 'getBerita']);
+    Route::get('/kategori', [ViewerController::class, 'getKategori']);
+    Route::get('/kategori/{slug}', [ViewerController::class, 'getBeritaByKategori']);
+    Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
+    Route::get('/search', [ViewerController::class, 'searchBerita']);
+    Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar']);
+    Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
 });
 
 
@@ -138,17 +146,14 @@ Route::prefix('redaksi')->group(function () {
 
 // API untuk Viewers (Frontend)
 Route::prefix('viewers')->group(function() {
-    Route::get('/berita', [ViewerController::class, 'getBerita']);
-    Route::get('/kategori', [ViewerController::class, 'getKategori']);
-    Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
-    Route::get('/search', [ViewerController::class, 'searchBerita']);
-});
 
 // API untuk Viewers (Frontend)
 Route::prefix('viewers')->group(function() {
     Route::get('/berita', [ViewerController::class, 'getBerita']);
     Route::get('/kategori', [ViewerController::class, 'getKategori']);
+    Route::get('/kategori/{slug}', [ViewerController::class, 'getBeritaByKategori']);
     Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
     Route::get('/search', [ViewerController::class, 'searchBerita']);
-    Route::get('/notifikasi', [ViewerController::class, 'getNotifikasi']);
+    Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar']);
+    Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
 });
