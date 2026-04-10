@@ -7,7 +7,7 @@ Route::get('/', function () {
     return view('viewers.pages.home');
 });
 
-#================= ADMIN =================
+#================= ADMIN ===================
 Route::get('/kategori', function () {
     return view('Admin.pages.manajemen_kategori');
 });
