@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 #================= VIEWERS =================
 Route::get('/', function () {
-    return view('viewers.pages.tampilanDetilBerita');
+    return view('viewers.pages.home');
 });
 
 #================= ADMIN ===================
@@ -52,16 +52,11 @@ Route::get('/redaksi-manajemen-berita', function () {
 
 #================= AUTH =================
 Route::get('/login', function () {
-    return view('Login.Register.login.Login');
+    return view('Auth.login');
 })->name('login');
 
-Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
-
 Route::get('/register', function () {
-    return view('Login.Register.login.register');
+    return view('Auth.register');
 })->name('register');
 
-Route::post('/register', [App\Http\Controllers\Auth\RegisterController::class, 'register']);
-
-Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 

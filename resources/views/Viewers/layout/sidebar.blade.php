@@ -2,39 +2,49 @@
     <div class="widget">
         <div class="wgt-title">📈 Sedang Tren</div>
         <div id="trendingContainer">
-            <a href="#" class="trending-item">
-                <div class="tr-rank gold">1</div>
-                <div>
-                    <div class="tr-title">Kebijakan Baru Ekspor Impor Disahkan, Ini Dampaknya...</div>
-                    <div class="tr-views">👁 1.2M <span class="tr-badge hot">HOT</span></div>
-                </div>
-            </a>
-            <a href="#" class="trending-item">
-                <div class="tr-rank silver">2</div>
-                <div>
-                    <div class="tr-title">Timnas Indonesia Lolos ke Semifinal Piala Asia!</div>
-                    <div class="tr-views">👁 850K <span class="tr-badge up">NAIK</span></div>
-                </div>
-            </a>
-            <a href="#" class="trending-item">
-                <div class="tr-rank bronze">3</div>
-                <div>
-                    <div class="tr-title">Harga Emas Antam Tembus Rekor Tertinggi Tahun Ini</div>
-                    <div class="tr-views">👁 500K</div>
-                </div>
-            </a>
-            <a href="#" class="trending-item">
-                <div class="tr-rank" style="color:var(--muted)">4</div>
-                <div>
-                    <div class="tr-title">Peluncuran Gadget Terbaru dengan Teknologi AI</div>
-                    <div class="tr-views">👁 320K</div>
-                </div>
-            </a>
-        </div>
+            </div>
     </div>
 
-    <div class="ad-banner">
-        <div class="ad-label">Advertisement</div>
-        <div class="ad-content">SPACE IKLAN 300x250</div>
+    <div style="margin-bottom: 20px;">
+        @include('Viewers.layout.ad_banner', [
+            'type' => 'box',
+            'text' => 'SPACE IKLAN 300x250'
+        ])
     </div>
-</div>  
+
+    <div class="widget">
+        <div class="wgt-title">📁 Jelajahi Kategori</div>
+        <div class="cat-grid" id="sidebarCategoryContainer">
+            <div style="grid-column: span 2; text-align: center; color: var(--muted); font-size: 12px; padding: 10px;">
+                Memuat Kategori...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pake Vanilla JS biar aman dieksekusi sebelum jQuery keload di bawah
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/api/viewers/kategori')
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    const container = document.getElementById('sidebarCategoryContainer');
+                    if (!container) return;
+
+                    let html = '';
+                    res.data.forEach(cat => {
+                        // Emoji dihapus, cuma nampilin nama kategorinya aja
+                        html += `
+                            <div class="cat-box" onclick="window.location.href='/kategori/${cat.slug}'">
+                                ${cat.nama_kategori}
+                            </div>
+                        `;
+                    });
+
+                    container.innerHTML = html;
+                }
+            })
+            .catch(err => console.error("Gagal load kategori sidebar:", err));
+    });
+</script>

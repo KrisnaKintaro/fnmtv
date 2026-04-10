@@ -14,7 +14,12 @@ class ViewerController extends Controller
      */
     public function getKategori()
     {
-        $kategori = Kategori::all();
+        // Hitung jumlah berita yang 'Published' di tiap kategori, lalu urutkan dari yang terbanyak
+        $kategori = Kategori::withCount(['berita' => function($query) {
+            $query->where('status_berita', 'Published');
+        }])
+        ->orderBy('berita_count', 'desc')
+        ->get();
 
         return response()->json([
             'status' => 'success',
@@ -29,7 +34,7 @@ class ViewerController extends Controller
     {
         $baseQuery = Berita::with(['kategori', 'user'])->where('status_berita', 'Published');
 
-        $headline = (clone $baseQuery)->latest('waktu_publikasi')->take(3)->get();
+        $headline = (clone $baseQuery)->latest('waktu_publikasi')->take(4)->get();
         $terbaru = (clone $baseQuery)->latest('waktu_publikasi')->take(10)->get();
         $trending = (clone $baseQuery)->orderBy('jumlah_view', 'desc')->take(5)->get();
 
@@ -139,6 +144,19 @@ class ViewerController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $hasilPencarian
+        ]);
+    }
+
+    public function getBeritaPopuler()
+    {
+        $berita = Berita::with(['kategori', 'user'])
+            ->where('status_berita', 'Published')
+            ->orderBy('jumlah_view', 'desc') // Urutin dari view terbanyak
+            ->paginate(10); // Pake paginate biar bisa diload per halaman
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $berita
         ]);
     }
 }

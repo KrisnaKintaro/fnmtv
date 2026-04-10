@@ -3,7 +3,6 @@
         <div class="ts-links">
             <a href="/" class="ts-link {{ request()->is('/') ? 'active' : '' }}">Berita Terkini</a>
             <a href="/kategori/populer" class="ts-link {{ request()->is('kategori/populer') ? 'active' : '' }}">Berita Populer</a>
-            <a href="/kategori/pilihan-editor" class="ts-link {{ request()->is('kategori/pilihan-editor') ? 'active' : '' }}">Pilihan Editor</a>
         </div>
         <div class="ts-socials">
             <div class="ts-social" title="Facebook" onclick="openSocial('facebook')">f</div>
@@ -13,33 +12,38 @@
     </div>
 </div>
 
-<div class="header">
-    <div class="header-inner">
-        <a href="/" class="logo">FNM</a>
-        <div class="header-tagline">Fenomena News Media<br>Delivering unbiased, in-depth reporting</div>
-        <div class="header-search" id="searchWrap">
-            <input class="search-input" type="text" placeholder="Cari berita, topik, penulis..." id="searchInput" onkeyup="handleSearchKey(event)" autocomplete="off">
-            <button class="search-btn" onclick="doSearch()">🔍</button>
+<div class="sticky-header-wrap">
+
+    <div class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">FNM</a>
+            <div class="header-tagline">Fenomena News Media<br>Delivering unbiased, in-depth reporting</div>
+
+            <div class="header-search" id="searchWrap">
+                <input class="search-input" type="text" placeholder="Cari berita, topik, penulis..." id="searchInput" onkeyup="handleSearchKey(event)" autocomplete="off">
+                <button class="search-btn" onclick="doSearch()">🔍</button>
+            </div>
+
+            <div style="margin-left: 20px; display: flex; gap: 10px;">
+                <a href="/login" class="btn btn-outline" style="padding: 8px 18px; font-size: 13px;">Masuk</a>
+                <a href="/register" class="btn btn-red" style="padding: 8px 18px; font-size: 13px;">Daftar</a>
+            </div>
+
         </div>
     </div>
-</div>
 
-<div class="nav">
-    <div class="nav-inner">
-        <a href="/" class="nav-item {{ request()->is('/') ? 'active' : '' }}">HOME</a>
-        <a href="/kategori/politik" class="nav-item {{ request()->is('kategori/politik') ? 'active' : '' }}">Politik</a>
-        <a href="/kategori/ekonomi" class="nav-item {{ request()->is('kategori/ekonomi') ? 'active' : '' }}">Ekonomi</a>
-        <a href="/kategori/olahraga" class="nav-item {{ request()->is('kategori/olahraga') ? 'active' : '' }}">Olahraga</a>
-        <a href="/kategori/teknologi" class="nav-item {{ request()->is('kategori/teknologi') ? 'active' : '' }}">Teknologi</a>
-        <a href="/kategori/kesehatan" class="nav-item {{ request()->is('kategori/kesehatan') ? 'active' : '' }}">Kesehatan</a>
+    <div class="nav">
+        <div class="nav-inner">
+            <a href="/" class="nav-item" id="navHome">HOME</a>
 
-        <div class="nav-more" id="navMore" onclick="toggleNavMore()">
-            Lainnya <span>▾</span>
-            <div class="nav-more-dropdown" id="navMoreDropdown">
-                <a href="/kategori/hukum" class="nmd-item">⚖️ Hukum</a>
-                <a href="/kategori/lingkungan" class="nmd-item">🌿 Lingkungan</a>
-                <a href="/kategori/budaya" class="nmd-item">🎭 Budaya</a>
+            <div id="dynamicNavCategories" style="display: contents;"></div>
+
+            <div class="nav-more" id="navMore" onclick="toggleNavMore()" style="display: none;">
+                Lainnya <span>▾</span>
+                <div class="nav-more-dropdown" id="navMoreDropdown">
+                </div>
             </div>
         </div>
     </div>
+
 </div>
