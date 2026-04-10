@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 #================= VIEWERS =================
 Route::get('/', function () {
-    return view('viewers.pages.home');
+    return view('viewers.pages.tampilanDetilBerita');
 });
 
 #================= ADMIN ===================
