@@ -141,29 +141,39 @@
 
 @section('js')
 <script>
-    // DATA DUMMY AWAL (Ada yg nominalnya Rp 0 biar bisa dites)
-    let financeDB = [
-        {
-            id: 1, berita_id: 101, user_id: 5, nominal_pendapatan: 750000, status_pembayaran: "Paid", waktu_pembayaran: "2026-03-10T10:00:00.000000Z",
-            berita: { id: 101, judul_berita: "Pemerintah Umumkan Kebijakan Baru..." }, user: { id: 5, username: "Budi S." }
-        },
-        {
-            id: 2, berita_id: 102, user_id: 6, nominal_pendapatan: 0, status_pembayaran: "Unpaid", waktu_pembayaran: null,
-            berita: { id: 102, judul_berita: "Timnas Garuda Menang Telak 3-0" }, user: { id: 6, username: "Rina A." }
-        },
-        {
-            id: 3, berita_id: 103, user_id: 7, nominal_pendapatan: 400000, status_pembayaran: "Paid", waktu_pembayaran: "2026-02-09T14:30:00.000000Z",
-            berita: { id: 103, judul_berita: "Film Indonesia Raih Penghargaan Berlin" }, user: { id: 7, username: "Sari M." }
-        },
-        {
-            id: 4, berita_id: 104, user_id: 8, nominal_pendapatan: 0, status_pembayaran: "Unpaid", waktu_pembayaran: null,
-            berita: { id: 104, judul_berita: "Rupiah Menguat Terhadap Dolar AS" }, user: { id: 8, username: "Arif W." }
-        }
-    ];
+    const financeApiBase = '/api/admin/tracking_pembayaran';
+    const financeHeaders = {
+        'Accept': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+    };
 
+    let financeDB = [];
     let ubahStatusTargetId = null;
     let ubahStatusTargetVal = null;
     let editFinanceId = null; // Penampung ID untuk edit nominal
+
+    function fetchFinanceData() {
+        Toast.show('info', 'Memuat daftar transaksi finansial...');
+        $.ajax({
+            url: `${financeApiBase}/ambilData`,
+            method: 'GET',
+            headers: financeHeaders,
+            success: function(result) {
+                if (result.status === 'success' && Array.isArray(result.data)) {
+                    financeDB = result.data;
+                    updateSidebarBadge(financeDB);
+                    terapkanFilterLokal();
+                    Toast.show('success', 'Data transaksi finansial berhasil dimuat.');
+                } else {
+                    Toast.show('error', result.message || 'Gagal memuat data finansial.');
+                }
+            },
+            error: function(xhr) {
+                const msg = xhr.responseJSON?.message || 'Gagal memuat data finansial.';
+                Toast.show('error', msg);
+            }
+        });
+    }
 
     // --- INISIALISASI DATATABLE ENGINE ---
     const financeTable = new DataTableEngine({
@@ -214,8 +224,7 @@
 
         generateTahunDropdown();
 
-        updateSidebarBadge(financeDB);
-        terapkanFilterLokal();
+        fetchFinanceData();
     });
 
     // --- FUNGSI UPDATE BADGE SIDEBAR ---
@@ -318,18 +327,32 @@
         const nominalBaru = parseInt(document.getElementById('editNominalValue').value) || 0;
         const data = financeDB.find(x => x.id === editFinanceId);
 
-        if(data) {
-            // Simulasi API Backend (Nanti diganti pake $.ajax PATCH ke TrackingPembayaranController)
-            console.log(`[API POST] Update Nominal ID ${data.berita_id} jadi Rp ${nominalBaru}`);
+        if (data) {
+            const payload = {
+                nominal_pendapatan: nominalBaru,
+                status_pembayaran: data.status_pembayaran || 'Unpaid'
+            };
 
-            // Update UI Lokal
-            data.nominal_pendapatan = nominalBaru;
-
-            // Refresh tabel & hitung ulang Stats Card
-            terapkanFilterLokal();
-
-            Toast.show('success', 'Nominal pendapatan berhasil diperbarui!');
-            ModalManager.close('modalEditNominal');
+            $.ajax({
+                url: `${financeApiBase}/updatePembayaran/${data.berita_id}`,
+                method: 'PUT',
+                headers: financeHeaders,
+                data: payload,
+                success: function(result) {
+                    if (result.status === 'success' && result.data) {
+                        Object.assign(data, result.data);
+                        terapkanFilterLokal();
+                        Toast.show('success', 'Nominal pendapatan berhasil diperbarui!');
+                        ModalManager.close('modalEditNominal');
+                    } else {
+                        Toast.show('error', result.message || 'Gagal menyimpan nominal pendapatan.');
+                    }
+                },
+                error: function(xhr) {
+                    const msg = xhr.responseJSON?.message || 'Gagal menyimpan nominal pendapatan.';
+                    Toast.show('error', msg);
+                }
+            });
         }
     }
     // ==========================================
@@ -353,14 +376,32 @@
                 return;
             }
 
-            data.status_pembayaran = ubahStatusTargetVal;
-            if (ubahStatusTargetVal === 'Paid') data.waktu_pembayaran = new Date().toISOString();
-            else data.waktu_pembayaran = null;
+            const payload = {
+                nominal_pendapatan: data.nominal_pendapatan,
+                status_pembayaran: ubahStatusTargetVal
+            };
 
-            terapkanFilterLokal();
-            updateSidebarBadge(financeDB);
-            Toast.show('success', 'Status berhasil diubah!');
-            ModalManager.close('modalUbahStatus');
+            $.ajax({
+                url: `${financeApiBase}/updatePembayaran/${data.berita_id}`,
+                method: 'PUT',
+                headers: financeHeaders,
+                data: payload,
+                success: function(result) {
+                    if (result.status === 'success' && result.data) {
+                        Object.assign(data, result.data);
+                        terapkanFilterLokal();
+                        updateSidebarBadge(financeDB);
+                        Toast.show('success', 'Status berhasil diubah!');
+                        ModalManager.close('modalUbahStatus');
+                    } else {
+                        Toast.show('error', result.message || 'Gagal mengubah status pembayaran.');
+                    }
+                },
+                error: function(xhr) {
+                    const msg = xhr.responseJSON?.message || 'Gagal mengubah status pembayaran.';
+                    Toast.show('error', msg);
+                }
+            });
         }
     }
 </script>
