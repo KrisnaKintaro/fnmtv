@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalitikBeritaController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\LaporanFinansialController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
@@ -79,6 +80,11 @@ Route::prefix('admin/top_performance')->group(function () {
     Route::get('/ambilData', [TopPerformanceController::class, 'getTopPerformance']);
 });
 
+Route::prefix('admin/analitik_berita')->group(function() {
+    Route::get('/ambilData', [AnalitikBeritaController::class, 'getAnaliticsData']);
+});
+
+// API untuk Viewers (Frontend)
 // API Viewers yang BEBAS DIAKSES (Nggak butuh login)
 Route::prefix('viewers')->group(function() {
     Route::get('/berita', [ViewerController::class, 'getBerita']);
