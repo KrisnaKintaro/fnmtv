@@ -86,11 +86,11 @@ class ViewerController extends Controller
 
         // Hitung rekap reaksi untuk ditampilkan saat pertama kali load
         $rekapReaksi = [
-            'suka'  => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'suka')->count(),
-            'cinta' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'cinta')->count(),
-            'kaget' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'kaget')->count(),
-            'sedih' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'sedih')->count(),
-            'marah' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'marah')->count(),
+            'suka'  => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'suka')->count(),
+            'cinta' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'cinta')->count(),
+            'kaget' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'kaget')->count(),
+            'sedih' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'sedih')->count(),
+            'marah' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'marah')->count(),
         ];
 
         // Tempelkan data reaksi ke object berita
