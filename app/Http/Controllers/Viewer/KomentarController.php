@@ -14,7 +14,7 @@ class KomentarController extends Controller
     {
         $request->validate([
             'berita_id'    => 'required|exists:beritas,id',
-            'isi_komentar' => 'required|string|min:3|max:500',
+            'isi_komentar' => 'required|string|min:1|max:500',
         ], [
             'isi_komentar.required' => 'Isi komentarnya jangan dikosongin lah cuy.',
             'isi_komentar.min'      => 'Komentarnya kependekan, minimal 3 karakter ya.',

@@ -58,7 +58,7 @@
                 <div class="cs-title" id="csTitleCount">Komentar Pembaca (0)</div>
 
                 <div class="comment-form">
-                    <textarea class="cf-input" id="inputKomentar" placeholder="Tulis komentar Anda di sini... Minta tolong gunakan bahasa yang sopan ya cuy!"></textarea>
+                    <textarea class="cf-input" id="inputKomentar" placeholder="Tulis komentar Anda di sini... Minta tolong gunakan bahasa yang sopan ya!"></textarea>
                     <div class="cf-foot">
                         <input type="text" class="cf-name" id="inputNama" placeholder="Nama Anda (Opsional)">
                         <button class="cf-submit" id="btnKirimKomentar" onclick="kirimKomentar()">Kirim Komentar</button>
