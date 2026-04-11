@@ -1,11 +1,23 @@
 @extends('Viewers.master_viewers')
+@section('css')
+<style>
+    @keyframes modalPop {
+        0% {
+            transform: scale(0.9);
+            opacity: 0;
+        }
 
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+@endsection
 @section('konten')
 <div class="container page-anim">
     <div class="main-grid">
-
         <div class="main-content">
-
             <div class="ph-breadcrumb">
                 <a href="/">Home</a> /
                 <a href="#" id="bcCatLink"><span id="bcCatName">Memuat...</span></a> /
@@ -38,11 +50,21 @@
             <div class="reaction-bar">
                 <div class="rb-label">Bagaimana tanggapan Anda?</div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="reactionContainer">
+
+                    @guest
+                    <button class="reaction-btn" onclick="cekLoginDulu(event)">👍 <span class="rb-count" id="count-suka">0</span></button>
+                    <button class="reaction-btn" onclick="cekLoginDulu(event)">❤️ <span class="rb-count" id="count-cinta">0</span></button>
+                    <button class="reaction-btn" onclick="cekLoginDulu(event)">🤯 <span class="rb-count" id="count-kaget">0</span></button>
+                    <button class="reaction-btn" onclick="cekLoginDulu(event)">😢 <span class="rb-count" id="count-sedih">0</span></button>
+                    <button class="reaction-btn" onclick="cekLoginDulu(event)">😡 <span class="rb-count" id="count-marah">0</span></button>
+                    @else
                     <button class="reaction-btn" onclick="kirimReaksi('suka')">👍 <span class="rb-count" id="count-suka">0</span></button>
                     <button class="reaction-btn" onclick="kirimReaksi('cinta')">❤️ <span class="rb-count" id="count-cinta">0</span></button>
                     <button class="reaction-btn" onclick="kirimReaksi('kaget')">🤯 <span class="rb-count" id="count-kaget">0</span></button>
                     <button class="reaction-btn" onclick="kirimReaksi('sedih')">😢 <span class="rb-count" id="count-sedih">0</span></button>
                     <button class="reaction-btn" onclick="kirimReaksi('marah')">😡 <span class="rb-count" id="count-marah">0</span></button>
+                    @endguest
+
                 </div>
             </div>
 
@@ -58,25 +80,47 @@
                 <div class="cs-title" id="csTitleCount">Komentar Pembaca (0)</div>
 
                 <div class="comment-form">
-                    <textarea class="cf-input" id="inputKomentar" placeholder="Tulis komentar Anda di sini... Minta tolong gunakan bahasa yang sopan ya!"></textarea>
+                    <textarea class="cf-input" id="inputKomentar" placeholder="Tulis komentar Anda..." @guest onfocus="cekLoginDulu(event)" @endguest></textarea>
                     <div class="cf-foot">
-                        <input type="text" class="cf-name" id="inputNama" placeholder="Nama Anda (Opsional)">
+                        @guest
+                        <p style="font-size: 13px; color: var(--muted);">Silakan <a href="/login" style="color:var(--primary);">Login</a> buat ikutan komentar cuy.</p>
+                        @endguest
+
+                        @auth
+                        <div class="cf-name-info">Berkomentar sebagai: <b>{{ Auth::user()->username }}</b></div>
                         <button class="cf-submit" id="btnKirimKomentar" onclick="kirimKomentar()">Kirim Komentar</button>
+                        @endauth
                     </div>
                 </div>
 
                 <div class="comment-list" id="komentarList">
                     <div style="text-align: center; color: var(--muted); padding: 20px;">Memuat komentar...</div>
                 </div>
-
             </div>
-
         </div>
 
         <div class="sidebar-col">
             @include('Viewers.layout.sidebar')
         </div>
+    </div>
+</div>
 
+<div id="modalAuthSuggest" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+    <div style="background: white; width: 90%; max-width: 400px; text-align: center; padding: 40px 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; animation: modalPop 0.3s ease-out forwards;">
+
+        <div style="font-size: 56px; margin-bottom: 20px; line-height: 1;">🔐</div>
+
+        <h2 style="font-family: 'Merriweather', serif; font-size: 24px; margin-bottom: 12px; color: #1a1a1a;">Eitss, Login Dulu Cuy!</h2>
+
+        <p style="font-size: 15px; color: #666; margin-bottom: 30px; line-height: 1.6;">
+            Biar interaksi lu makin asik, lu harus masuk ke akun FNM dulu buat ngasih komentar atau reaksi. Cuma butuh semenit kok!
+        </p>
+
+        <div style="display: flex; gap: 12px;">
+            <button onclick="tutupModalLogin()" style="flex:1; padding: 12px; border-radius: 8px; border: 1px solid #ccc; background: white; color: #555; font-weight: 600; cursor: pointer; transition: 0.2s;">Nanti Aja</button>
+
+            <a href="/login" style="flex:1; padding: 12px; border-radius: 8px; background: #cc0000; color: white; text-decoration: none; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: 0.2s;">Gas Login!</a>
+        </div>
     </div>
 </div>
 @endsection
@@ -87,18 +131,32 @@
     let currentBeritaId = null;
 
     $(document).ready(function() {
-        // 1. Ambil slug dari URL (contoh: /berita/judul-berita -> ambil "judul-berita")
         const pathArray = window.location.pathname.split('/');
         currentSlug = pathArray[pathArray.length - 1];
 
-        // 2. Load Data Artikel
-        if(currentSlug) {
+        if (currentSlug) {
             loadBeritaDetail(currentSlug);
-            loadSidebarTrending(); // Biar sidebarnya ga kosong
+            loadSidebarTrending();
         }
     });
 
-    // --- FUNGSI LOAD DATA BERITA ---
+    // --- FUNGSI CEGAT LOGIN ---
+    function cekLoginDulu(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if(e.target) e.target.blur();
+        }
+
+        console.log("Memanggil modal login...");
+        $('#modalAuthSuggest').fadeIn(200).css('display', 'flex');
+        return false;
+    }
+
+    function tutupModalLogin() {
+        $('#modalAuthSuggest').fadeOut(200);
+    }
+
     function loadBeritaDetail(slug) {
         $.ajax({
             url: `/api/viewers/berita/${slug}`,
@@ -108,45 +166,33 @@
                     if (res.status === 'success') {
                         const b = res.data.berita || res.data;
                         currentBeritaId = b.id;
-
-                        renderDetailBerita(b); // Render isi
-
+                        renderDetailBerita(b);
                         const dataKomentar = b.komentar || [];
-                        renderKomentar(dataKomentar); // Render komentar
-
-                        // Render reaksi (baca dari reaksi_rekap yang kita bikin di Step 2)
-                        if(b.reaksi_rekap) renderReaksi(b.reaksi_rekap);
-                    } else {
-                        $('#artJudul').text('Gagal memuat berita!');
-                        $('#artBody').html(`<p style="text-align:center; color:red;">${res.message || 'Error dari server'}</p>`);
+                        renderKomentar(dataKomentar);
+                        if (b.reaksi_rekap) renderReaksi(b.reaksi_rekap);
                     }
                 } catch (e) {
-                    console.error("JS Error saat nge-render cuy:", e);
-                    $('#artJudul').text('Waduh, terjadi kesalahan sistem!');
-                    $('#artBody').html('<p style="text-align:center; color:red;">Gagal memproses data artikel dari database.</p>');
+                    console.error("JS Error:", e);
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error("API Error cuy:", xhr.responseText);
-                $('#artJudul').text('Server Error atau Berita Hilang!');
-                $('#artBody').html('<p style="text-align:center; color:red;">Hubungi admin untuk menindak lanjuti masalah ini</p>');
             }
         });
     }
 
-    // --- FUNGSI RENDER TAMPILAN BERITA ---
     function renderDetailBerita(b) {
         const cat = b.kategori ? b.kategori.nama_kategori : 'Umum';
         const catSlug = b.kategori ? b.kategori.slug : '';
         const penulis = b.user ? b.user.username : 'FNM Redaksi';
-        const waktu = new Date(b.waktu_publikasi).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const waktu = new Date(b.waktu_publikasi).toLocaleString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
 
-        // Update Breadcrumb
         $('#bcCatName').text(cat);
         $('#bcCatLink').attr('href', `/kategori/${catSlug}`);
         $('#bcTitle').text(b.judul_berita.substring(0, 30) + '...');
-
-        // Update Header Info
         $('#artCat').text(`Nasional · ${cat}`);
         $('#artJudul').text(b.judul_berita);
         $('#artAvatar').text(penulis.charAt(0).toUpperCase());
@@ -154,111 +200,76 @@
         $('#artWaktu').text(`${waktu} WIB`);
         $('#artViews').text(`👁️ ${b.jumlah_view} Kali Dibaca`);
 
-        // Update Gambar
         let img = b.foto_thumbnail;
         if (img && !img.startsWith('http')) img = `/uploads/thumbnail/${img}`;
-        if (img) {
-            $('#artThumbnail').html(`<img src="${img}" style="width:100%; height:100%; object-fit:cover;">`);
-        } else {
-            $('#artThumbnail').html(`<div style="font-size: 50px; color: var(--muted);">📰</div>`);
-        }
-
-        // Update Isi Teks (HTML murni dari Quill/RichText)
+        $('#artThumbnail').html(img ? `<img src="${img}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="font-size: 50px; color: var(--muted);">📰</div>`);
         $('#artBody').html(b.isi_berita);
-
-        // Update Judul Halaman di Browser Tab
         document.title = `${b.judul_berita} - FNM`;
     }
 
-    // --- FUNGSI RENDER KOMENTAR ---
     function renderKomentar(komentarData) {
         $('#artKomenCount').text(`💬 ${komentarData.length} Komentar`);
         $('#csTitleCount').text(`Komentar Pembaca (${komentarData.length})`);
-
         let html = '';
-        if(komentarData.length === 0) {
+        if (komentarData.length === 0) {
             html = '<div style="text-align: center; color: var(--muted); padding: 20px;">Belum ada komentar. Jadilah yang pertama!</div>';
         } else {
             komentarData.forEach(k => {
-                const initial = k.nama_pengirim ? k.nama_pengirim.charAt(0).toUpperCase() : 'A';
-                const nama = k.nama_pengirim || 'Anonim';
-                const waktu = new Date(k.created_at).toLocaleDateString('id-ID');
-
+                // Sesuai revisi Krisna, ambil dari relasi user.username
+                const nama = k.user ? k.user.username : 'Anonim';
+                const initial = nama.charAt(0).toUpperCase();
                 html += `
                     <div class="comment-item">
                         <div class="ci-avatar">${initial}</div>
                         <div class="ci-body">
                             <div class="ci-user">${nama}</div>
-                            <div class="ci-time">${waktu}</div>
+                            <div class="ci-time">${new Date(k.created_at).toLocaleDateString('id-ID')}</div>
                             <div class="ci-text">${k.isi_komentar}</div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
         $('#komentarList').html(html);
     }
 
-    // --- FUNGSI KIRIM KOMENTAR ---
     function kirimKomentar() {
         const isi = $('#inputKomentar').val().trim();
-        const nama = $('#inputNama').val().trim();
-
-        if(!isi) {
+        if (!isi) {
             Toast.show('error', 'Komentar nggak boleh kosong cuy!');
             return;
         }
-
         $('#btnKirimKomentar').text('Mengirim...').prop('disabled', true);
-
         $.ajax({
-            url: '/api/viewers/tambahKomentar', // Sesuai route lu
+            url: '/api/viewers/tambahKomentar',
             type: 'POST',
             data: {
                 berita_id: currentBeritaId,
-                isi_komentar: isi,
-                nama_pengirim: nama || 'Anonim'
+                isi_komentar: isi
             },
             success: function(res) {
-                Toast.show('success', 'Komentar berhasil dikirim dan menunggu moderasi!');
+                Toast.show('success', 'Komentar terkirim! Menunggu moderasi redaksi.');
                 $('#inputKomentar').val('');
                 $('#btnKirimKomentar').text('Kirim Komentar').prop('disabled', false);
             },
-            error: function(err) {
-                Toast.show('error', 'Gagal mengirim komentar.');
+            error: function() {
+                Toast.show('error', 'Gagal kirim komentar.');
                 $('#btnKirimKomentar').text('Kirim Komentar').prop('disabled', false);
             }
         });
     }
 
-    // --- FUNGSI RENDER REAKSI (Pas pertama kali halaman dibuka) ---
     function renderReaksi(reaksiData) {
-        // Reset angka jadi 0 dulu
         $('.rb-count').text('0');
-
-        // Deteksi format data dari backend
-        if (Array.isArray(reaksiData)) {
-            // Kalau API ngirim array: [{jenis_reaksi: 'like', total: 5}, ...]
-            reaksiData.forEach(r => {
-                // Sesuain 'jenis_reaksi' sama 'total' dengan nama kolom database lu ya
-                $(`#count-${r.jenis_reaksi}`).text(r.total || r.jumlah || 1);
-            });
-        } else if (typeof reaksiData === 'object') {
-            // Kalau API ngirim object: { like: 5, love: 2 }
-            for (let jenis in reaksiData) {
-                $(`#count-${jenis}`).text(reaksiData[jenis]);
-            }
+        for (let jenis in reaksiData) {
+            $(`#count-${jenis}`).text(reaksiData[jenis]);
         }
     }
 
-    // --- FUNGSI KIRIM/TOGGLE REAKSI KETIKA DIKLIK ---
     function kirimReaksi(jenis) {
         if (!currentBeritaId) return;
-
         const btnCount = $(`#count-${jenis}`);
         const originalText = btnCount.text();
         btnCount.text('...');
-
         $.ajax({
             url: '/api/viewers/toggleReaksi',
             type: 'POST',
@@ -266,33 +277,22 @@
                 berita_id: currentBeritaId,
                 jenis_reaksi: jenis
             },
-            success: function(res) {
-                if (res.status === 'success') {
-                    loadBeritaDetail(currentSlug);
-                }
+            success: function() {
+                loadBeritaDetail(currentSlug);
             },
-            error: function(err) {
-                btnCount.text(originalText); // Balikin angka kalau error
-
-                // Kalau API lu nolak gara-gara belum login (kode 401)
-                if (err.status === 401 || err.status === 403) {
-                    Toast.show('error', 'Masuk/Login dulu cuy buat ngasih reaksi!');
-                } else {
-                    Toast.show('error', 'Gagal mengirim reaksi, coba lagi nanti.');
-                }
+            error: function() {
+                btnCount.text(originalText);
+                Toast.show('error', 'Gagal reaksi.');
             }
         });
     }
 
-    // --- FUNGSI SIDEBAR TRENDING ---
     function loadSidebarTrending() {
         $.ajax({
-            url: '/api/viewers/berita', // Ambil data dari endpoint Home
+            url: '/api/viewers/berita',
             type: 'GET',
             success: function(res) {
-                if (res.status === 'success' && res.data.trending) {
-                    renderSidebar(res.data.trending);
-                }
+                if (res.status === 'success') renderSidebar(res.data.trending);
             }
         });
     }
@@ -301,33 +301,26 @@
         const container = document.getElementById('trendingContainer');
         if (!container) return;
         let html = '';
-        const colors = ['gold', 'silver', 'bronze', '', ''];
-
         trendingData.forEach((item, index) => {
-            const rankClass = colors[index] || '';
             html += `
                 <a href="/berita/${item.slug}" class="trending-item">
-                    <div class="tr-rank ${rankClass}">${index + 1}</div>
+                    <div class="tr-rank">${index + 1}</div>
                     <div>
                         <div class="tr-title">${item.judul_berita}</div>
                         <div class="tr-views">👁 ${item.jumlah_view} views</div>
                     </div>
-                </a>
-            `;
+                </a>`;
         });
         container.innerHTML = html;
     }
 
-    // --- FUNGSI SHARE SOSIAL MEDIA ---
     function shareSocial(platform) {
         const url = encodeURIComponent(window.location.href);
         const title = encodeURIComponent($('#artJudul').text());
         let shareUrl = '';
-
-        if(platform === 'facebook') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-        if(platform === 'twitter') shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
-        if(platform === 'whatsapp') shareUrl = `https://api.whatsapp.com/send?text=${title} - ${url}`;
-
+        if (platform === 'facebook') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        if (platform === 'twitter') shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+        if (platform === 'whatsapp') shareUrl = `https://api.whatsapp.com/send?text=${title} - ${url}`;
         window.open(shareUrl, '_blank', 'width=600,height=400');
     }
 

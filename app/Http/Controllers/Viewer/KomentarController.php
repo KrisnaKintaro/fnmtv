@@ -31,7 +31,7 @@ class KomentarController extends Controller
 
         $komentarBaru = Komentar::create([
             'berita_id'    => $request->berita_id,
-            'user_id'      => Auth::id() ?: 1, // Diambil dari session user yang login
+            'user_id'      => Auth::id(), 
             'isi_komentar' => $request->isi_komentar,
             'status_moderasi' => 'Pending'
         ]);
