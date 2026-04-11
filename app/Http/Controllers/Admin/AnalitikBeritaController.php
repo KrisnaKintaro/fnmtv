@@ -21,7 +21,7 @@ class AnalitikBeritaController extends Controller
     public function getAnaliticsData(Request $request)
     {
         $period = $request->get('period', 'week');
-        
+
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -36,342 +36,296 @@ class AnalitikBeritaController extends Controller
     }
 
     /**
-     * Get summary statistics: total news, comments, users, revenue
+     * Get summary statistics
      */
     private function getSummaryStats($period)
     {
         $dateFrom = $this->getDateRangeFrom($period);
-        
-        // Total published news
+
+        // 1. Total Berita Published (Sinkron dengan query manual)
         $totalNews = Berita::where('status_berita', 'Published')->count();
         $newsChange = Berita::where('status_berita', 'Published')
+            ->whereDate('waktu_publikasi', '>=', $dateFrom)
+            ->count();
+
+        // 2. Total Komentar HANYA pada berita yang statusnya Published
+        $totalComments = Komentar::whereHas('berita', function ($q) {
+            $q->where('status_berita', 'Published');
+        })->count();
+
+        $commentsChange = Komentar::whereHas('berita', function ($q) {
+            $q->where('status_berita', 'Published');
+        })
             ->whereDate('created_at', '>=', $dateFrom)
             ->count();
-        
-        // Total comments
-        $totalComments = Komentar::count();
-        $commentsChange = Komentar::whereDate('created_at', '>=', $dateFrom)->count();
-        
-        // Total registered users
-        $totalUsers = User::where('role', '!=', 'admin')->count();
-        $usersChange = User::where('role', '!=', 'admin')
-            ->whereDate('created_at', '>=', $dateFrom)
-            ->count();
-        
-        // Total revenue
-        $totalRevenue = Pendapatan::where('status_pembayaran', 'Paid')
-            ->sum('nominal_pendapatan');
+
+        // 3. Total SEMUA User (Admin included agar sesuai dengan SELECT COUNT(id) FROM users)
+        $totalUsers = User::count();
+        $usersChange = User::whereDate('created_at', '>=', $dateFrom)->count();
+
+        // 4. Total Revenue
+        $totalRevenue = Pendapatan::where('status_pembayaran', 'Paid')->sum('nominal_pendapatan');
         $revenueChange = Pendapatan::where('status_pembayaran', 'Paid')
-            ->whereDate('created_at', '>=', $dateFrom)
+            ->whereDate('waktu_pembayaran', '>=', $dateFrom)
             ->sum('nominal_pendapatan');
-        
+
         return [
             'totalNews' => $totalNews,
             'totalComments' => $totalComments,
             'totalUsers' => $totalUsers,
             'revenue' => (int)$totalRevenue,
-            'newsChange' => ($period === 'today' ? "$newsChange artikel hari ini" : 
-                           ($period === 'week' ? "$newsChange artikel minggu ini" : 
-                           ($period === 'month' ? "$newsChange artikel bulan ini" : "$newsChange artikel tahun ini"))),
-            'commentsChange' => ($period === 'today' ? "$commentsChange komentar hari ini" : 
-                               ($period === 'week' ? "$commentsChange komentar minggu ini" : 
-                               ($period === 'month' ? "$commentsChange komentar bulan ini" : "$commentsChange komentar tahun ini"))),
-            'usersChange' => ($period === 'today' ? "$usersChange user hari ini" : 
-                            ($period === 'week' ? "$usersChange user minggu ini" : 
-                            ($period === 'month' ? "$usersChange user bulan ini" : "$usersChange user tahun ini"))),
-            'revenueChange' => '+Rp ' . number_format($revenueChange / 1000000, 1) . 'M ' . 
-                             ($period === 'month' ? 'bulan ini' : ($period === 'today' ? 'hari ini' : 'periode ini'))
+            'newsChange' => ($period === 'today' ? "+$newsChange artikel hari ini" : "+$newsChange artikel periode ini"),
+            'commentsChange' => ($period === 'today' ? "+$commentsChange komentar hari ini" : "+$commentsChange komentar periode ini"),
+            'usersChange' => ($period === 'today' ? "+$usersChange user baru hari ini" : "+$usersChange user baru periode ini"),
+            'revenueChange' => 'Rp ' . number_format($revenueChange, 0, ',', '.') . ' periode ini'
         ];
     }
 
     /**
-     * Get top news by views for the period
+     * Get top news by views
      */
     private function getTopNews($period)
     {
         $dateFrom = $this->getDateRangeFrom($period);
-        
-        $topNews = Berita::where('status_berita', 'Published')
+
+        return Berita::where('status_berita', 'Published')
             ->whereDate('waktu_publikasi', '>=', $dateFrom)
             ->with(['user:id,username', 'kategori:id,nama_kategori'])
-            ->select('id', 'user_id', 'kategori_id', 'judul_berita', 'jumlah_view', 'waktu_publikasi', 'created_at')
             ->orderBy('jumlah_view', 'desc')
             ->limit(8)
             ->get()
-            ->map(function($news) {
+            ->map(function ($news) {
                 return [
                     'id' => $news->id,
                     'title' => $news->judul_berita,
-                    'category' => $news->kategori->nama_kategori ?? 'Uncategorized',
+                    'category' => $news->kategori->nama_kategori ?? 'Umum',
                     'views' => $news->jumlah_view ?? 0,
-                    'author' => $news->user->username ?? 'Unknown',
+                    'author' => $news->user->username ?? 'Anonim',
                     'published' => Carbon::parse($news->waktu_publikasi)->format('d M Y'),
                     'trend' => $this->getTrend($news->jumlah_view)
                 ];
-            });
-        
-        return $topNews->toArray();
+            })->toArray();
     }
 
     /**
-     * Get viral content - articles with high engagement
+     * Get viral content (high engagement) - Tanpa Data Dummy
      */
     private function getViralContent($period)
     {
         $dateFrom = $this->getDateRangeFrom($period);
-        
-        $viralContent = Berita::where('status_berita', 'Published')
+
+        return Berita::where('status_berita', 'Published')
             ->whereDate('waktu_publikasi', '>=', $dateFrom)
             ->with(['user:id,username', 'kategori:id,nama_kategori'])
-            ->withCount([
-                'komentar',
-                'reaksi'
-            ])
-            ->select('id', 'user_id', 'kategori_id', 'judul_berita', 'created_at')
+            ->withCount(['komentar', 'reaksi'])
             ->orderBy('komentar_count', 'desc')
             ->limit(5)
             ->get()
-            ->map(function($news) {
+            ->map(function ($news) {
                 return [
                     'id' => $news->id,
                     'title' => $news->judul_berita,
-                    'category' => $news->kategori->nama_kategori ?? 'Uncategorized',
+                    'category' => $news->kategori->nama_kategori ?? 'Umum',
                     'comments' => $news->komentar_count ?? 0,
                     'reactions' => $news->reaksi_count ?? 0,
-                    'shares' => rand(500, 5000), // Placeholder - implement shares tracking if needed
-                    'author' => $news->user->username ?? 'Unknown'
+                    'shares' => 0, // Set 0 karena tabel share belum ada
+                    'author' => $news->user->username ?? 'Anonim'
                 ];
-            });
-        
-        return $viralContent->toArray();
+            })->toArray();
     }
 
     /**
-     * Get chart data for traffic trends
+     * Get chart data for traffic trends (DB Agnostic)
      */
     private function getChartData($period)
     {
-        if ($period === 'today') {
-            return $this->getChartDataToday();
-        } elseif ($period === 'week') {
-            return $this->getChartDataWeek();
-        } elseif ($period === 'month') {
-            return $this->getChartDataMonth();
-        } else {
-            return $this->getChartDataYear();
-        }
+        return match ($period) {
+            'today' => $this->getChartDataToday(),
+            'week' => $this->getChartDataWeek(),
+            'month' => $this->getChartDataMonth(),
+            'year' => $this->getChartDataYear(),
+            'all' => $this->getChartDataAll(), // Tambahin ini cuy!
+            default => $this->getChartDataWeek(),
+        };
     }
 
     private function getChartDataToday()
     {
         $today = Carbon::today();
-        $hours = [];
-        $views = [];
-        $visitors = [];
-        $comments = [];
-        
-        for ($i = 0; $i < 12; $i++) {
-            $hour = 6 + ($i * 2);
-            $hours[] = sprintf('%02d', $hour);
-            
-            // SQLite compatible: use strftime instead of HOUR
-            $viewsCount = ViewLog::whereDate('created_at', $today)
-                ->whereRaw("CAST(strftime('%H', created_at) AS INTEGER) >= ? AND CAST(strftime('%H', created_at) AS INTEGER) < ?", [$hour, $hour + 2])
-                ->count();
-            $views[] = $viewsCount;
-            
-            $visitorCount = ViewLog::whereDate('created_at', $today)
-                ->whereRaw("CAST(strftime('%H', created_at) AS INTEGER) >= ? AND CAST(strftime('%H', created_at) AS INTEGER) < ?", [$hour, $hour + 2])
-                ->distinct('ip_address')
-                ->count();
-            $visitors[] = $visitorCount;
-            
-            $commentCount = Komentar::whereDate('created_at', $today)
-                ->whereRaw("CAST(strftime('%H', created_at) AS INTEGER) >= ? AND CAST(strftime('%H', created_at) AS INTEGER) < ?", [$hour, $hour + 2])
-                ->count();
-            $comments[] = $commentCount;
+        $labels = []; $views = []; $visitors = []; $comments = [];
+
+        // Looping 24 jam penuh
+        for ($i = 0; $i < 24; $i++) {
+            $labels[] = sprintf('%02d:00', $i); // Hasil: 00:00, 01:00, dll
+
+            $start = $today->copy()->setTime($i, 0, 0);
+            $end = $today->copy()->setTime($i, 59, 59);
+
+            $views[] = ViewLog::whereBetween('created_at', [$start, $end])->count();
+            $visitors[] = ViewLog::whereBetween('created_at', [$start, $end])->distinct('ip_address')->count();
+            $comments[] = Komentar::whereBetween('created_at', [$start, $end])->count();
         }
-        
-        return [
-            'labels' => $hours,
-            'views' => $views,
-            'visitors' => $visitors,
-            'comments' => $comments
-        ];
+
+        return ['labels' => $labels, 'views' => $views, 'visitors' => $visitors, 'comments' => $comments];
     }
 
     private function getChartDataWeek()
     {
-        $labels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+        $labels = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
         $views = [];
         $visitors = [];
         $comments = [];
-        
+
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
-            
-            $viewsCount = ViewLog::whereDate('created_at', $date)->count();
-            $views[] = $viewsCount;
-            
-            $visitorCount = ViewLog::whereDate('created_at', $date)
-                ->distinct('ip_address')
-                ->count();
-            $visitors[] = $visitorCount;
-            
-            $commentCount = Komentar::whereDate('created_at', $date)->count();
-            $comments[] = $commentCount;
+
+            $views[] = ViewLog::whereDate('created_at', $date)->count();
+            $visitors[] = ViewLog::whereDate('created_at', $date)->distinct('ip_address')->count();
+            $comments[] = Komentar::whereDate('created_at', $date)->count();
         }
-        
-        return [
-            'labels' => $labels,
-            'views' => $views,
-            'visitors' => $visitors,
-            'comments' => $comments
-        ];
+
+        return ['labels' => $labels, 'views' => $views, 'visitors' => $visitors, 'comments' => $comments];
     }
 
     private function getChartDataMonth()
     {
-        $labels = ['1', '5', '10', '15', '20', '25', '30'];
-        $days = [1, 5, 10, 15, 20, 25, 30];
-        $views = [];
-        $visitors = [];
-        $comments = [];
-        
-        foreach ($days as $day) {
-            $date = Carbon::now()->setDay($day);
-            
-            $viewsCount = ViewLog::whereDate('created_at', $date)->count();
-            $views[] = $viewsCount;
-            
-            $visitorCount = ViewLog::whereDate('created_at', $date)
-                ->distinct('ip_address')
-                ->count();
-            $visitors[] = $visitorCount;
-            
-            $commentCount = Komentar::whereDate('created_at', $date)->count();
-            $comments[] = $commentCount;
+        $labels = []; $views = []; $visitors = []; $comments = [];
+
+        // Looping 30 hari ke belakang
+        for ($i = 29; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i);
+            $labels[] = $date->format('d/m'); // Hasil: 12/04, 13/04, dll
+
+            $views[] = ViewLog::whereDate('created_at', $date)->count();
+            $visitors[] = ViewLog::whereDate('created_at', $date)->distinct('ip_address')->count();
+            $comments[] = Komentar::whereDate('created_at', $date)->count();
         }
-        
-        return [
-            'labels' => $labels,
-            'views' => $views,
-            'visitors' => $visitors,
-            'comments' => $comments
-        ];
+
+        return ['labels' => $labels, 'views' => $views, 'visitors' => $visitors, 'comments' => $comments];
     }
 
     private function getChartDataYear()
     {
-        $labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul'];
+        $labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
         $views = [];
         $visitors = [];
         $comments = [];
-        
-        for ($month = 1; $month <= 7; $month++) {
-            $startDate = Carbon::now()->setMonth($month)->startOfMonth();
-            $endDate = Carbon::now()->setMonth($month)->endOfMonth();
-            
-            $viewsCount = ViewLog::whereBetween('created_at', [$startDate, $endDate])->count();
-            $views[] = $viewsCount;
-            
-            $visitorCount = ViewLog::whereBetween('created_at', [$startDate, $endDate])
-                ->distinct('ip_address')
-                ->count();
-            $visitors[] = $visitorCount;
-            
-            $commentCount = Komentar::whereBetween('created_at', [$startDate, $endDate])->count();
-            $comments[] = $commentCount;
+
+        for ($month = 1; $month <= 12; $month++) {
+            $start = Carbon::now()->month($month)->startOfMonth();
+            $end = Carbon::now()->month($month)->endOfMonth();
+
+            $views[] = ViewLog::whereBetween('created_at', [$start, $end])->count();
+            $visitors[] = ViewLog::whereBetween('created_at', [$start, $end])->distinct('ip_address')->count();
+            $comments[] = Komentar::whereBetween('created_at', [$start, $end])->count();
         }
-        
-        return [
-            'labels' => $labels,
-            'views' => $views,
-            'visitors' => $visitors,
-            'comments' => $comments
-        ];
+
+        return ['labels' => $labels, 'views' => $views, 'visitors' => $visitors, 'comments' => $comments];
+    }
+
+    private function getChartDataAll()
+    {
+        $labels = []; $views = []; $visitors = []; $comments = [];
+
+        // CARI TAHUN PALING TUA DARI SEMUA TABEL
+        $minView = ViewLog::min('created_at');
+        $minKom = Komentar::min('created_at');
+
+        $years = [];
+        if ($minView) $years[] = Carbon::parse($minView)->year;
+        if ($minKom) $years[] = Carbon::parse($minKom)->year;
+
+        // Ambil tahun terkecil dari gabungan data di atas
+        $minYear = empty($years) ? Carbon::now()->year : min($years);
+        $currentYear = Carbon::now()->year;
+
+        // Jaga-jaga kalau web lu baru rilis tahun ini
+        if ($minYear == $currentYear) {
+            $minYear = $currentYear - 1;
+        }
+
+        for ($year = $minYear; $year <= $currentYear; $year++) {
+            $start = Carbon::create($year)->startOfYear();
+            $end = Carbon::create($year)->endOfYear();
+
+            $labels[] = (string)$year;
+
+            $views[] = ViewLog::whereBetween('created_at', [$start, $end])->count();
+            $visitors[] = ViewLog::whereBetween('created_at', [$start, $end])->distinct('ip_address')->count();
+            $comments[] = Komentar::whereBetween('created_at', [$start, $end])->count();
+        }
+
+        return ['labels' => $labels, 'views' => $views, 'visitors' => $visitors, 'comments' => $comments];
     }
 
     /**
-     * Get category performance data
+     * Get category performance
      */
     private function getCategoryPerformance($period)
     {
         $dateFrom = $this->getDateRangeFrom($period);
-        
-        $categories = Kategori::with('berita')
-            ->withCount(['berita' => function($q) use ($dateFrom) {
-                $q->where('status_berita', 'Published')
-                  ->whereDate('created_at', '>=', $dateFrom);
-            }])
-            ->get();
-        
-        $maxViews = 0;
-        $categoryData = [];
-        
-        foreach ($categories as $cat) {
-            $views = Berita::where('kategori_id', $cat->id)
-                ->where('status_berita', 'Published')
-                ->whereDate('created_at', '>=', $dateFrom)
-                ->sum('jumlah_view');
-            
-            if ($views > $maxViews) {
-                $maxViews = $views;
-            }
-            
-            $categoryData[] = [
+
+        $categories = Kategori::withSum(['berita as total_views' => function ($q) use ($dateFrom) {
+            $q->where('status_berita', 'Published')
+                ->whereDate('waktu_publikasi', '>=', $dateFrom);
+        }], 'jumlah_view')->get();
+
+        $maxViews = $categories->max('total_views') ?: 1;
+
+        return $categories->map(function ($cat) use ($maxViews) {
+            return [
                 'name' => $cat->nama_kategori,
-                'emoji' => '📊', // You can customize emojis per category in database
-                'views' => $views,
-                'pct' => 0 // Will be calculated next
+                'emoji' => '📊',
+                'views' => (int) $cat->total_views,
+                'pct' => round(((int) $cat->total_views / $maxViews) * 100)
             ];
-        }
-        
-        // Calculate percentages
-        foreach ($categoryData as &$cat) {
-            $cat['pct'] = $maxViews > 0 ? round(($cat['views'] / $maxViews) * 100) : 0;
-        }
-        
-        // Sort by views descending
-        usort($categoryData, function($a, $b) {
-            return $b['views'] - $a['views'];
-        });
-        
-        return array_slice($categoryData, 0, 8); // Top 8 categories
+        })->sortByDesc('views')->take(8)->values()->toArray();
     }
 
     /**
-     * Get heatmap data for best publishing times
+     * Get heatmap data - Berdasarkan Waktu Publikasi Berita
      */
     private function getHeatmapData($period)
     {
         $dateFrom = $this->getDateRangeFrom($period);
-        
-        // Heatmap data based on views per hour per day
-        // SQLite strftime '%w' returns 0=Sunday, 1=Monday, ... 6=Saturday
-        $days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];  // Indonesian: Sun, Mon, Tue, Wed, Thu, Fri, Sat
+        $days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
         $hours = ['06', '09', '12', '15', '18', '21'];
+        $matrix = array_fill(0, 7, array_fill(0, 6, 0));
+
+        // Ambil data publikasi berita (Bukan ViewLog)
+        $beritas = Berita::where('status_berita', 'Published')
+            ->whereDate('waktu_publikasi', '>=', $dateFrom)
+            ->get(['waktu_publikasi']);
+
+        foreach ($beritas as $b) {
+            $dt = Carbon::parse($b->waktu_publikasi);
+            $day = $dt->dayOfWeek;
+            $h = $dt->hour;
+
+            $hIndex = match (true) {
+                $h >= 6 && $h < 9 => 0,
+                $h >= 9 && $h < 12 => 1,
+                $h >= 12 && $h < 15 => 2,
+                $h >= 15 && $h < 18 => 3,
+                $h >= 18 && $h < 21 => 4,
+                default => 5,
+            };
+            $matrix[$day][$hIndex]++;
+        }
+
+        // Normalisasi warna berdasarkan angka tertinggi di matrix
+        $allValues = collect($matrix)->flatten();
+        $maxCount = $allValues->max() ?: 1;
+
         $intensities = [];
-        
-        // Iterate through each day (0=Sunday to 6=Saturday in SQLite)
-        for ($dayIndex = 0; $dayIndex < 7; $dayIndex++) {
+        foreach ($matrix as $dayData) {
             $dayIntensities = [];
-            for ($hourIndex = 0; $hourIndex < 6; $hourIndex++) {
-                $hour = intval($hours[$hourIndex]);
-                
-                // Get actual viewlog data using SQLite-compatible functions
-                $views = ViewLog::whereDate('created_at', '>=', $dateFrom)
-                    ->whereRaw("CAST(strftime('%w', created_at) AS INTEGER) = ?", [$dayIndex])
-                    ->whereRaw("CAST(strftime('%H', created_at) AS INTEGER) = ?", [$hour])
-                    ->count();
-                
-                // Normalize to 0-1 scale
-                $intensity = min($views / 1000, 1.0);
-                $dayIntensities[] = $intensity;
+            foreach ($dayData as $count) {
+                $dayIntensities[] = $count / $maxCount;
             }
             $intensities[] = $dayIntensities;
         }
-        
+
         return [
             'days' => $days,
             'hours' => $hours,
@@ -379,28 +333,22 @@ class AnalitikBeritaController extends Controller
         ];
     }
 
-    /**
-     * Helper: Get date range start based on period
-     */
     private function getDateRangeFrom($period)
     {
         return match ($period) {
             'today' => Carbon::today(),
-            'week' => Carbon::now()->subDays(7),
+            'week'  => Carbon::now()->subDays(7),
             'month' => Carbon::now()->subDays(30),
-            'year' => Carbon::now()->subMonths(12),
+            'year'  => Carbon::now()->subMonths(12),
+            'all'   => Carbon::create(2000, 1, 1), // Tambahin ini cuy
             default => Carbon::now()->subDays(7),
         };
     }
 
-    /**
-     * Helper: Determine trend direction
-     */
     private function getTrend($views)
     {
-        // Simple logic - in production, compare with previous period
-        if ($views > 30000) return 'up';
-        if ($views < 15000) return 'down';
+        if ($views > 1000) return 'up';
+        if ($views < 100) return 'down';
         return 'stable';
     }
 }

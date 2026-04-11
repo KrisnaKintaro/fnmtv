@@ -26,14 +26,30 @@
   let currentFilter = 'all';
 
   $(document).ready(function() {
+    $('#tbTitle').text('Moderasi Komentar');
+    $('#tbCrumb').text('Admin / Moderasi Komentar');
     loadKomentarFromAPI();
   });
 
   async function loadKomentarFromAPI() {
+    const container = document.getElementById('komentarContainer');
+
+    // TAMPILAN LOADING SEBELUM FETCH API
+    container.innerHTML = `
+      <div style="padding: 60px 20px; text-align: center; color: var(--muted); font-family: 'Source Sans 3';">
+          <div style="font-size: 40px; margin-bottom: 12px; animation: pulse 1.5s infinite;">⏳</div>
+          <div style="font-weight: 600; font-size: 16px; color: var(--text);">Mengambil Data...</div>
+          <div style="font-size: 13px; margin-top: 6px;">Sedang mengambil data komentar dari API, mohon tunggu sebentar.</div>
+      </div>
+      <style>
+          @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+      </style>
+    `;
+
     try {
       const response = await fetch('/api/admin/manajemen_komentar/ambilData');
       const result = await response.json();
-      
+
       if (result.status === 'success') {
         allKomentar = result.data;
         updateCounts();
@@ -44,6 +60,14 @@
     } catch (error) {
       console.error('Error:', error);
       Toast.show('error', 'Terjadi kesalahan saat memuat data');
+      // Tampilan kalau API error / mati
+      container.innerHTML = `
+        <div style="padding: 40px; text-align: center; color: var(--red);">
+            <div style="font-size: 40px; margin-bottom: 10px;">🔌</div>
+            <div style="font-weight: 600;">Koneksi Terputus</div>
+            <div style="font-size: 13px;">Gagal terhubung ke API. Silakan refresh halaman.</div>
+        </div>
+      `;
     }
   }
 
@@ -51,19 +75,19 @@
     const pending = allKomentar.filter(k => k.status_moderasi === 'Pending').length;
     const spam = allKomentar.filter(k => k.status_moderasi === 'Spam').length;
     const approved = allKomentar.filter(k => k.status_moderasi === 'Approved').length;
-    
+
     document.getElementById('allCount').textContent = allKomentar.length;
     document.getElementById('pendingCount').textContent = pending;
     document.getElementById('pendingCountTab').textContent = pending;
     document.getElementById('spamCount').textContent = spam;
     document.getElementById('approvedCount').textContent = approved;
-    
+
     document.getElementById('warnBox').style.display = pending > 0 ? 'block' : 'none';
   }
 
   function filterKomentar(filter) {
     currentFilter = filter;
-    
+
     if (filter === 'all') {
       filteredKomentar = allKomentar;
     } else if (filter === 'pending') {
@@ -79,7 +103,7 @@
 
   function renderKomentar() {
     const container = document.getElementById('komentarContainer');
-    
+
     if (!filteredKomentar || filteredKomentar.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -93,15 +117,15 @@
     container.innerHTML = filteredKomentar.map(komentar => {
       const inicial = (komentar.nama || 'A')[0].toUpperCase();
       const bgColor = ['#cc0000', '#1a3a7a', '#1a7a3c', '#b86200'][Math.floor(Math.random() * 4)];
-      const statusColor = komentar.status_moderasi === 'Approved' ? 'b-ok' : 
+      const statusColor = komentar.status_moderasi === 'Approved' ? 'b-ok' :
                          (komentar.status_moderasi === 'Spam' ? 'b-spam' : 'b-review');
-      const statusIcon = komentar.status_moderasi === 'Approved' ? '✓ OK' : 
+      const statusIcon = komentar.status_moderasi === 'Approved' ? '✓ OK' :
                         (komentar.status_moderasi === 'Spam' ? '⚠ Spam' : '⏳ Pending');
 
       const tanggal = new Date(komentar.created_at).toLocaleDateString('id-ID', {
         day: 'numeric', month: 'short', year: 'numeric'
       });
-      
+
       const waktu = new Date(komentar.created_at).toLocaleTimeString('id-ID', {
         hour: '2-digit', minute: '2-digit'
       });
@@ -110,7 +134,7 @@
         <div class="cmt-item" ${komentar.status_moderasi === 'Spam' ? 'style="background:#fef9f9;"' : ''}>
           <div class="cmt-avatar" style="background:${bgColor};">${inicial}</div>
           <div class="cmt-body">
-            <div class="cmt-user">${komentar.nama || 'Anonim'} 
+            <div class="cmt-user">${komentar.nama || 'Anonim'}
               <span class="badge ${statusColor}" style="margin-left:6px;">${statusIcon}</span>
             </div>
             <div class="cmt-article">Pada: "${komentar.berita?.judul_berita || 'Berita tidak ditemukan'}"</div>

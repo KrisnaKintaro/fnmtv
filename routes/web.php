@@ -99,10 +99,6 @@ Route::middleware(['auth', 'RoleCheck:Redaksi'])->group(function () {
     Route::get('/redaksi-manajemen-berita', fn() => view('Redaksi.pages.manajemen_berita'));
 });
 
-// Route::get('/redaksi-manajemen-berita', function () {
-//     return view('Redaksi.pages.manajemen_berita');
-// });
-
 #================= AUTH =================
 Route::get('/login', function () {
     return view('Auth.login');
