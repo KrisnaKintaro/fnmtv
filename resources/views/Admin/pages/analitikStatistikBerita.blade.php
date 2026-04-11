@@ -798,6 +798,7 @@
         }
 
         // 2. Render Chart
+        // 2. Render Chart (BALIK KE DESAIN ASLI YANG CAKEP)
         function drawChart(metric) {
             if (!APP_DATA || !APP_DATA.chartData) return;
             const canvas = document.getElementById('visitChart');
@@ -806,92 +807,133 @@
             const values = data[metric];
             const labels = data.labels; // Tarik data label horizontal
 
-            const w = canvas.parentElement.clientWidth;
-            const h = canvas.parentElement.clientHeight;
-            canvas.width = w;
-            canvas.height = h;
-            ctx.clearRect(0, 0, w, h);
+            const W = canvas.parentElement.clientWidth;
+            const H = canvas.parentElement.clientHeight || 180;
+            canvas.width = W;
+            canvas.height = H;
 
+            ctx.clearRect(0, 0, W, H);
             if (!values || values.length === 0) return;
 
-            const allMax = Math.max(...data.views, ...data.visitors, ...data.comments);
-            const maxVal = allMax * 1.2 || 10;
+            // --- PADDING SETUP (Buat ngasih ruang ke Grid Y-Axis & X-Axis) ---
+            const padL = 48, padR = 24, padT = 16, padB = 28;
+            const chartW = W - padL - padR;
+            const chartH = H - padT - padB;
 
-            // Jaga-jaga kalau datanya cuma 1 tahun (biar JS ga error Infinity)
-            const stepX = values.length > 1 ? w / (values.length - 1) : w / 2;
+            // Hitung skala berdasarkan metrik yang aktif aja, biar angkanya pas
+            const maxVal = Math.max(...values) * 1.15 || 10;
+            const step = values.length > 1 ? chartW / (values.length - 1) : chartW / 2;
 
-            // BERI RUANG DI BAWAH (25px) BUAT NULIS TEKS
-            const paddingBottom = 25;
-            const chartH = h - paddingBottom;
+            // --- 1. GAMBAR GRID HORIZONTAL & LABEL SUMBU Y ---
+            ctx.strokeStyle = '#e0ddd6';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padT + chartH - (i / 4) * chartH;
 
-            // Gambar Area (Gradient)
-            const gradient = ctx.createLinearGradient(0, 0, 0, chartH);
-            gradient.addColorStop(0, 'rgba(204, 0, 0, 0.2)');
-            gradient.addColorStop(1, 'rgba(204, 0, 0, 0)');
+                // Garis abu-abu background
+                ctx.beginPath();
+                ctx.moveTo(padL, y);
+                ctx.lineTo(W - padR, y);
+                ctx.stroke();
+
+                // Teks angka sumbu Y (misal: 10K, 15K)
+                ctx.fillStyle = '#7a7570';
+                ctx.font = '10px JetBrains Mono, monospace';
+                ctx.textAlign = 'right';
+                const val = Math.round((maxVal / 4) * i);
+                const textVal = val >= 1000 ? (val / 1000).toFixed(1).replace('.0','') + 'K' : val;
+                ctx.fillText(textVal, padL - 8, y + 3);
+            }
+
+            // --- 2. GAMBAR AREA SHADOW MERAH (GRADIENT) ---
+            const gradient = ctx.createLinearGradient(0, padT, 0, padT + chartH);
+            gradient.addColorStop(0, 'rgba(204,0,0,0.18)');
+            gradient.addColorStop(1, 'rgba(204,0,0,0.01)');
 
             ctx.beginPath();
-            ctx.fillStyle = gradient;
             values.forEach((v, i) => {
-                const x = values.length > 1 ? i * stepX : w / 2;
-                const y = chartH - (v / maxVal * (chartH - 20));
-                if (i === 0) ctx.moveTo(x, chartH);
-                ctx.lineTo(x, y);
-                if (i === values.length - 1) ctx.lineTo(x, chartH);
+                const x = values.length > 1 ? padL + (i * step) : padL + (chartW / 2);
+                const y = padT + chartH - (v / maxVal) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
             });
-            ctx.lineTo(w, chartH);
-            ctx.lineTo(0, chartH);
+            ctx.lineTo(values.length > 1 ? padL + chartW : padL + (chartW / 2), padT + chartH);
+            ctx.lineTo(padL, padT + chartH);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
             ctx.fill();
 
-            // Gambar Garis Merah Utama
+            // --- 3. GAMBAR GARIS UTAMA (MERAH) ---
             ctx.beginPath();
             ctx.strokeStyle = '#cc0000';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2.5;
             ctx.lineJoin = 'round';
             values.forEach((v, i) => {
-                const x = values.length > 1 ? i * stepX : w / 2;
-                const y = chartH - (v / maxVal * (chartH - 20));
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                const x = values.length > 1 ? padL + (i * step) : padL + (chartW / 2);
+                const y = padT + chartH - (v / maxVal) * chartH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
             });
             ctx.stroke();
 
-           // === GAMBAR LABEL X-AXIS DI BAWAH GRAFIK ===
-            ctx.fillStyle = "#7a7570";
-            ctx.font = "11px 'JetBrains Mono', monospace";
-
+            // --- 4. GAMBAR TITIK LINGKARAN & LABEL SUMBU X ---
             let skip = 1;
-            // Diperlebar dikit skip-nya biar makin lega
             if (labels.length > 15) skip = Math.ceil(labels.length / 6);
 
-            labels.forEach((label, i) => {
+            values.forEach((v, i) => {
+                const x = values.length > 1 ? padL + (i * step) : padL + (chartW / 2);
+                const y = padT + chartH - (v / maxVal) * chartH;
+
+                // Titik Lingkaran di tiap sudut
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                ctx.strokeStyle = '#cc0000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Gambar Label Sumbu X (dengan logic skip biar ga numpuk)
                 let isFirst = i === 0;
                 let isLast = i === labels.length - 1;
-                // FIX NUMPUK: Jangan gambar 'skip' kalau dia posisinya terlalu mepet sama index terakhir
                 let isTick = (i % skip === 0) && (labels.length - 1 - i > skip / 2);
 
                 if (isFirst || isLast || isTick) {
-                    let x = values.length > 1 ? i * stepX : w / 2;
+                    ctx.fillStyle = '#7a7570';
+                    ctx.font = "11px 'JetBrains Mono', monospace";
 
                     if (isFirst) ctx.textAlign = "left";
                     else if (isLast) ctx.textAlign = "right";
                     else ctx.textAlign = "center";
 
-                    ctx.fillText(label, x, h - 5);
+                    ctx.fillText(labels[i], x, padT + chartH + 18);
                 }
             });
 
-            // Update stats di bawah (biarkan seperti sebelumnya)
+            // --- 5. UPDATE STATISTIK DINAMIS DI BAWAH CHART ---
+            // Notalin khusus untuk data period dan filter yang aktif saat ini
+            const total = values.reduce((a, b) => a + b, 0);
+            const avg = Math.round(total / (values.length || 1));
+            const peak = Math.max(...values, 0);
+
+            // Nentuin Label Teks sesuai permintaan lu
+            let labelName = 'Views';
+            if (metric === 'visitors') labelName = 'Pengunjung';
+            if (metric === 'comments') labelName = 'Komentar';
+
+            // Render stats
             document.getElementById('chartStatsRow').innerHTML = `
                 <div class="cs-item">
-                    <div class="cs-val">${(data.views.reduce((a,b)=>a+b,0)).toLocaleString('id')}</div>
-                    <div class="cs-lbl">Total Views</div>
+                    <div class="cs-val">${total.toLocaleString('id')}</div>
+                    <div class="cs-lbl">Total ${labelName}</div>
                 </div>
                 <div class="cs-item">
-                    <div class="cs-val">${(data.visitors.reduce((a,b)=>a+b,0)).toLocaleString('id')}</div>
-                    <div class="cs-lbl">Unik Visitors</div>
+                    <div class="cs-val">${avg.toLocaleString('id')}</div>
+                    <div class="cs-lbl">Rata-rata/hari</div>
                 </div>
                 <div class="cs-item">
-                    <div class="cs-val">${(data.comments.reduce((a,b)=>a+b,0)).toLocaleString('id')}</div>
-                    <div class="cs-lbl">Semua Komentar</div>
+                    <div class="cs-val">${peak.toLocaleString('id')}</div>
+                    <div class="cs-lbl">Peak ${labelName}</div>
                 </div>
             `;
         }
