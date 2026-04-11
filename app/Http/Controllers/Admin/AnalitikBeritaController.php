@@ -152,7 +152,10 @@ class AnalitikBeritaController extends Controller
     private function getChartDataToday()
     {
         $today = Carbon::today();
-        $labels = []; $views = []; $visitors = []; $comments = [];
+        $labels = [];
+        $views = [];
+        $visitors = [];
+        $comments = [];
 
         // Looping 24 jam penuh
         for ($i = 0; $i < 24; $i++) {
@@ -171,13 +174,16 @@ class AnalitikBeritaController extends Controller
 
     private function getChartDataWeek()
     {
-        $labels = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        $labels = [];
         $views = [];
         $visitors = [];
         $comments = [];
 
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i);
+
+            Carbon::setLocale('id');
+            $labels[] = $date->translatedFormat('D');
 
             $views[] = ViewLog::whereDate('created_at', $date)->count();
             $visitors[] = ViewLog::whereDate('created_at', $date)->distinct('ip_address')->count();
@@ -189,7 +195,10 @@ class AnalitikBeritaController extends Controller
 
     private function getChartDataMonth()
     {
-        $labels = []; $views = []; $visitors = []; $comments = [];
+        $labels = [];
+        $views = [];
+        $visitors = [];
+        $comments = [];
 
         // Looping 30 hari ke belakang
         for ($i = 29; $i >= 0; $i--) {
@@ -206,14 +215,20 @@ class AnalitikBeritaController extends Controller
 
     private function getChartDataYear()
     {
-        $labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $labels = [];
         $views = [];
         $visitors = [];
         $comments = [];
 
-        for ($month = 1; $month <= 12; $month++) {
-            $start = Carbon::now()->month($month)->startOfMonth();
-            $end = Carbon::now()->month($month)->endOfMonth();
+        // ✅ FIX (Opsional tapi lebih pro): Tunjukin 12 bulan terakhir mundur dari bulan ini
+        // Biar kalau sekarang April 2026, grafiknya mulai dari Mei 2025 s/d April 2026.
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $start = $date->copy()->startOfMonth();
+            $end = $date->copy()->endOfMonth();
+
+            Carbon::setLocale('id');
+            $labels[] = $date->translatedFormat('M'); // Contoh: Jan, Feb, Mar
 
             $views[] = ViewLog::whereBetween('created_at', [$start, $end])->count();
             $visitors[] = ViewLog::whereBetween('created_at', [$start, $end])->distinct('ip_address')->count();
@@ -225,7 +240,10 @@ class AnalitikBeritaController extends Controller
 
     private function getChartDataAll()
     {
-        $labels = []; $views = []; $visitors = []; $comments = [];
+        $labels = [];
+        $views = [];
+        $visitors = [];
+        $comments = [];
 
         // CARI TAHUN PALING TUA DARI SEMUA TABEL
         $minView = ViewLog::min('created_at');
