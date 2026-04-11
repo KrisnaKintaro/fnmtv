@@ -85,6 +85,20 @@
         </div>
     </div>
 </div>
+
+<div class="modal-backdrop" id="modalDeleteCat" style="display:none;">
+    <div class="modal" style="max-width:350px; text-align: center; padding: 30px 20px;">
+        <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+        <div class="modal-title" style="margin-bottom: 10px; font-size: 18px; font-weight: 700;">Konfirmasi Hapus</div>
+        <p style="color: var(--muted); font-size: 14px; margin-bottom: 24px; line-height: 1.5;">
+            Yakin ingin menghapus kategori ini?
+        </p>
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <button class="btn btn-outline" onclick="closeModalDelete()">Batal</button>
+            <button class="btn btn-red" onclick="prosesHapusKategori()" id="btnConfirmDelete">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -136,7 +150,7 @@
                 <td>
                     <div class="act-btns">
                         <div class="ico-btn" onclick="editKategori(${val.id})" title="Edit">✏️</div>
-                        <div class="ico-btn" onclick="hapusKategori(${val.id})" title="Hapus">🗑</div>
+                        <div class="ico-btn" onclick="konfirmasiHapus(${val.id}, ${val.berita_count || 0})" title="Hapus">🗑</div>
                     </div>
                 </td>
             </tr>`;
@@ -176,7 +190,7 @@
                 </div>
                 <div class="cat-actions">
                     <div class="ico-btn" onclick="editKategori(${val.id})">✏️</div>
-                    <div class="ico-btn" onclick="hapusKategori(${val.id})">🗑</div>
+                    <div class="ico-btn" onclick="konfirmasiHapus(${val.id}, ${val.berita_count || 0})">🗑</div>
                 </div>
             </div>`;
         });
@@ -287,28 +301,58 @@
         }
     }
 
-    async function hapusKategori(id) {
-        if (confirm('Yakin ingin menghapus kategori ini? Data artikel di dalamnya mungkin terdampak.')) {
-            try {
-                const response = await fetch(`/api/admin/manajemen_kategori/hapusData/${id}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                    }
-                });
+    let deleteCatId = null;
 
-                const result = await response.json();
+    function konfirmasiHapus(id, count) {
+        // Pengecekan maut: Kategori ga boleh dihapus kalau masih ada artikelnya!
+        if (count > 0) {
+            Toast.show('error', `Tidak bisa dihapus! Kategori ini masih dipakai oleh ${count} artikel. Kosongin dulu artikelnya baru bisa dihapus.`);
+            return;
+        }
 
-                if (result.status === 'success') {
-                    Toast.show('success', result.message);
-                    loadDataKategoriFromAPI();
-                } else {
-                    Toast.show('error', result.message || 'Gagal menghapus kategori');
+        // Kalau jumlah artikel 0, gas buka modal konfirmasi
+        deleteCatId = id;
+        ModalManager.open('modalDeleteCat');
+    }
+
+    function closeModalDelete() {
+        deleteCatId = null;
+        ModalManager.close('modalDeleteCat');
+    }
+
+    async function prosesHapusKategori() {
+        if (!deleteCatId) return;
+
+        const btn = document.getElementById('btnConfirmDelete');
+        btn.textContent = 'Menghapus...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`/api/admin/manajemen_kategori/hapusData/${deleteCatId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                Toast.show('error', 'Terjadi kesalahan saat menghapus');
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                Toast.show('success', 'Mantap! Kategori berhasil dihapus.');
+                closeModalDelete();
+                loadDataKategoriFromAPI();
+            } else {
+                Toast.show('error', result.message || 'Gagal menghapus kategori');
+                closeModalDelete();
             }
+        } catch (error) {
+            console.error('Error:', error);
+            Toast.show('error', 'Waduh, terjadi kesalahan saat menghapus data.');
+            closeModalDelete();
+        } finally {
+            // Balikin tombol seperti semula
+            btn.textContent = 'Ya, Hapus';
+            btn.disabled = false;
         }
     }
 
