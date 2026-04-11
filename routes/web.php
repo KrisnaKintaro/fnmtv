@@ -13,6 +13,10 @@ Route::get('/search', function () {
     return view('Viewers.pages.beritaHasilSearch');
 });
 
+Route::get('/kategori/{slug}', function () {
+    return view('Viewers.pages.tampilanTiapKategori');
+});
+
 #================= ADMIN ===================
 Route::get('/kategori', function () {
     return view('Admin.pages.manajemen_kategori');
