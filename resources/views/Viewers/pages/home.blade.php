@@ -127,7 +127,13 @@
     function renderHeadline(data) {
         const container = document.getElementById('heroContainer');
         if (!data || data.length === 0) {
-            container.innerHTML = '<div style="padding:40px;text-align:center;">Belum ada headline cuy.</div>';
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: var(--white); border-radius: 8px;">
+                    <div style="font-size: 56px; margin-bottom: 16px;">📰</div>
+                    <h2 style="margin-bottom: 8px; color: var(--text);">Belum Ada Headline Utama</h2>
+                    <p style="color: var(--muted); font-size: 15px;">Tim redaksi sedang menyiapkan berita panas untuk Anda hari ini.</p>
+                </div>
+            `;
             return;
         }
 
@@ -188,8 +194,14 @@
         const listContainer = document.getElementById('latestNewsContainer');
 
         if (!data || data.length === 0) {
-            gridContainer.innerHTML = '';
-            listContainer.innerHTML = '<div style="padding:20px;text-align:center;">Belum ada berita rilis.</div>';
+            gridContainer.innerHTML = `
+                <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; background: var(--white); border-radius: 12px; border: 2px dashed var(--border); text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🕵️‍♂️</div>
+                    <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px;">Wah, Berita Terkini Masih Kosong!</div>
+                    <div style="font-size: 14px; color: var(--muted);">Jadilah yang pertama tahu saat ada update berita terbaru nanti.</div>
+                </div>
+            `;
+            listContainer.innerHTML = '';
             return;
         }
 
@@ -237,7 +249,13 @@
         if (!container) return;
 
         if (!data || data.length === 0) {
-            container.innerHTML = '<div style="padding:10px 0; color:var(--muted); font-size:13px;">Belum ada trending.</div>';
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 10px; text-align: center; background: #f9f9f9; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="font-size: 36px; margin-bottom: 12px;">📉</div>
+                    <div style="font-size: 15px; font-weight: 700; color: var(--text);">Belum Ada Tren</div>
+                    <div style="font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.4;">Belum ada berita yang cukup viral untuk masuk ke daftar ini.</div>
+                </div>
+            `;
             return;
         }
 

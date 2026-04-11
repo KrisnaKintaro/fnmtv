@@ -94,7 +94,13 @@
         $('#searchCount').text(`Menemukan ${totalCount} artikel`);
 
         if (!berita || berita.length === 0) {
-            container.html(`<div style="text-align:center;padding:40px;">Nggak ada data cuy!</div>`);
+            container.html(`
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; background: var(--white); border-radius: 12px; border: 2px dashed var(--border); text-align: center;">
+                    <div style="font-size: 56px; margin-bottom: 16px;">🕵️‍♂️</div>
+                    <div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px;">Pencarian Tidak Ditemukan!</div>
+                    <div style="font-size: 14px; color: var(--muted); max-width: 400px; line-height: 1.5;">Waduh, berita yang lu cari nggak ada cuy. Coba gunakan kata kunci lain yang lebih umum atau periksa kembali ejaan lu.</div>
+                </div>
+            `);
             return;
         }
 
@@ -134,7 +140,13 @@
             .slice(0, 5);
 
         if (trendingData.length === 0) {
-            container.innerHTML = '<div style="font-size:12px;color:var(--muted);">Tidak ada tren pencarian.</div>';
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 10px; text-align: center; background: #f9f9f9; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="font-size: 36px; margin-bottom: 12px;">📉</div>
+                    <div style="font-size: 15px; font-weight: 700; color: var(--text);">Belum Ada Tren</div>
+                    <div style="font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.4;">Belum ada berita terpopuler untuk kata kunci pencarian ini.</div>
+                </div>
+            `;
             return;
         }
 
