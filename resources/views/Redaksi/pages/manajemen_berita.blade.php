@@ -570,7 +570,7 @@
         const row = document.querySelector(`tr[data-key="${key}"]`);
 
         // Ubah status jadi pending
-        applyVerdict(row, key, 'pending');
+        applyVerdict(row, key, 'Pending');
 
         // Tutup semua modalnya
         ModalManager.close('modalConfirmUnpublish');
@@ -596,7 +596,7 @@
                 status_berita: 'Pending'
             },
             success: function(response) {
-                applyVerdict(row, key, 'pending');
+                applyVerdict(row, key, 'Pending');
 
                 ModalManager.close('modalConfirmUnpublish');
                 ModalManager.close('modalDetail');

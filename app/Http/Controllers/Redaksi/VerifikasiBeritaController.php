@@ -47,11 +47,12 @@ class VerifikasiBeritaController extends Controller
         ], 200);
     }
 
-    // Proses Verifikasi (ACC/Tolak)
+    // Proses Verifikasi (ACC/Tolak/Unpublish)
     public function verifikasiBerita(Request $request, $id)
     {
+        // 🔴 FIX 1: Tambahin 'Pending' di aturan validasi biar bisa Unpublish
         $request->validate([
-            'status_berita' => 'required|in:Published,Rejected',
+            'status_berita' => 'required|in:Published,Rejected,Pending',
         ]);
 
         $berita = Berita::findOrFail($id);
@@ -68,18 +69,18 @@ class VerifikasiBeritaController extends Controller
                 ]
             );
         } else {
-            // Skenario 2: Redaksi Nolak Berita (Atau batalin Publish)
+            // Skenario 2: Redaksi Nolak Berita ATAU Batalin Publish (Unpublish / Pending)
             $pendapatan = Pendapatan::where('berita_id', $berita->id)->first();
 
             if ($pendapatan) {
                 if ($pendapatan->status_pembayaran === 'Paid') {
-                    // Mencegah Redaksi mereject berita yang sudah cair duitnya
+                    // Mencegah Redaksi narik berita yang udah cair duitnya
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Berita ini sudah lunas dibayar oleh Admin, tidak bisa di-reject atau ditarik!'
                     ], 403);
                 } else {
-                    // Kalau masih Unpaid, hapus tagihannya
+                    // Kalau masih Unpaid, hapus tagihannya biar negara nggak rugi
                     $pendapatan->delete();
                 }
             }
@@ -92,11 +93,13 @@ class VerifikasiBeritaController extends Controller
 
         if ($request->status_berita == 'Published') {
             $updateData['waktu_publikasi'] = now();
-            // Kalau di-acc, bersihin catatan penolakan lama biar gak nyangkut
             $updateData['catatan_penolakan'] = null;
         } else if ($request->status_berita == 'Rejected') {
-            // Nah, ini kuncinya! Ambil dari request AJAX tadi
             $updateData['catatan_penolakan'] = $request->catatan_penolakan;
+            $updateData['waktu_publikasi'] = null;
+        } else if ($request->status_berita == 'Pending') {
+            // 🔴 FIX 2: Bersihin tanggal publikasi kalau ditarik jadi Unpublish (Pending)
+            $updateData['catatan_penolakan'] = null;
             $updateData['waktu_publikasi'] = null;
         }
 
@@ -109,7 +112,7 @@ class VerifikasiBeritaController extends Controller
                 'id' => $berita->id,
                 'status_berita' => $berita->status_berita,
                 'waktu_publikasi' => $berita->waktu_publikasi,
-                'catatan_penolakan' => $berita->catatan_penolakan // Balikin juga datanya biar JS bisa baca
+                'catatan_penolakan' => $berita->catatan_penolakan
             ]
         ], 200);
     }
