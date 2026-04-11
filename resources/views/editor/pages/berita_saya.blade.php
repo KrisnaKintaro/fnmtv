@@ -298,10 +298,10 @@
             loadDaftarBerita();
 
             // Polling buat update tabel & notif setiap 10 detik
-            setInterval(function() {
-                // Kita panggil loadData secara silent (tanpa ngerusak ketikan user)
-                loadDaftarBerita(true);
-            }, 5000);
+            // setInterval(function() {
+            //     // Kita panggil loadData secara silent (tanpa ngerusak ketikan user)
+            //     loadDaftarBerita(true);
+            // }, 5000);
 
             // INIT NOTIFIKASI KHUSUS EDITOR
             SmartNotif.init({
@@ -417,7 +417,7 @@
         function loadDaftarBerita(isSilent = false) {
             $.ajax({
                 // Tambahin "?t=" + waktu sekarang biar browser kapok nge-cache
-                url: '/api/editor/manajemen_berita/ambilData?t=' + new Date().getTime(),
+                url: '/api/editor/manajemen_berita/ambilData',
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
