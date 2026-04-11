@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnalitikBeritaController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\LaporanFinansialController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
@@ -68,6 +69,10 @@ Route::prefix('admin/statistik_interaksi_berita')->group(function() {
 
 Route::prefix('admin/top_performance')->group(function () {
     Route::get('/ambilData', [TopPerformanceController::class, 'getTopPerformance']);
+});
+
+Route::prefix('admin/analitik_berita')->group(function() {
+    Route::get('/ambilData', [AnalitikBeritaController::class, 'getAnaliticsData']);
 });
 
 // API untuk Viewers (Frontend)
