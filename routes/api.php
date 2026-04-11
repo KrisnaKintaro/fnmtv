@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\StatistikInteraksiBeritaController;
 use App\Http\Controllers\Admin\TopPerformanceController;
 use App\Http\Controllers\Admin\TrackingPembayaranController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Editor\BeritaController;
 use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
 use App\Http\Controllers\Viewer\KomentarController;
@@ -25,12 +26,20 @@ use Illuminate\Support\Facades\Route;
 
 
 
+// Pinjem middleware 'web' biar bisa nulis Session buat Blade
+Route::prefix('auth')->middleware('web')->group(function() {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
+    Route::get('/checkVerify', [AuthController::class, 'checkVerify'])->middleware('auth');
+    Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
+        ->middleware(['auth', 'throttle:6,1'])
+        ->name('verification.send');
 
-
-
-
-
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+});
 
 
 Route::prefix('admin/manajemen_kategori')->group(function() {
@@ -76,6 +85,7 @@ Route::prefix('admin/analitik_berita')->group(function() {
 });
 
 // API untuk Viewers (Frontend)
+// API Viewers yang BEBAS DIAKSES (Nggak butuh login)
 Route::prefix('viewers')->group(function() {
     Route::get('/berita', [ViewerController::class, 'getBerita']);
     Route::get('/kategori', [ViewerController::class, 'getKategori']);
@@ -83,6 +93,10 @@ Route::prefix('viewers')->group(function() {
     Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
     Route::get('/berita-populer', [ViewerController::class, 'getBeritaPopuler']);
     Route::get('/search', [ViewerController::class, 'searchBerita']);
+});
+
+// API Viewers yang WAJIB BAWA TOKEN (Wajib login)
+Route::prefix('viewers')->middleware('auth:sanctum')->group(function() {
     Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar']);
     Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
 });

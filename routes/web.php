@@ -1,6 +1,39 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
+use App\Models\User;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
+#================= VERIFIKASI EMAIL =================
+// Halaman pemberitahuan "Cek Email"
+
+Route::prefix('email')->group(function () {
+    Route::get('/verify', function () {
+        return view('Auth.verifyEmail');
+    })->middleware('auth')->name('verification.notice');
+
+    // Proses saat link di email diklik (Tetap di web karena merespons HTML/Browser)
+    Route::get('/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+        ->middleware(['signed'])
+        ->name('verification.verify');
+});
+
+#================= LUPA PASSWORD =================
+// Tampilan Lupa Password 
+Route::view('/forgot-password', 'Auth.forgotPassword')
+    ->middleware('guest')
+    ->name('password.request');
+
+// Tampilan Reset Password (Pakai closure karena butuh nangkep $token dan $request->email)
+Route::get('/reset-password/{token}', function (Request $request, $token) {
+    return view('Auth.resetPassword', [
+        'token' => $token,
+        'email' => $request->query('email')
+    ]);
+})->middleware('guest')->name('password.reset');
 
 #================= VIEWERS =================
 Route::get('/', function () {
@@ -17,12 +50,11 @@ Route::get('/kategori/{slug}', function () {
     return view('Viewers.pages.tampilanTiapKategori');
 });
 
-Route::get('berita/{slug}', function(){
+Route::get('berita/{slug}', function () {
     return view('Viewers.pages.tampilanDetilBerita');
 });
-
-Route::get('/profil', function () {
-    return view('Viewers.pages.userProfil');
+Route::middleware(['auth', 'RoleCheck:Viewer'])->group(function () {
+    Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
 });
 
 #================= ADMIN ===================
@@ -34,7 +66,7 @@ Route::get('/komentar', function () {
     return view('Admin.pages.komentar');
 });
 
-Route::get('/analitik_statistik_berita', function(){
+Route::get('/analitik_statistik_berita', function () {
     return view('Admin.pages.analitikStatistikBerita');
 });
 
@@ -63,10 +95,13 @@ Route::get('/tulis-editor', function () {
     return view('editor.pages.tulis_berita');
 });
 #================= REDAKSI =================
-
-Route::get('/redaksi-manajemen-berita', function () {
-    return view('Redaksi.pages.manajemen_berita');
+Route::middleware(['auth', 'RoleCheck:Redaksi'])->group(function () {
+    Route::get('/redaksi-manajemen-berita', fn() => view('Redaksi.pages.manajemen_berita'));
 });
+
+// Route::get('/redaksi-manajemen-berita', function () {
+//     return view('Redaksi.pages.manajemen_berita');
+// });
 
 #================= AUTH =================
 Route::get('/login', function () {
@@ -76,5 +111,3 @@ Route::get('/login', function () {
 Route::get('/register', function () {
     return view('Auth.register');
 })->name('register');
-
-

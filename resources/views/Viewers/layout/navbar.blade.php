@@ -27,29 +27,29 @@
             <div style="margin-left: 20px; display: flex; gap: 10px; align-items: center;">
 
                 @guest
-                    <a href="/login" class="btn btn-outline" style="padding: 8px 18px; font-size: 13px;"><i class="fas fa-sign-in-alt"></i> Masuk</a>
-                    <a href="/register" class="btn btn-red" style="padding: 8px 18px; font-size: 13px;"><i class="fas fa-user-plus"></i> Daftar</a>
+                <a href="/login" class="btn btn-outline" style="padding: 8px 18px; font-size: 13px;"><i class="fas fa-sign-in-alt"></i> Masuk</a>
+                <a href="/register" class="btn btn-red" style="padding: 8px 18px; font-size: 13px;"><i class="fas fa-user-plus"></i> Daftar</a>
                 @endguest
 
                 @auth
-                    <div class="user-profile-menu" style="position: relative; cursor: pointer;" onclick="toggleProfileMenu()">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">
-                                {{ strtoupper(substr(Auth::user()->username ?? 'U', 0, 1)) }}
-                            </div>
-                            <span style="font-weight: 600; font-size: 14px; color: var(--text);">{{ Auth::user()->username ?? 'User' }}</span>
-                            <i class="fas fa-chevron-down" style="font-size: 10px; color: var(--muted);"></i>
+                <div class="user-profile-menu" style="position: relative; cursor: pointer;" onclick="toggleProfileMenu()">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">
+                            {{ strtoupper(substr(Auth::user()->username ?? 'U', 0, 1)) }}
                         </div>
-
-                        <div id="profileDropdown" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; width: 180px; overflow: hidden; z-index: 100;">
-                            <a href="/profil" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--border);">
-                                <i class="fas fa-user-edit" style="color: var(--primary);"></i> Edit Profil
-                            </a>
-                            <a href="/logout" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: #dc3545;">
-                                <i class="fas fa-sign-out-alt"></i> Keluar
-                            </a>
-                        </div>
+                        <span style="font-weight: 600; font-size: 14px; color: var(--text);">{{ Auth::user()->username ?? 'User' }}</span>
+                        <i class="fas fa-chevron-down" style="font-size: 10px; color: var(--muted);"></i>
                     </div>
+
+                    <div id="profileDropdown" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; width: 180px; overflow: hidden; z-index: 100;">
+                        <a href="/profil" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--border);">
+                            <i class="fas fa-user-edit" style="color: var(--primary);"></i> Edit Profil
+                        </a>
+                        <a href="#" onclick="doLogout(event)" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: #dc3545;">
+                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        </a>
+                    </div>
+                </div>
                 @endauth
 
             </div>
@@ -85,7 +85,7 @@
     window.addEventListener('click', function(e) {
         if (!document.querySelector('.user-profile-menu')?.contains(e.target)) {
             const dropdown = document.getElementById('profileDropdown');
-            if(dropdown) dropdown.style.display = 'none';
+            if (dropdown) dropdown.style.display = 'none';
         }
     });
 </script>

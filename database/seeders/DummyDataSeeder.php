@@ -34,6 +34,7 @@ class DummyDataSeeder extends Seeder
                     'password' => Hash::make('password123'),
                     'role' => $role,
                     'status' => 'Aktif',
+                    'email_verified_at' => now(),
                 ]);
             }
         }

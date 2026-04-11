@@ -14,7 +14,7 @@ class KomentarController extends Controller
     {
         $request->validate([
             'berita_id'    => 'required|exists:beritas,id',
-            'isi_komentar' => 'required|string|min:3|max:500',
+            'isi_komentar' => 'required|string|min:1|max:500',
         ], [
             'isi_komentar.required' => 'Isi komentarnya jangan dikosongin lah cuy.',
             'isi_komentar.min'      => 'Komentarnya kependekan, minimal 3 karakter ya.',
@@ -31,7 +31,7 @@ class KomentarController extends Controller
 
         $komentarBaru = Komentar::create([
             'berita_id'    => $request->berita_id,
-            'user_id'      => Auth::id() ?: 1, // Diambil dari session user yang login
+            'user_id'      => Auth::id(), 
             'isi_komentar' => $request->isi_komentar,
             'status_moderasi' => 'Pending'
         ]);
