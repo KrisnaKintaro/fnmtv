@@ -21,6 +21,10 @@ Route::get('berita/{slug}', function(){
     return view('Viewers.pages.tampilanDetilBerita');
 });
 
+Route::get('/profil', function () {
+    return view('Viewers.pages.userProfil');
+});
+
 #================= ADMIN ===================
 Route::get('/kategori', function () {
     return view('Admin.pages.manajemen_kategori');
