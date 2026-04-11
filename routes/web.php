@@ -17,6 +17,10 @@ Route::get('/kategori/{slug}', function () {
     return view('Viewers.pages.tampilanTiapKategori');
 });
 
+Route::get('berita/{slug}', function(){
+    return view('Viewers.pages.tampilanDetilBerita');
+});
+
 #================= ADMIN ===================
 Route::get('/kategori', function () {
     return view('Admin.pages.manajemen_kategori');

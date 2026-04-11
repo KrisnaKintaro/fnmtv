@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Viewer;
 use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use App\Models\Kategori;
+use App\Models\Reaksi;
 use Illuminate\Http\Request;
 
 class ViewerController extends Controller
 {
-    /**
-     * 1. Ambil Data Kategori (Buat render Navbar & Dropdown)
-     */
     public function getKategori()
     {
         // Hitung jumlah berita yang 'Published' di tiap kategori, lalu urutkan dari yang terbanyak
@@ -27,9 +25,6 @@ class ViewerController extends Controller
         ]);
     }
 
-    /**
-     * 2. Ambil Berita untuk Halaman Home
-     */
     public function getBerita()
     {
         $baseQuery = Berita::with(['kategori', 'user'])->where('status_berita', 'Published');
@@ -48,9 +43,6 @@ class ViewerController extends Controller
         ]);
     }
 
-    /**
-     * 3. Ambil Detail Berita + Komentar + REAKSI (Berdasarkan Slug)
-     */
     public function getBeritaDetail($slug)
     {
         $berita = Berita::with([
@@ -58,9 +50,7 @@ class ViewerController extends Controller
             'user',
             'komentar' => function($query) {
                 $query->where('status_moderasi', 'Approved')->latest();
-            },
-            'komentar.user',
-            'reaksi' // <--- INI YANG LU CARI CUY!
+            }
         ])
         ->where('slug', $slug)
         ->where('status_berita', 'Published')
@@ -69,33 +59,28 @@ class ViewerController extends Controller
         if (!$berita) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Berita tidak ditemukan atau belum dirilis cuy!'
+                'message' => 'Berita tidak ditemukan'
             ], 404);
         }
 
-        $berita->increment('jumlah_view');
-
-        // Bikin rekap jumlah per reaksi biar frontend gak repot ngitung
+        // Hitung rekap reaksi untuk ditampilkan saat pertama kali load
         $rekapReaksi = [
-            'suka'  => $berita->reaksi->where('jenis_reaksi', 'suka')->count(),
-            'cinta' => $berita->reaksi->where('jenis_reaksi', 'cinta')->count(),
-            'kaget' => $berita->reaksi->where('jenis_reaksi', 'kaget')->count(),
-            'sedih' => $berita->reaksi->where('jenis_reaksi', 'sedih')->count(),
-            'marah' => $berita->reaksi->where('jenis_reaksi', 'marah')->count(),
+            'suka'  => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'suka')->count(),
+            'cinta' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'cinta')->count(),
+            'kaget' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'kaget')->count(),
+            'sedih' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'sedih')->count(),
+            'marah' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'marah')->count(),
         ];
+
+        // Tempelkan data reaksi ke object berita
+        $berita->reaksi_rekap = $rekapReaksi;
 
         return response()->json([
             'status' => 'success',
-            'data' => [
-                'berita' => $berita,
-                'rekap_reaksi' => $rekapReaksi
-            ]
+            'data' => $berita
         ]);
     }
 
-    /**
-     * 4. [BARU] Ambil Berita Berdasarkan Slug Kategori
-     */
     public function getBeritaByKategori($slug_kategori)
     {
         // Cari dulu kategorinya ada atau nggak
