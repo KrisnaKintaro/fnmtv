@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use App\Models\Kategori;
 use App\Models\Reaksi;
+use App\Models\ViewLog;
 use Illuminate\Http\Request;
 
 class ViewerController extends Controller
@@ -43,7 +44,7 @@ class ViewerController extends Controller
         ]);
     }
 
-    public function getBeritaDetail($slug)
+    public function getBeritaDetail(Request $request, $slug)
     {
         $berita = Berita::with([
             'kategori',
@@ -63,13 +64,33 @@ class ViewerController extends Controller
             ], 404);
         }
 
+        // --- LOGIKA TRACKING VIEW & ANTI SPAM ---
+        $ipAddress = $request->ip();
+
+        // Cek apakah IP ini udah baca berita ini dalam 2 jam terakhir (Biar ga di-spam F5)
+        $sudahBaca = ViewLog::where('berita_id', $berita->id)
+                            ->where('ip_address', $ipAddress)
+                            ->where('created_at', '>=', now()->subHours(2))
+                            ->exists();
+
+        if (!$sudahBaca) {
+            // 1. Tulis history-nya ke tabel view_logs
+            ViewLog::create([
+                'berita_id' => $berita->id,
+                'ip_address' => $ipAddress
+            ]);
+
+            // 2. Tambahin +1 ke kolom jumlah_view (pake fungsi increment bawaan Laravel biar cepet)
+            $berita->increment('jumlah_view');
+        }
+
         // Hitung rekap reaksi untuk ditampilkan saat pertama kali load
         $rekapReaksi = [
-            'suka'  => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'suka')->count(),
-            'cinta' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'cinta')->count(),
-            'kaget' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'kaget')->count(),
-            'sedih' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'sedih')->count(),
-            'marah' => Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'marah')->count(),
+            'suka'  => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'suka')->count(),
+            'cinta' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'cinta')->count(),
+            'kaget' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'kaget')->count(),
+            'sedih' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'sedih')->count(),
+            'marah' => \App\Models\Reaksi::where('berita_id', $berita->id)->where('jenis_reaksi', 'marah')->count(),
         ];
 
         // Tempelkan data reaksi ke object berita
