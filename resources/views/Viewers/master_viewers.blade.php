@@ -10,9 +10,8 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<link rel="stylesheet" href="{{ asset('viewers/css/viewers_css.css') }}">
-@yield('css')
+    <link rel="stylesheet" href="{{ asset('viewers/css/viewers_css.css') }}">
+    @yield('css')
 </head>
 
 <body>
@@ -29,11 +28,45 @@
 
     <script src="{{ asset('viewers/js/jquery.min.js') }}"></script>
     <script src="{{ asset('viewers/js/toast.js') }}"></script>
+    <script src="{{ asset('viewers/js/modalManager.js') }}"></script>
     <script src="{{ asset('viewers/js/viewers_js.js') }}"></script>
+
     <script>
+        // SETUP CSRF TOKEN GLOBAL
+        const token = localStorage.getItem('auth_token');
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Authorization': token ? 'Bearer ' + token : ''
+            }
+        });
+
         $(document).ready(function() {
             loadGlobalCategories();
         });
+
+        function doLogout(e) {
+            if (e) e.preventDefault();
+
+            $.ajax({
+                url: '/api/auth/logout',
+                type: 'POST',
+                success: function(res) {
+                    // Hapus KTP Digital dari browser
+                    localStorage.removeItem('auth_token');
+                    Toast.show('success', 'Berhasil keluar. Sampai jumpa cuy!');
+
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                },
+                error: function(err) {
+                    // Kalaupun error (misal token udah kadaluarsa di server), tetep paksa hapus dari browser
+                    localStorage.removeItem('auth_token');
+                    window.location.href = '/';
+                }
+            });
+        }
 
         function loadGlobalCategories() {
             $.ajax({
@@ -42,7 +75,7 @@
                 success: function(res) {
                     if (res.status === 'success') {
                         renderNavbar(res.data);
-                        renderFooter(res.data); // <--- INI TAMBAHANNYA CUY
+                        renderFooter(res.data);
                     }
                 },
                 error: function(err) {
@@ -58,15 +91,12 @@
             let mainHtml = '';
             let moreHtml = '';
 
-            // KAMUS EMOJI UDAH DIMUSNAHKAN DARI SINI 💥
-
             categories.forEach((cat, index) => {
                 const isActive = currentPath.includes(`/kategori/${cat.slug}`) ? 'active' : '';
 
                 if (index < 5) {
                     mainHtml += `<a href="/kategori/${cat.slug}" class="nav-item ${isActive}">${cat.nama_kategori}</a>`;
                 } else {
-                    // Emoji dihapus, langsung nembak nama kategori
                     moreHtml += `<a href="/kategori/${cat.slug}" class="nmd-item ${isActive}">${cat.nama_kategori}</a>`;
                 }
             });
@@ -81,10 +111,8 @@
             }
         }
 
-        // FUNGSI BARU BUAT NGISI FOOTER
         function renderFooter(categories) {
             let html = '';
-            // Kita ambil 4 kategori teratas aja biar footernya rapi ga kepanjangan
             categories.slice(0, 4).forEach(cat => {
                 html += `<a href="/kategori/${cat.slug}" class="ft-link">${cat.nama_kategori}</a>`;
             });

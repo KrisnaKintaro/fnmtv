@@ -36,6 +36,7 @@ class UserController extends Controller
         $penggunaBaru = User::create([
             'username' => $request->username,
             'email'    => $request->email,
+            'email_verified_at' => now(),
             'password' => Hash::make($request->password),
             'role'     => $request->role
         ]);

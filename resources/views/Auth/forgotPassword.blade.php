@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>FNM — Register</title>
+    <title>FNM — Lupa Password</title>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS Sama persis kayak form login */
+        /* Menggunakan CSS yang persis sama dengan Login */
         :root {
             --red: #cc0000;
             --red-dark: #990000;
@@ -67,23 +67,7 @@
             font-size: 13px;
             color: var(--muted);
             margin-bottom: 24px;
-        }
-
-        .login-role-chip {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .login-role-chip span {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #e6f4ec;
-            color: #1a7a3c;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 5px 14px;
-            border-radius: 20px;
+            line-height: 1.5;
         }
 
         .lfield {
@@ -135,28 +119,6 @@
             background: var(--red-dark);
         }
 
-        .login-btn:disabled {
-            background: var(--muted);
-            cursor: not-allowed;
-        }
-
-        .login-foot {
-            text-align: center;
-            font-size: 12px;
-            color: var(--muted);
-            margin-top: 18px;
-        }
-
-        .toggle-link {
-            text-decoration: none;
-            color: var(--red);
-            font-weight: 600;
-        }
-
-        .toggle-link:hover {
-            text-decoration: underline;
-        }
-
         .back-btn {
             position: absolute;
             top: 24px;
@@ -168,13 +130,11 @@
             color: var(--muted);
             font-size: 13px;
             font-weight: 700;
-            transition: 0.2s;
             padding: 8px 16px;
             border-radius: 8px;
             background: var(--white);
             border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            z-index: 1000;
+            transition: 0.2s;
         }
 
         .back-btn:hover {
@@ -196,10 +156,7 @@
             display: none;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 6px 28px rgba(0, 0, 0, .25);
             z-index: 9999;
-            min-width: 250px;
-            transition: opacity .3s;
         }
     </style>
 </head>
@@ -207,45 +164,24 @@
 <body>
 
     <div class="login-wrap">
-        <a href="/" class="back-btn">⬅ Kembali ke Beranda</a>
+        <a href="/login" class="back-btn">⬅ Kembali ke Login</a>
 
         <div class="login-card">
-            <div class="login-logo">FNM</div>
-            <div class="login-sub">Fenomena News Media — Platform Berita Terpercaya</div>
-            <div class="login-role-chip">
-                <span>✍️ Daftar Akun Baru</span>
-            </div>
+            <div style="font-size: 40px; text-align: center; margin-bottom: 10px;">🔑</div>
+            <div class="login-logo" style="font-size: 24px;">Lupa Password?</div>
+            <div class="login-sub">Nggak usah panik. Masukin alamat email yang di pakai buat daftar, nanti kita kirimin link buat bikin password baru.</div>
 
-            <form id="formRegister">
-                <div class="lfield">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Pilih username unik lu" required>
-                </div>
+            <form id="formForgot">
                 <div class="lfield">
                     <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Masukkan email" required>
+                    <input type="email" id="email" placeholder="Masukkan email anda" required>
                 </div>
-                <div class="lfield">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Masukkan password" required>
-                </div>
-                <div class="lfield">
-                    <label for="password_confirmation">Konfirmasi Password</label>
-                    <input type="password" id="password_confirmation" placeholder="Konfirmasi password" required>
-                </div>
-                <button type="submit" class="login-btn" id="btnSubmitRegister">Daftar</button>
+                <button type="submit" class="login-btn" id="btnSubmit">Kirim Link Reset</button>
             </form>
-
-            <div class="login-foot">
-                Sudah punya akun? <a href="/login" class="toggle-link">Masuk di sini</a>
-            </div>
         </div>
     </div>
 
-    <div id="toast">
-        <span id="toastIco"></span>
-        <span id="toastMsg"></span>
-    </div>
+    <div id="toast"><span id="toastIco"></span><span id="toastMsg"></span></div>
 
     <script src="/admin/js/jquery.min.js"></script>
     <script src="/admin/js/toast.js"></script>
@@ -258,50 +194,30 @@
                 }
             });
 
-            $('#formRegister').on('submit', function(e) {
+            $('#formForgot').on('submit', function(e) {
                 e.preventDefault();
+                const btn = $('#btnSubmit');
+                btn.text('Mengirim...').prop('disabled', true);
 
-                const btn = $('#btnSubmitRegister');
-                btn.text('Memproses...').prop('disabled', true);
-
-                const payload = {
-                    username: $('#username').val(),
-                    email: $('#email').val(),
-                    password: $('#password').val(),
-                    password_confirmation: $('#password_confirmation').val()
-                };
-
-                // Tembak API Register
                 $.ajax({
-                    url: '/api/auth/register',
+                    url: '/api/auth/forgot-password',
                     type: 'POST',
-                    data: payload,
+                    data: {
+                        email: $('#email').val()
+                    },
                     success: function(res) {
-                        if (res.status === 'success') {
-                            Toast.show('success', 'Pendaftaran berhasil! Silakan cek email untuk verifikasi.');
-                            setTimeout(() => window.location.href = '/login', 2000);
-                        }
+                        Toast.show('success', res.message);
+                        btn.text('Kirim Link Reset').prop('disabled', false);
+                        $('#email').val(''); // Kosongin input
                     },
                     error: function(err) {
-                        btn.text('Daftar').prop('disabled', false); // Nyalain tombol lagi
-
-                        let msg = 'Gagal mendaftar cuy, cek lagi datanya.';
-
-                        // Tangkep error validasi dari Laravel (misal email udah kepake)
-                        if (err.responseJSON && err.responseJSON.errors) {
-                            const firstError = Object.values(err.responseJSON.errors)[0][0];
-                            msg = firstError;
-                        } else if (err.responseJSON && err.responseJSON.message) {
-                            msg = err.responseJSON.message;
-                        }
-
-                        Toast.show('error', msg);
+                        Toast.show('error', err.responseJSON?.message || 'Gagal mengirim link.');
+                        btn.text('Kirim Link Reset').prop('disabled', false);
                     }
                 });
             });
         });
     </script>
-
 </body>
 
 </html>
