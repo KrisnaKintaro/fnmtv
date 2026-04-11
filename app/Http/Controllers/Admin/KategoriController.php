@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule; // buat modifikasi validasi unique
 
 class KategoriController extends Controller
 {
@@ -23,13 +24,40 @@ class KategoriController extends Controller
 
     public function tambahKategoriBaru(Request $request)
     {
+        // Ubah aturan unique biar cuma ngecek data yang masih aktif (deleted_at = null)
         $request->validate([
-            'nama_kategori' => 'required|string|unique:kategoris,nama_kategori'
+            'nama_kategori' => [
+                'required',
+                'string',
+                Rule::unique('kategoris', 'nama_kategori')->whereNull('deleted_at')
+            ]
         ], [
             'nama_kategori.required' => 'Nama kategori wajib diisi cuy!',
-            'nama_kategori.unique' => 'Kategori ini udah ada, bikin yang lain dong.'
+            'nama_kategori.unique' => 'Kategori ini udah ada dan masih aktif, bikin yang lain dong.'
         ]);
 
+        // Cari kategori di "tong sampah" (Soft Deleted)
+        $kategoriTerhapus = Kategori::onlyTrashed()
+                            ->where('nama_kategori', $request->nama_kategori)
+                            ->first();
+
+        // Kalau ternyata ada di tong sampah, kita Edo Tensei (bangkitkan)!
+        if ($kategoriTerhapus) {
+            $kategoriTerhapus->restore();
+
+            // Jaga-jaga kalau admin nginput huruf besar-kecilnya beda, kita update slug-nya juga
+            $kategoriTerhapus->update([
+                'slug' => Str::slug($request->nama_kategori)
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Kategori lama yang sempat dihapus berhasil diaktifkan kembali!',
+                'data' => $kategoriTerhapus
+            ]);
+        }
+
+        // Kalau beneran data murni baru, eksekusi seperti biasa
         $slugOtomatis = Str::slug($request->nama_kategori);
 
         $kategoriBaru = Kategori::create([
@@ -55,8 +83,15 @@ class KategoriController extends Controller
             ], 404);
         }
 
+        // Biar pas di-edit nggak tabrakan sama yang di tong sampah
         $request->validate([
-            'nama_kategori' => 'required|string|unique:kategoris,nama_kategori,' . $id_kategori
+            'nama_kategori' => [
+                'required',
+                'string',
+                Rule::unique('kategoris', 'nama_kategori')
+                    ->ignore($id_kategori)
+                    ->whereNull('deleted_at')
+            ]
         ]);
 
         $kategori->nama_kategori = $request->nama_kategori;

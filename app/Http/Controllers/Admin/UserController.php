@@ -100,6 +100,7 @@ class UserController extends Controller
             'message' => 'Akun berhasil dihapus permanen!'
         ]);
     }
+
     public function ubahStatusUser(Request $request, $idUser)
     {
         $user = User::find($idUser);
