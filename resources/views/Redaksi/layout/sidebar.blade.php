@@ -21,11 +21,15 @@
     </div>
 
     <div class="s-footer">
-        <div class="s-avatar">R</div>
-        <div>
-            <div class="s-uname">Rina Agustina</div>
-            <div class="s-urole">Redaksi</div>
+        @auth
+        <div class="s-avatar">
+            {{ strtoupper(substr(Auth::user()->username ?? 'U', 0, 1)) }}
         </div>
+        <div>
+            <div class="s-uname"> {{ Auth::user()->username ?? 'User' }} </div>
+            <div class="s-urole"> {{ Auth::user()->role ?? 'User' }} </div>
+        </div>
+        @endauth
         <div class="s-logout" onclick="doLogout()" title="Keluar">
             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

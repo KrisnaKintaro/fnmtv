@@ -22,7 +22,7 @@
                         <label style="display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px;">Username</label>
                         <div style="position: relative;">
                             <i class="fas fa-at" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
-                            <input type="text" id="inputUsername" placeholder="Username Anda" value="User_Tampan_01" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-family: inherit;">
+                            <input type="text" id="inputUsername" placeholder="Username Anda" value="{{ Auth::user()->username }}" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-family: inherit;">
                         </div>
                     </div>
 
@@ -30,7 +30,7 @@
                         <label style="display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px;">Alamat Email</label>
                         <div style="position: relative;">
                             <i class="fas fa-envelope" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
-                            <input type="email" id="inputEmail" placeholder="Email Anda" value="user@fnmtv.com" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-family: inherit;">
+                            <input type="email" id="inputEmail" placeholder="Email Anda" value="{{ Auth::user()->email }}" style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-family: inherit;">
                         </div>
                     </div>
                 </div>

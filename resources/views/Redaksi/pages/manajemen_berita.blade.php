@@ -715,11 +715,10 @@
         if (document.getElementById('pendingCount')) document.getElementById('pendingCount').textContent = cnt.pending;
     }
 
-    /* ── LOGIN / LOGOUT ── */
-    function doLogout() {
-        if (!confirm('Yakin ingin keluar dari panel Redaksi?')) return;
-        // Arahin ke route logout
-        alert("Proses logout jalan...");
-    }
+    // Fungsi kuhapus krn sdh ada di master layout.
+    // function doLogout() {
+    //     if (!confirm('Yakin ingin keluar dari panel Redaksi?')) return;
+    //     alert("Proses logout jalan...");
+    // }
 </script>
 @endsection

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Panel Editor</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -41,6 +42,36 @@
             },
             cache: false
         });
+    </script>
+
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            cache: false
+        });
+    
+        function doLogout(e) {
+            if (e) e.preventDefault();
+    
+            if (!confirm('Yakin ingin keluar dari panel?')) {
+                return;
+            }
+    
+            $.ajax({
+                url: '/api/auth/logout',
+                type: 'POST',
+                success: function () {
+                    localStorage.removeItem('auth_token');
+                    window.location.href = '/login';
+                },
+                error: function () {
+                    localStorage.removeItem('auth_token');
+                    window.location.href = '/login';
+                }
+            });
+        }
     </script>
     @yield('js')
 </body>

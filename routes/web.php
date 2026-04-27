@@ -58,41 +58,45 @@ Route::middleware(['auth', 'RoleCheck:Viewer'])->group(function () {
 });
 
 #================= ADMIN ===================
-Route::get('/kategori', function () {
-    return view('Admin.pages.manajemen_kategori');
-});
+Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
+    Route::get('/kategori', function () {
+        return view('Admin.pages.manajemen_kategori');
+    });
 
-Route::get('/komentar', function () {
-    return view('Admin.pages.komentar');
-});
+    Route::get('/komentar', function () {
+        return view('Admin.pages.komentar');
+    });
 
-Route::get('/analitik_statistik_berita', function () {
-    return view('Admin.pages.analitikStatistikBerita');
-});
+    Route::get('/analitik_statistik_berita', function () {
+        return view('Admin.pages.analitikStatistikBerita');
+    });
 
-Route::get('/finansial', function () {
-    return view('Admin.pages.finansial');
-});
+    Route::get('/finansial', function () {
+        return view('Admin.pages.finansial');
+    });
 
-Route::get('/user', function () {
-    return view('Admin.pages.manajemen_user');
-});
+    Route::get('/user', function () {
+        return view('Admin.pages.manajemen_user');
+    });
 
-Route::get('/pengaturan', function () {
-    return view('Admin.pages.pengaturan');
+    Route::get('/pengaturan', function () {
+        return view('Admin.pages.pengaturan');
+    });
 });
 
 #================= EDITOR =================
-Route::get('/editor', function () {
-    return view('editor.pages.berita_saya');
-});
+Route::middleware(['auth', 'RoleCheck:Editor'])->group(function () {
+    Route::get('/editor', function () {
+        return view('editor.pages.berita_saya');
+    });
 
-Route::get('/berita-saya', function () {
-    return view('editor.pages.berita_saya');
-});
+    Route::get('/berita-saya', function () {
+        return view('editor.pages.berita_saya');
+    });
 
-Route::get('/tulis-editor', function () {
-    return view('editor.pages.tulis_berita');
+    Route::get('/tulis-editor', function () {
+        return view('editor.pages.tulis_berita');
+    });
 });
 #================= REDAKSI =================
 Route::middleware(['auth', 'RoleCheck:Redaksi'])->group(function () {

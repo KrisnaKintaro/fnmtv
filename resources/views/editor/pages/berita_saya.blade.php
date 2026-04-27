@@ -434,7 +434,7 @@
                         const pending = response.filter(b => b.status_berita === 'Pending').length;
                         const rejected = response.filter(b => b.status_berita === 'Rejected').length;
 
-                        $('.s-badge').text(all);
+                        $('#editorSidebarBadge').text(all);
                         const tabs = $('#tabPills .tab-p span');
                         if (tabs.length >= 4) {
                             $(tabs[0]).text(all);
