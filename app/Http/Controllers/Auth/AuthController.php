@@ -53,7 +53,8 @@ public function login(Request $request)
             Auth::login($user);
             $request->session()->regenerate();
 
-            if (!$user->hasVerifiedEmail()) {
+            // Pengecekan Verifikasi buat role hanya digunakan untuk role viewers aja.
+            if (!$user->hasVerifiedEmail() && !in_array($user->role, ['Admin', 'Editor', 'Redaksi'])) {
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Login sukses! Mengarahkan ke verifikasi...',
