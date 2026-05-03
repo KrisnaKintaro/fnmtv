@@ -559,26 +559,6 @@
         ModalManager.open('modalDetail');
     }
 
-    /* ── FUNGSI: BUKA MODAL BATAL PUBLISH ── */
-    function cancelPublish() {
-        ModalManager.open('modalConfirmUnpublish');
-    }
-
-    /* ── FUNGSI BARU: EKSEKUSI BATAL PUBLISH ── */
-    function executeUnpublish() {
-        const key = document.getElementById('modalDetail').dataset.currentKey;
-        const row = document.querySelector(`tr[data-key="${key}"]`);
-
-        // Ubah status jadi pending
-        applyVerdict(row, key, 'Pending');
-
-        // Tutup semua modalnya
-        ModalManager.close('modalConfirmUnpublish');
-        ModalManager.close('modalDetail');
-
-        Toast.show('warning', 'Publikasi ditarik. Artikel kembali ke status Pending.');
-    }
-
     function cancelPublish() {
         // Kita panggil modal custom kita, bukan confirm() web lagi
         ModalManager.open('modalConfirmUnpublish');
