@@ -1,7 +1,6 @@
 /* ==========================================
    TUGAS: Mengatur Search, Filter, Sort, dan Pagination secara universal
    ========================================== */
-
 class DataTableEngine {
     constructor(config) {
         // State Data
@@ -16,12 +15,56 @@ class DataTableEngine {
         this.infoWrapper = document.querySelector(config.infoWrapper);
         this.emptyState = document.querySelector(config.emptyState);
 
-        // Callback Rendering (Biar tiap halaman bisa ngatur HTML tr-nya sendiri)
+        // Callback Rendering
         this.renderRowHTML = config.renderRowHTML;
 
         // Custom Logic Holders
         this.customFilterLogic = null;
         this.customSortLogic = null;
+
+        // 🌟 FITUR BARU: Otomatis nampilin loading saat di-inisialisasi
+        this.showLoading();
+    }
+
+    // 🌟 FUNGSI BARU: Animasi Loading Jam Pasir
+    showLoading() {
+        if (!this.tbody) return;
+
+        // Ambil jumlah kolom tabel biar colspan-nya nutupin seluruh lebar tabel
+        let colCount = 1;
+        if (this.tbody.parentElement && this.tbody.parentElement.tagName === 'TABLE') {
+            const headerRow = this.tbody.parentElement.querySelector('thead tr');
+            if (headerRow) colCount = headerRow.children.length;
+        }
+
+        // Kalau tbody ada di dalam tabel (tr/td), kalau pakai div (kayak di komentar) pakai div biasa
+        if (this.tbody.tagName === 'TBODY') {
+            this.tbody.innerHTML = `
+                <tr>
+                    <td colspan="${colCount}" style="padding: 60px 20px; text-align: center; color: var(--muted);">
+                        <div style="font-size: 40px; margin-bottom: 12px; animation: pulse 1.5s infinite;">⏳</div>
+                        <div style="font-weight: 600; font-size: 16px; color: var(--text);">Mengambil Data...</div>
+                        <div style="font-size: 13px; margin-top: 6px;">Sedang memproses data dari server, mohon tunggu sebentar.</div>
+                    </td>
+                </tr>
+            `;
+        } else {
+            this.tbody.innerHTML = `
+                <div style="padding: 60px 20px; text-align: center; color: var(--muted);">
+                    <div style="font-size: 40px; margin-bottom: 12px; animation: pulse 1.5s infinite;">⏳</div>
+                    <div style="font-weight: 600; font-size: 16px; color: var(--text);">Mengambil Data...</div>
+                    <div style="font-size: 13px; margin-top: 6px;">Sedang memproses data dari server, mohon tunggu sebentar.</div>
+                </div>
+            `;
+        }
+
+        // Sisipin keyframes pulse kalau belum ada di halaman
+        if (!document.getElementById('dt-pulse-style')) {
+            const style = document.createElement('style');
+            style.id = 'dt-pulse-style';
+            style.innerHTML = `@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }`;
+            document.head.appendChild(style);
+        }
     }
 
     // 1. Load Data Mentah dari API
@@ -34,7 +77,7 @@ class DataTableEngine {
     // 2. Set Rules untuk Filter & Search
     setFilterAndSearch(filterFunction) {
         this.customFilterLogic = filterFunction;
-        this.currentPage = 1; // Balikin ke page 1 tiap kali ngefilter
+        this.currentPage = 1;
         this.process();
     }
 
@@ -48,12 +91,10 @@ class DataTableEngine {
     process() {
         this.dataTerfilter = [...this.dataAsli];
 
-        // Jalankan Filter & Search
         if (this.customFilterLogic) {
             this.dataTerfilter = this.dataTerfilter.filter(this.customFilterLogic);
         }
 
-        // Jalankan Sorting
         if (this.customSortLogic) {
             this.dataTerfilter.sort(this.customSortLogic);
         }
@@ -68,24 +109,19 @@ class DataTableEngine {
         const totalData = this.dataTerfilter.length;
         const totalPages = Math.ceil(totalData / this.perPage);
 
-        // Pengaman: kalau data nyusut tapi current page di luar batas
         if (this.currentPage > totalPages && totalPages > 0) this.currentPage = totalPages;
 
-        // Hitung index potongan
         const startIdx = (this.currentPage - 1) * this.perPage;
         const endIdx = startIdx + this.perPage;
         const paginatedData = this.dataTerfilter.slice(startIdx, endIdx);
 
-        // Render HTML Baris
         let rowsHtml = '';
         paginatedData.forEach((item, index) => {
-            // Panggil fungsi render bawaan halamannya
             rowsHtml += this.renderRowHTML(item, index);
         });
 
         this.tbody.innerHTML = rowsHtml;
 
-        // Atur Tampilan Kosong
         if (totalData === 0) {
             if (this.emptyState) this.emptyState.style.display = 'block';
             this.tbody.innerHTML = '';
@@ -93,7 +129,6 @@ class DataTableEngine {
             if (this.emptyState) this.emptyState.style.display = 'none';
         }
 
-        // Update Text Info
         if (this.infoWrapper) {
             this.infoWrapper.textContent = `Menampilkan ${paginatedData.length} dari ${totalData} data`;
         }
@@ -101,39 +136,42 @@ class DataTableEngine {
         this.renderPaginationButtons(totalPages);
     }
 
-    // 6. Render Tombol Pagination
+    // 6. Render Tombol Pagination (Yang Udah Cerdas)
     renderPaginationButtons(totalPages) {
         if (!this.pagerWrapper) return;
-
         let html = '';
+
         if (totalPages > 1) {
-            for (let i = 1; i <= totalPages; i++) {
+            let maxButtons = 10;
+            let startPage = Math.max(1, this.currentPage - Math.floor(maxButtons / 2));
+            let endPage = startPage + maxButtons - 1;
+
+            if (endPage > totalPages) {
+                endPage = totalPages;
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+
+            if (this.currentPage > 1) {
+                html += `<div class="pg-btn" data-page="${this.currentPage - 1}">&laquo; Prev</div>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
                 html += `<div class="pg-btn ${i === this.currentPage ? 'active' : ''}" data-page="${i}">${i}</div>`;
             }
+
+            if (this.currentPage < totalPages) {
+                html += `<div class="pg-btn" data-page="${this.currentPage + 1}">Next &raquo;</div>`;
+            }
         }
+
         this.pagerWrapper.innerHTML = html;
 
-        // Tambah event listener ke tombol yang baru dibuat
         const btns = this.pagerWrapper.querySelectorAll('.pg-btn');
         btns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 this.currentPage = parseInt(e.target.getAttribute('data-page'));
-                this.render(); // Cuma render ulang, gak perlu process filter dari awal
+                this.render();
             });
         });
-    }
-
-    // 7. [PENGEMBANGAN] Fitur Export / Download
-    exportData(type = 'csv') {
-        console.log(`Menyiapkan data untuk didownload dalam format ${type}...`);
-        if(this.dataTerfilter.length === 0) {
-            alert("Tidak ada data untuk diexport!");
-            return;
-        }
-
-        if (type === 'csv') {
-            // Nanti logikanya kita bikin di sini
-            alert("Fitur Export CSV sedang dikembangkan cuy!");
-        }
     }
 }

@@ -20,8 +20,56 @@ $(document).ready(function () {
         } else if (link && currentPath.includes(link)) {
             $(this).addClass("active");
         }
+
+        updateGlobalKomentarBadge();
+        updateGlobalFinanceBadge();
     });
 });
+
+function updateGlobalKomentarBadge() {
+    $.ajax({
+        url: '/api/admin/manajemen_komentar/ambilData?status=Pending',
+        type: 'GET',
+        success: function(res) {
+            if (res.status === 'success') {
+                const count = res.data.length;
+                const badge = $('#badgePendingKomentar');
+
+                if (count > 0) {
+                    badge.text(count).show(); // Tampilkan angka kalau > 0
+                } else {
+                    badge.hide(); // Sembunyikan kalau 0
+                }
+            }
+        },
+        error: function(err) {
+            console.error("Gagal load badge komentar", err);
+        }
+    });
+}
+
+function updateGlobalFinanceBadge() {
+    $.ajax({
+        url: '/api/admin/tracking_pembayaran/ambilData?status=Unpaid',
+        type: 'GET',
+        success: function(res) {
+            if (res.status === 'success') {
+                const count = res.data.length;
+                const badge = $('#badgeUnpaidFinance');
+
+                if (count > 0) {
+                    badge.text(count).show();
+                } else {
+                    badge.hide();
+                }
+            }
+        },
+        error: function(err) {
+            console.error("Gagal load badge finansial", err);
+        }
+    });
+}
+
 /**
  * 1. NOTIFIKASI DROPDOWN (NAVBAR)
  * Mengatur buka-tutup panel notifikasi di Topbar.

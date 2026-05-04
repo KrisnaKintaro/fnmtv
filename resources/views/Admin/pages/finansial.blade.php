@@ -141,6 +141,46 @@
 
 @section('js')
 <script>
+    $(document).ready(function() {
+        $('#tbTitle').text('Administrasi Finansial');
+        $('#tbCrumb').text('Admin / Finansial');
+
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.placeholder = 'Cari judul artikel atau penulis...';
+            searchInput.value = '';
+            searchInput.onkeyup = function() { terapkanFilterLokal(); };
+        }
+
+        // 🌟 FIX: FITUR NOTIFIKASI LONCENG
+        SmartNotif.init({
+            apiUrl: '/api/admin/tracking_pembayaran/ambilData?status=Unpaid',
+            renderItemHTML: function(item) {
+                const judul = item.berita ? item.berita.judul_berita : 'Artikel Terhapus';
+                const penulis = item.user ? item.user.username : 'Unknown';
+                const nominal = 'Rp ' + parseInt(item.nominal_pendapatan).toLocaleString('id-ID');
+
+                // Mencegah XSS
+                const amanJudul = $('<div>').text(judul).html();
+                const amanPenulis = $('<div>').text(penulis).html();
+
+                return `
+                    <div class="notif-item" onclick="sorotFinansial(${item.id})" style="cursor:pointer; padding:12px; border-bottom:1px solid #eee; display:flex; gap:12px; background: #fffaf0; transition: background 0.2s;">
+                        <div style="font-size:20px;">💰</div>
+                        <div class="notif-txt">
+                            <div style="font-weight:700; font-size:13px; color:var(--text);">Tagihan: ${amanPenulis}</div>
+                            <div style="font-size:12px; color:#555; line-height:1.4;">"${amanJudul}"</div>
+                            <div style="font-size:11px; color:var(--red); margin-top:4px; font-weight:600;">Nominal: ${nominal} - Klik untuk bayar</div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        generateTahunDropdown();
+        fetchFinanceData();
+    });
+
     const financeApiBase = '/api/admin/tracking_pembayaran';
     const financeHeaders = {
         'Accept': 'application/json',
@@ -161,7 +201,6 @@
             success: function(result) {
                 if (result.status === 'success' && Array.isArray(result.data)) {
                     financeDB = result.data;
-                    updateSidebarBadge(financeDB);
                     terapkanFilterLokal();
                     Toast.show('success', 'Data transaksi finansial berhasil dimuat.');
                 } else {
@@ -212,26 +251,26 @@
         }
     });
 
-    $(document).ready(function() {
-        $('#tbTitle').text('Administrasi Finansial');
-        $('#tbCrumb').text('Admin / Finansial');
+    // 🌟 FIX: FUNGSI KLIK DARI NOTIFIKASI
+    function sorotFinansial(idTransaksi) {
+        // Reset UI Filters
+        document.getElementById('filterStatus').value = 'all';
+        document.getElementById('filterBulan').value = '';
+        document.getElementById('filterTahun').value = '';
+
         const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.placeholder = 'Cari judul artikel atau penulis...';
-            searchInput.value = '';
-            searchInput.onkeyup = function() { terapkanFilterLokal(); };
-        }
+        if(searchInput) searchInput.value = '';
 
-        generateTahunDropdown();
+        // Terapkan filter manual langsung ke DataEngine
+        const dataSorotan = financeDB.filter(val => val.id === idTransaksi);
+        financeTable.loadData(dataSorotan);
+        hitungStats(dataSorotan);
 
-        fetchFinanceData();
-    });
+        // Tutup notif panel
+        const panel = document.getElementById('notifPanel');
+        if (panel) panel.classList.remove('open');
 
-    // --- FUNGSI UPDATE BADGE SIDEBAR ---
-    function updateSidebarBadge(dataArray) {
-        const totalUnpaid = dataArray.filter(x => x.status_pembayaran === 'Unpaid').length;
-        const badgeEl = document.getElementById('badgeUnpaidFinance');
-        if (badgeEl) badgeEl.innerText = totalUnpaid;
+        Toast.show('success', 'Menyorot transaksi dari notifikasi.');
     }
 
     // --- FUNGSI GENERATE TAHUN (Otomatis dari 2026 s/d Sekarang) ---
@@ -390,7 +429,6 @@
                     if (result.status === 'success' && result.data) {
                         Object.assign(data, result.data);
                         terapkanFilterLokal();
-                        updateSidebarBadge(financeDB);
                         Toast.show('success', 'Status berhasil diubah!');
                         ModalManager.close('modalUbahStatus');
                     } else {
