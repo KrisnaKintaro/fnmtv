@@ -5,6 +5,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\PengaturanController;
 
 
 #================= VERIFIKASI EMAIL =================
@@ -79,9 +80,10 @@ Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
         return view('Admin.pages.manajemen_user');
     });
 
-    Route::get('/pengaturan', function () {
-        return view('Admin.pages.pengaturan');
-    });
+    Route::get('/pengaturan', [PengaturanController::class, 'index']);
+    Route::post('/pengaturan', [PengaturanController::class, 'updateIdentity']);
+    Route::post('/pengaturan/password', [PengaturanController::class, 'updatePassword']);
+    
 });
 
 #================= EDITOR =================

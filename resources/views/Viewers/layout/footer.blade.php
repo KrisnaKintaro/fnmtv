@@ -1,8 +1,8 @@
 <div class="footer">
     <div class="footer-inner">
         <div>
-            <div class="ft-brand">FNM</div>
-            <div class="ft-desc">Fenomena News Media — Delivering unbiased, in-depth reporting on the stories that shape our world.</div>
+            <div class="ft-brand" id="footerBrand">FNM</div>
+            <div class="ft-desc" id="footerDesc">Fenomena News Media — Delivering unbiased, in-depth reporting on the stories that shape our world.</div>
         </div>
 
         <div>
