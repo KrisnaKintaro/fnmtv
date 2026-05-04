@@ -31,6 +31,19 @@
     <script src="{{ asset('viewers/js/modalManager.js') }}"></script>
     <script src="{{ asset('viewers/js/viewers_js.js') }}"></script>
 
+    <div id="modalLogoutConfirm" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(2px);">
+        <div style="background:#fff; width:100%; max-width:420px; border-radius:24px; box-shadow:0 24px 80px rgba(0,0,0,0.16); padding:28px; position:relative; overflow:hidden;">
+            <div style="font-size:20px; font-weight:800; color:#111; margin-bottom:12px;">Yakin ingin keluar?</div>
+            <div style="font-size:14px; color:#5f6368; line-height:1.7; margin-bottom:24px;">
+                Kamu akan keluar dari akun dan dialihkan ke beranda. Pastikan semua aktivitas sudah selesai sebelum keluar.
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <button onclick="ModalManager.close('modalLogoutConfirm')" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:1px solid #d2d2d2; background:#fff; color:#333; font-weight:700; cursor:pointer;">Batal</button>
+                <button onclick="performLogout()" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:none; background:#cc0000; color:#fff; font-weight:700; cursor:pointer;">Keluar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // SETUP CSRF TOKEN GLOBAL
         const token = localStorage.getItem('auth_token');
@@ -42,17 +55,23 @@
         });
 
         $(document).ready(function() {
+            loadSiteInfo();
             loadGlobalCategories();
         });
 
-        function doLogout(e) {
+        function confirmLogout(e) {
             if (e) e.preventDefault();
+            ModalManager.open('modalLogoutConfirm');
+        }
+
+        function performLogout() {
+            ModalManager.close('modalLogoutConfirm');
+            Toast.show('info', 'Sedang keluar... tunggu sebentar.');
 
             $.ajax({
                 url: '/api/auth/logout',
                 type: 'POST',
                 success: function(res) {
-                    // Hapus KTP Digital dari browser
                     localStorage.removeItem('auth_token');
                     Toast.show('success', 'Berhasil keluar. Sampai jumpa cuy!');
 
@@ -61,9 +80,12 @@
                     }, 1000);
                 },
                 error: function(err) {
-                    // Kalaupun error (misal token udah kadaluarsa di server), tetep paksa hapus dari browser
                     localStorage.removeItem('auth_token');
-                    window.location.href = '/';
+                    Toast.show('error', 'Gagal logout. Kamu tetap diarahkan ke beranda.');
+
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1200);
                 }
             });
         }
@@ -118,6 +140,48 @@
             });
             $('#dynamicFooterCategories').html(html);
         }
+
+        // LOAD SITE INFO DARI DATABASE
+        function loadSiteInfo() {
+            $.ajax({
+                url: '/api/viewers/site-info',
+                type: 'GET',
+                success: function(res) {
+                    if (res.status === 'success') {
+                        const data = res.data;
+                        const taglineEl = document.getElementById('siteTagline');
+                        if (taglineEl) {
+                            taglineEl.innerHTML = `${data.nama_situs}<br>${data.tagline}`;
+                        }
+                    }
+                },
+                error: function(err) {
+                    console.error("Gagal load site info:", err);
+                }
+            });
+        }
+
+        // LOAD SITE INFO UNTUK FOOTER
+        function loadSiteInfoFooter() {
+            $.ajax({
+                url: '/api/viewers/site-info',
+                type: 'GET',
+                success: function(res) {
+                    if (res.status === 'success') {
+                        const data = res.data;
+                        const footerDesc = document.getElementById('footerDesc');
+                        if (footerDesc) {
+                            footerDesc.innerHTML = `${data.nama_situs}<br>${data.tagline}`;
+                        }
+                    }
+                },
+                error: function(err) {
+                    console.error("Gagal load site info footer:", err);
+                }
+            });
+        }
+        
+        loadSiteInfoFooter();
     </script>
 
     @yield('js')
