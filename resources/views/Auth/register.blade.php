@@ -285,7 +285,7 @@
                     error: function(err) {
                         btn.text('Daftar').prop('disabled', false); // Nyalain tombol lagi
 
-                        let msg = 'Gagal mendaftar cuy, cek lagi datanya.';
+                        let msg = 'Gagal mendaftar, cek lagi data anda.';
 
                         // Tangkep error validasi dari Laravel (misal email udah kepake)
                         if (err.responseJSON && err.responseJSON.errors) {
