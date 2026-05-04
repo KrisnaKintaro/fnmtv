@@ -59,7 +59,8 @@ class UserController extends Controller
         $request->validate([
             'username' => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $id_user, // Boleh email sama asal punya dia sendiri
-            'role'     => 'required|in:Admin,Redaksi,Editor,Viewer'
+            'role'     => 'required|in:Admin,Redaksi,Editor,Viewer',
+            'password' => 'nullable|min:6'
         ]);
 
         $pengguna->username = $request->username;

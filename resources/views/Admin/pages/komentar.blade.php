@@ -107,7 +107,7 @@
     if (!filteredKomentar || filteredKomentar.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
-          <div class="ico">💬</div>
+          <div class="ico">📭</div>
           <p>Tidak ada komentar untuk ditampilkan.</p>
         </div>
       `;
@@ -115,17 +115,22 @@
     }
 
     container.innerHTML = filteredKomentar.map(komentar => {
-      const inicial = (komentar.nama || 'A')[0].toUpperCase();
+      // 🛡️ FIX XSS: Bersihin nama dan isi komentar
+      const rawNama = komentar.user ? komentar.user.username : (komentar.nama || 'Anonim');
+      const amanNama = $('<div>').text(rawNama).html();
+      const amanKomentar = $('<div>').text(komentar.isi_komentar).html();
+
+      const inicial = amanNama[0].toUpperCase();
       const bgColor = ['#cc0000', '#1a3a7a', '#1a7a3c', '#b86200'][Math.floor(Math.random() * 4)];
+
       const statusColor = komentar.status_moderasi === 'Approved' ? 'b-ok' :
                          (komentar.status_moderasi === 'Spam' ? 'b-spam' : 'b-review');
-      const statusIcon = komentar.status_moderasi === 'Approved' ? '✓ OK' :
-                        (komentar.status_moderasi === 'Spam' ? '⚠ Spam' : '⏳ Pending');
+      const statusIcon = komentar.status_moderasi === 'Approved' ? '✅ OK' :
+                        (komentar.status_moderasi === 'Spam' ? '🚨 Spam' : '⏳ Pending');
 
       const tanggal = new Date(komentar.created_at).toLocaleDateString('id-ID', {
         day: 'numeric', month: 'short', year: 'numeric'
       });
-
       const waktu = new Date(komentar.created_at).toLocaleTimeString('id-ID', {
         hour: '2-digit', minute: '2-digit'
       });
@@ -134,20 +139,20 @@
         <div class="cmt-item" ${komentar.status_moderasi === 'Spam' ? 'style="background:#fef9f9;"' : ''}>
           <div class="cmt-avatar" style="background:${bgColor};">${inicial}</div>
           <div class="cmt-body">
-            <div class="cmt-user">${komentar.nama || 'Anonim'}
+            <div class="cmt-user">${amanNama}
               <span class="badge ${statusColor}" style="margin-left:6px;">${statusIcon}</span>
             </div>
             <div class="cmt-article">Pada: "${komentar.berita?.judul_berita || 'Berita tidak ditemukan'}"</div>
-            <div class="cmt-text">${komentar.isi_komentar}</div>
+            <div class="cmt-text">${amanKomentar}</div>
             <div class="cmt-time">${tanggal}, ${waktu}</div>
             <div class="cmt-acts">
               ${komentar.status_moderasi !== 'Approved' ? `
-                <button class="btn btn-ghost btn-sm" onclick="ubahStatusKomentar(${komentar.id}, 'Approved')">✓ Setujui</button>
+                <button class="btn btn-ghost btn-sm" onclick="ubahStatusKomentar(${komentar.id}, 'Approved')">✅ Setujui</button>
               ` : ''}
               ${komentar.status_moderasi !== 'Spam' ? `
-                <button class="btn btn-sm" style="background:#fde8e8;color:var(--red);border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:12px;" onclick="ubahStatusKomentar(${komentar.id}, 'Spam')">⚠ Tandai Spam</button>
+                <button class="btn btn-sm" style="background:#fde8e8;color:var(--red);border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:12px;" onclick="ubahStatusKomentar(${komentar.id}, 'Spam')">🚨 Tandai Spam</button>
               ` : ''}
-              <button class="btn btn-sm" style="background:#fde8e8;color:var(--red);border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:12px;" onclick="hapusKomentar(${komentar.id})">🗑 Hapus</button>
+              <button class="btn btn-sm" style="background:#fde8e8;color:var(--red);border:none;border-radius:5px;padding:5px 10px;cursor:pointer;font-size:12px;" onclick="hapusKomentar(${komentar.id})">🗑️ Hapus</button>
             </div>
           </div>
         </div>

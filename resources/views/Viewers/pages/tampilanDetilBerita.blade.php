@@ -216,15 +216,18 @@
         } else {
             komentarData.forEach(k => {
                 // Sesuai revisi Krisna, ambil dari relasi user.username
-                const nama = k.user ? k.user.username : 'Anonim';
+                const nama = k.user;
                 const initial = nama.charAt(0).toUpperCase();
+
+                const namaAman = $('<div>').text(nama).html();
+                const komentarAman = $('<div>').text(k.isi_komentar).html();
                 html += `
                     <div class="comment-item">
                         <div class="ci-avatar">${initial}</div>
                         <div class="ci-body">
-                            <div class="ci-user">${nama}</div>
+                            <div class="ci-user">${namaAman}</div>
                             <div class="ci-time">${new Date(k.created_at).toLocaleDateString('id-ID')}</div>
-                            <div class="ci-text">${k.isi_komentar}</div>
+                            <div class="ci-text">${komentarAman}</div>
                         </div>
                     </div>`;
             });

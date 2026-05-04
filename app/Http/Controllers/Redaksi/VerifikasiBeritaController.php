@@ -50,9 +50,11 @@ class VerifikasiBeritaController extends Controller
     // Proses Verifikasi (ACC/Tolak/Unpublish)
     public function verifikasiBerita(Request $request, $id)
     {
-        // 🔴 FIX 1: Tambahin 'Pending' di aturan validasi biar bisa Unpublish
         $request->validate([
-            'status_berita' => 'required|in:Published,Rejected,Pending',
+            'status_berita'     => 'required|in:Published,Rejected,Pending',
+            'catatan_penolakan' => 'required_if:status_berita,Rejected'
+        ], [
+            'catatan_penolakan.required_if' => 'Catatan penolakan wajib diisi kalau artikel ditolak cuy!'
         ]);
 
         $berita = Berita::findOrFail($id);

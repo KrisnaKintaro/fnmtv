@@ -16,7 +16,7 @@ class BeritaController extends Controller
     public function getDaftarBerita()
     {
         $data = Berita::with('kategori:id,nama_kategori')
-            ->where('user_id', Auth::id() ?? 1)
+            ->where('user_id', Auth::id())
             ->where('status_berita', '!=', 'Published')
             ->latest()
             ->get();
@@ -39,15 +39,15 @@ class BeritaController extends Controller
         try {
             // Upload Foto Thumbnail
             $file = $request->file('foto_thumbnail');
-            $nama_file = time() . "_" . $file->getClientOriginalName();
+            $nama_file = time() . "_" . $file->hashName();
             $file->move(public_path('uploads/thumbnail'), $nama_file);
 
             $berita = Berita::create([
-                'user_id' => Auth::id() ?? 1,
+                'user_id' => Auth::id(),
                 'kategori_id' => $request->kategori_id,
                 'judul_berita' => $request->judul_berita,
                 'slug' => $request->slug ?? Str::slug($request->judul_berita) . '-' . time(),
-                'isi_berita' => $request->isi_berita,
+                'isi_berita' => clean($request->isi_berita),
                 'foto_thumbnail' => $nama_file,
                 'status_berita' => $request->status_berita ?? 'Draft',
                 'jumlah_view' => 0
@@ -84,7 +84,7 @@ class BeritaController extends Controller
 
             $dataUpdate = [
                 'judul_berita' => $request->judul_berita ?? $berita->judul_berita,
-                'isi_berita'   => $request->isi_berita ?? $berita->isi_berita,
+                'isi_berita'   => $request->isi_berita ?? clean($berita->isi_berita),
                 'kategori_id'  => $request->kategori_id ?? $berita->kategori_id,
                 'slug'         => $request->judul_berita ? Str::slug($request->judul_berita) . '-' . time() : $berita->slug,
                 'status_berita' => $request->status_berita ?? $berita->status_berita
@@ -97,7 +97,7 @@ class BeritaController extends Controller
                 }
 
                 $file = $request->file('foto_thumbnail');
-                $nama_file = time() . "_" . $file->getClientOriginalName();
+                $nama_file = time() . "_" . $file->hashName();
                 $file->move(public_path('uploads/thumbnail'), $nama_file);
 
                 $dataUpdate['foto_thumbnail'] = $nama_file;
