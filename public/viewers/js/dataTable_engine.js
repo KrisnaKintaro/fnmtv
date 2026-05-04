@@ -107,7 +107,22 @@ class DataTableEngine {
 
         let html = '';
         if (totalPages > 1) {
-            for (let i = 1; i <= totalPages; i++) {
+            const maxButtons = 10;
+            let startPage = 1;
+            let endPage = totalPages;
+
+            if (totalPages > maxButtons) {
+                const half = Math.floor(maxButtons / 2);
+                startPage = Math.max(1, this.currentPage - half);
+                endPage = startPage + maxButtons - 1;
+
+                if (endPage > totalPages) {
+                    endPage = totalPages;
+                    startPage = totalPages - maxButtons + 1;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
                 html += `<div class="pg-btn ${i === this.currentPage ? 'active' : ''}" data-page="${i}">${i}</div>`;
             }
         }

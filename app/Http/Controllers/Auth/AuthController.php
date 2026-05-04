@@ -73,7 +73,7 @@ public function login(Request $request)
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Login sukses cuy!',
+                'message' => 'Login Sukses',
                 'token' => $token,
                 'redirect' => $redirectUrl
             ]);
