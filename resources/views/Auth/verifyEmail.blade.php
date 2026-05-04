@@ -115,7 +115,7 @@ $(document).ready(function() {
                 }, 1000);
             },
             error: function(err) {
-                Toast.show('error', 'Gagal ngirim email, coba lagi nanti cuy.');
+                Toast.show('error', 'Gagal ngirim email, coba lagi nanti!');
                 btn.text(originalText).prop('disabled', false);
             }
         });

@@ -29,6 +29,19 @@
 
     <script src="{{ asset('admin/js/admin_js.js') }}"></script>
 
+    <div id="modalLogoutConfirm" class="modal-backdrop">
+        <div class="modal" style="max-width:420px; padding:28px; text-align:center;">
+            <div style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:12px;">Yakin ingin keluar dari panel Redaksi?</div>
+            <div style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px;">
+                Kamu akan keluar dari panel dan dialihkan ke halaman login. Pastikan semua aktivitas sudah selesai.
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+                <button onclick="ModalManager.close('modalLogoutConfirm')" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:1px solid var(--border); background:var(--white); color:var(--text); font-weight:700; cursor:pointer;">Batal</button>
+                <button onclick="performLogout()" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:none; background:var(--red); color:var(--white); font-weight:700; cursor:pointer;">Keluar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         $.ajaxSetup({
             headers: {
@@ -39,17 +52,18 @@
     
         function doLogout(e) {
             if (e) e.preventDefault();
-    
-            if (!confirm('Yakin ingin keluar dari panel Redaksi?')) {
-                return;
-            }
-    
+            ModalManager.open('modalLogoutConfirm');
+        }
+
+        function performLogout() {
+            ModalManager.close('modalLogoutConfirm');
+
             $.ajax({
                 url: '/api/auth/logout',
                 type: 'POST',
                 success: function () {
                     localStorage.removeItem('auth_token');
-                    window.location.href = '/login';  // Atau '/' jika mau ke beranda
+                    window.location.href = '/login';
                 },
                 error: function () {
                     localStorage.removeItem('auth_token');

@@ -31,15 +31,15 @@
     <script src="{{ asset('viewers/js/modalManager.js') }}"></script>
     <script src="{{ asset('viewers/js/viewers_js.js') }}"></script>
 
-    <div id="modalLogoutConfirm" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(2px);">
-        <div style="background:#fff; width:100%; max-width:420px; border-radius:24px; box-shadow:0 24px 80px rgba(0,0,0,0.16); padding:28px; position:relative; overflow:hidden;">
-            <div style="font-size:20px; font-weight:800; color:#111; margin-bottom:12px;">Yakin ingin keluar?</div>
-            <div style="font-size:14px; color:#5f6368; line-height:1.7; margin-bottom:24px;">
+    <div id="modalLogoutConfirm" class="modal-backdrop">
+        <div class="modal" style="max-width:420px; padding:28px; text-align:center;">
+            <div style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:12px;">Yakin ingin keluar dari akun?</div>
+            <div style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px;">
                 Kamu akan keluar dari akun dan dialihkan ke beranda. Pastikan semua aktivitas sudah selesai sebelum keluar.
             </div>
-            <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                <button onclick="ModalManager.close('modalLogoutConfirm')" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:1px solid #d2d2d2; background:#fff; color:#333; font-weight:700; cursor:pointer;">Batal</button>
-                <button onclick="performLogout()" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:none; background:#cc0000; color:#fff; font-weight:700; cursor:pointer;">Keluar</button>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+                <button onclick="ModalManager.close('modalLogoutConfirm')" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:1px solid var(--border); background:var(--white); color:var(--text); font-weight:700; cursor:pointer;">Batal</button>
+                <button onclick="performLogout()" style="flex:1; min-width:120px; padding:12px 16px; border-radius:12px; border:none; background:var(--red); color:var(--white); font-weight:700; cursor:pointer;">Keluar</button>
             </div>
         </div>
     </div>
