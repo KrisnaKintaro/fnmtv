@@ -30,6 +30,12 @@ const Toast = {
         } else if (type === 'warning') {
             icoEl.textContent = '⚠️';
             toastEl.style.background = '#b86200'; // Orange
+        } else if (type === 'info') {
+            icoEl.textContent = 'ℹ️';
+            toastEl.style.background = '#0d6efd'; // Biru info
+        } else {
+            icoEl.textContent = '💬';
+            toastEl.style.background = '#1a1a1a'; // Default
         }
 
         msgEl.innerText = msg;

@@ -212,7 +212,7 @@
         <a href="/" class="back-btn">⬅ Kembali ke Beranda</a>
 
         <div class="login-card">
-            <div class="login-logo">FNM</div>
+            <div class="login-logo" id="loginLogo">FNM</div>
             <div class="login-sub">Fenomena News Media — Platform Berita Terpercaya</div>
             <div class="login-role-chip">
                 <span>🔐 Login</span>
@@ -286,7 +286,7 @@
                     error: function(err) {
                         btn.text('Masuk').prop('disabled', false); // Nyalain tombol lagi
 
-                        let msg = 'Gagal login cuy, cek email/password lu.';
+                        let msg = 'Gagal login, cek email/password anda.';
                         if (err.responseJSON && err.responseJSON.message) {
                             msg = err.responseJSON.message;
                         }
@@ -294,6 +294,23 @@
                     }
                 });
             });
+                $(document).ready(function() {
+            $.ajax({
+                url: '/api/viewers/site-info',
+                type: 'GET',
+                success: function(res) {
+                    if (res.status === 'success') {
+                        const data = res.data;
+                        // Update title
+                        document.title = data.nama_situs + ' — Masuk';
+                        // Update logo jika ada element dengan id login-logo
+                        if (document.getElementById('loginLogo')) {
+                            document.getElementById('loginLogo').textContent = data.nama_situs;
+                        }
+                    }
+                }
+            });
+        });
         });
     </script>
 

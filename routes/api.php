@@ -14,6 +14,7 @@ use App\Http\Controllers\Redaksi\VerifikasiBeritaController;
 use App\Http\Controllers\Viewer\KomentarController;
 use App\Http\Controllers\Viewer\ReaksiController;
 use App\Http\Controllers\Viewer\ViewerController;
+use App\Http\Controllers\Viewer\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -93,6 +94,7 @@ Route::prefix('viewers')->group(function() {
     Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
     Route::get('/berita-populer', [ViewerController::class, 'getBeritaPopuler']);
     Route::get('/search', [ViewerController::class, 'searchBerita']);
+    Route::get('/site-info', [SettingController::class, 'getSiteInfo']);
 });
 
 // API Viewers yang WAJIB BAWA TOKEN (Wajib login)
