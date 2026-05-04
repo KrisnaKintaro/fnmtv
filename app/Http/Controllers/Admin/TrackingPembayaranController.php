@@ -9,11 +9,16 @@ use Illuminate\Http\Request;
 
 class TrackingPembayaranController extends Controller
 {
-    public function getDaftarPembayaran()
+    public function getDaftarPembayaran(Request $request)
     {
-        $pendapatan = Pendapatan::with(['berita:id,judul_berita', 'user:id,username'])
-            ->latest()
-            ->get();
+        $query = Pendapatan::with(['berita:id,judul_berita', 'user:id,username'])->latest();
+
+        // 🌟 FIX: Tambahin filter status biar API-nya pinter
+        if ($request->has('status')) {
+            $query->where('status_pembayaran', $request->status);
+        }
+
+        $pendapatan = $query->get();
 
         return response()->json([
             'status' => 'success',

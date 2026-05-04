@@ -24,7 +24,7 @@
     <a href="/komentar" class="s-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z"/></svg>
       Moderasi Komentar
-      <span class="s-badge" style="background:var(--red);color:#fff;">12</span>
+      <span class="s-badge" id="badgePendingKomentar" style="background:var(--red);color:#fff;">...</span>
     </a>
     <a href="/analitik_statistik_berita" class="s-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
@@ -37,7 +37,7 @@
     <a href="/finansial" class="s-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.343-4 3s1.79 3 4 3 4-1.343 4-3-1.79-3-4-3zM12 2v2m0 16v2m10-10h-2M4 12H2"/></svg>
       Administrasi Finansial
-      <span class="s-badge" id="badgeUnpaidFinance" style="background:var(--red);color:#fff;">12</span>
+      <span class="s-badge" id="badgeUnpaidFinance" style="background:var(--red);color:#fff;">...</span>
     </a>
   </div>
 
