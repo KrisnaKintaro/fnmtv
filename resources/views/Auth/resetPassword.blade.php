@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Reset Password</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -150,15 +151,22 @@
 
                 <div class="lfield">
                     <label for="password">Password Baru</label>
-                    <input type="password" id="password" placeholder="Minimal 8 karakter" required>
+                    <div style="position: relative;">
+                        <input type="password" id="password" placeholder="Minimal 8 karakter" required style="padding-right: 40px;">
+                        <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted);"></i>
+                    </div>
                 </div>
                 <div class="lfield">
                     <label for="password_confirmation">Konfirmasi Password</label>
-                    <input type="password" id="password_confirmation" placeholder="Ulangi password baru" required>
+                    <div style="position: relative;">
+                        <input type="password" id="password_confirmation" placeholder="Ulangi password baru" required style="padding-right: 40px;">
+                        <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted);"></i>
+                    </div>
                 </div>
-                <button type="submit" class="login-btn" id="btnSubmit">Simpan & Login</button>
-            </form>
         </div>
+        <button type="submit" class="login-btn" id="btnSubmit">Simpan & Login</button>
+        </form>
+    </div>
     </div>
 
     <div id="toast"><span id="toastIco"></span><span id="toastMsg"></span></div>
@@ -177,6 +185,14 @@
             $('#formReset').on('submit', function(e) {
                 e.preventDefault();
                 const btn = $('#btnSubmit');
+
+                const pwd = $('#password').val();
+                const confirmPwd = $('#password_confirmation').val();
+                if (pwd !== confirmPwd) {
+                    Toast.show('warning', 'Password dan Konfirmasi Password tidak sama cuy!');
+                    return; 
+                }
+
                 btn.text('Menyimpan...').prop('disabled', true);
 
                 $.ajax({
@@ -197,6 +213,17 @@
                         btn.text('Simpan & Login').prop('disabled', false);
                     }
                 });
+            });
+
+            $(document).on('click', '.toggle-password', function() {
+                $(this).toggleClass('fa-eye fa-eye-slash');
+                // Cari inputan yang sejajar sama ikon ini
+                let input = $(this).siblings('input');
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                } else {
+                    input.attr('type', 'password');
+                }
             });
         });
     </script>

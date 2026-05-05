@@ -23,7 +23,7 @@ Route::prefix('email')->group(function () {
 });
 
 #================= LUPA PASSWORD =================
-// Tampilan Lupa Password 
+// Tampilan Lupa Password
 Route::view('/forgot-password', 'Auth.forgotPassword')
     ->middleware('guest')
     ->name('password.request');
@@ -83,7 +83,7 @@ Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
     Route::get('/pengaturan', [PengaturanController::class, 'index']);
     Route::post('/pengaturan', [PengaturanController::class, 'updateIdentity']);
     Route::post('/pengaturan/password', [PengaturanController::class, 'updatePassword']);
-    
+
 });
 
 #================= EDITOR =================

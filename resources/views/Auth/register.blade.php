@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* CSS Sama persis kayak form login */
@@ -227,7 +228,10 @@
                 </div>
                 <div class="lfield">
                     <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Masukkan password" required>
+                    <div style="position: relative;">
+                        <input type="password" id="password" placeholder="Masukkan password" required style="padding-right: 40px;">
+                        <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted);"></i>
+                    </div>
                 </div>
                 <div class="lfield">
                     <label for="password_confirmation">Konfirmasi Password</label>
@@ -298,6 +302,17 @@
                         Toast.show('error', msg);
                     }
                 });
+            });
+
+            $(document).on('click', '.toggle-password', function() {
+                $(this).toggleClass('fa-eye fa-eye-slash');
+                // Cari inputan yang sejajar sama ikon ini
+                let input = $(this).siblings('input');
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                } else {
+                    input.attr('type', 'password');
+                }
             });
         });
     </script>

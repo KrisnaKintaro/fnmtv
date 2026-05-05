@@ -83,8 +83,10 @@ Route::prefix('viewers')->group(function () {
 
 // API Viewers yang WAJIB BAWA TOKEN (Wajib login)
 Route::prefix('viewers')->middleware('auth:sanctum')->group(function () {
-    Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar'])->middleware('throttle:10,1');
-    Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi'])->middleware('throttle:10,1');
+    // Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar'])->middleware('throttle:10,1');
+    // Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi'])->middleware('throttle:10,1');
+    Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar']);
+    Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
 });
 
 
