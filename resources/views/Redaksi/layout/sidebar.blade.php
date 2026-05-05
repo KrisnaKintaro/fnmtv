@@ -16,7 +16,14 @@
                 <polyline points="17 21 17 13 7 13 7 21" stroke-width="2" stroke-linecap="round" />
             </svg>
             Manajemen Berita
-            <span class="s-badge" id="pendingCount">5</span>
+            <span class="s-badge" id="pendingCount">...</span>
+        </a>
+    </div>
+    <div class="s-section">
+        <div class="s-label">Sistem</div>
+        <a href="/redaksi/profil" class="s-item">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Edit Profil
         </a>
     </div>
 

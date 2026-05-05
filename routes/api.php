@@ -150,5 +150,6 @@ Route::middleware(['web', 'auth', 'RoleCheck:Redaksi'])->group(function () {
         Route::get('/getBeritaMasuk', [VerifikasiBeritaController::class, 'getBeritaMasuk']);
         Route::get('/getNotifikasi', [VerifikasiBeritaController::class, 'getNotifikasi']);
         Route::patch('/verifikasiBerita/{id}', [VerifikasiBeritaController::class, 'verifikasiBerita']);
+        Route::put('/updateProfil', [AuthController::class, 'updateProfil']);
     });
 });

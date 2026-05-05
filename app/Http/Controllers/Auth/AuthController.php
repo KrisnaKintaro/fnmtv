@@ -165,4 +165,34 @@ public function login(Request $request)
 
         return response()->json(['status' => 'error', 'message' => 'Gagal reset password, token mungkin kadaluarsa.'], 400);
     }
+
+    public function updateProfil(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:8|confirmed',
+        ], [
+            'email.unique' => 'Email ini sudah dipakai, ganti yang lain.',
+            'password.confirmed' => 'Konfirmasi password ga sama nih.',
+            'password.min' => 'Password minimal 8 karakter.'
+        ]);
+
+        $user->username = $request->username;
+        $user->email = $request->email;
+
+        // Kalau password diisi, baru kita enkripsi dan update
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mantap! Profil berhasil diupdate.'
+        ]);
+    }
 }
