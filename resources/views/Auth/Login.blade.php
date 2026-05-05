@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* ... (Bagian CSS lu tetep sama persis kayak sebelumnya, ga ada yang berubah) ... */
@@ -228,7 +229,10 @@
                         <label for="password" style="margin-bottom: 0;">Password</label>
                         <a href="/forgot-password" style="font-size: 12px; color: var(--red); text-decoration: none; font-weight: 600;">Lupa Password?</a>
                     </div>
-                    <input type="password" id="password" placeholder="Masukkan password" required>
+                    <div style="position: relative;">
+                        <input type="password" id="password" placeholder="Masukkan password" required style="padding-right: 40px;">
+                        <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted);"></i>
+                    </div>
                 </div>
                 <button type="submit" class="login-btn" id="btnSubmitLogin">Masuk</button>
             </form>
@@ -276,7 +280,7 @@
                         if (res.status === 'success') {
                             Toast.show('success', res.message);
 
-                            if(res.token) localStorage.setItem('auth_token', res.token);
+                            if (res.token) localStorage.setItem('auth_token', res.token);
 
                             setTimeout(() => {
                                 window.location.href = res.redirect;
@@ -294,23 +298,34 @@
                     }
                 });
             });
-                $(document).ready(function() {
-            $.ajax({
-                url: '/api/viewers/site-info',
-                type: 'GET',
-                success: function(res) {
-                    if (res.status === 'success') {
-                        const data = res.data;
-                        // Update title
-                        document.title = data.nama_situs + ' — Masuk';
-                        // Update logo jika ada element dengan id login-logo
-                        if (document.getElementById('loginLogo')) {
-                            document.getElementById('loginLogo').textContent = data.nama_situs;
+            $(document).ready(function() {
+                $.ajax({
+                    url: '/api/viewers/site-info',
+                    type: 'GET',
+                    success: function(res) {
+                        if (res.status === 'success') {
+                            const data = res.data;
+                            // Update title
+                            document.title = data.nama_situs + ' — Masuk';
+                            // Update logo jika ada element dengan id login-logo
+                            if (document.getElementById('loginLogo')) {
+                                document.getElementById('loginLogo').textContent = data.nama_situs;
+                            }
                         }
                     }
+                });
+            });
+
+            $(document).on('click', '.toggle-password', function() {
+                $(this).toggleClass('fa-eye fa-eye-slash');
+                // Cari inputan yang sejajar sama ikon ini
+                let input = $(this).siblings('input');
+                if (input.attr('type') === 'password') {
+                    input.attr('type', 'text');
+                } else {
+                    input.attr('type', 'password');
                 }
             });
-        });
         });
     </script>
 

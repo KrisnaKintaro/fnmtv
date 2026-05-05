@@ -45,7 +45,7 @@
                         <a href="/profil" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--border);">
                             <i class="fas fa-user-edit" style="color: var(--primary);"></i> Edit Profil
                         </a>
-                        <a href="#" onclick="confirmLogout(event)" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: #dc3545;">
+                        <a href="/logout" onclick="confirmLogout(event)" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: #dc3545;">
                             <i class="fas fa-sign-out-alt"></i> Keluar
                         </a>
                     </div>
