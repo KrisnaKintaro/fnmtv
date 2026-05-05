@@ -316,7 +316,7 @@
                 imgUrl = `/uploads/thumbnail/${imgUrl}`; // Path folder asli lu
             }
             const thumbHTML = imgUrl ?
-                `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
+                `<img src="${imgUrl}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/eeeeee/999999?text=No+Image';" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
                 `<div style="font-size:24px; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">${val.emoji || '📰'}</div>`;
 
             return `
@@ -694,11 +694,5 @@
         // Update sidebar count
         if (document.getElementById('pendingCount')) document.getElementById('pendingCount').textContent = cnt.pending;
     }
-
-    // Fungsi kuhapus krn sdh ada di master layout.
-    // function doLogout() {
-    //     if (!confirm('Yakin ingin keluar dari panel Redaksi?')) return;
-    //     alert("Proses logout jalan...");
-    // }
 </script>
 @endsection

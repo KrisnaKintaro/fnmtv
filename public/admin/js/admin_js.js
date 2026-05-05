@@ -1,29 +1,34 @@
 $(document).ready(function () {
-    // 1. Inisiasi Smart Notifikasi (tanpa API dulu biar loncengnya bisa buka-tutup)
+    // 1. Inisiasi Smart Notifikasi
     if (typeof SmartNotif !== "undefined") {
         SmartNotif.init({});
     }
 
-    // 2. Auto-Active Sidebar Menu berdasarkan URL
+    // 2. Auto-Active Sidebar Menu
     const currentPath = window.location.pathname;
-
-    // Matikan semua tombol aktif bawaan dari HTML
     $(".s-item").removeClass("active");
-
-    // Loop setiap item menu
+    
     $(".s-item").each(function () {
         const link = $(this).attr("href");
-
-        // Cek kecocokan URL (hindari '/' biar gak bentrok, khusus root cek exact)
         if (link === "/") {
             if (currentPath === "/") $(this).addClass("active");
         } else if (link && currentPath.includes(link)) {
             $(this).addClass("active");
         }
-
-        updateGlobalKomentarBadge();
-        updateGlobalFinanceBadge();
+        // HAPUS pemanggilan badge dari dalam loop ini!
     });
+
+    // 3. Panggil update badge SEKALI SAJA dan HANYA JIKA elemennya ada di halaman
+    if ($('#badgePendingKomentar').length > 0) {
+        updateGlobalKomentarBadge();
+    }
+    if ($('#badgeUnpaidFinance').length > 0) {
+        updateGlobalFinanceBadge();
+    }
+
+    if ($('#pendingCount').length > 0) {
+        updateGlobalRedaksiBadge();
+    }
 });
 
 // Global fungsi untuk toggle show/hide password
@@ -37,6 +42,28 @@ $(document).on('click', '.toggle-password', function() {
         input.attr('type', 'password');
     }
 });
+
+function updateGlobalRedaksiBadge() {
+    $.ajax({
+        url: '/api/redaksi/getNotifikasi', // Nembak ke API notifikasi karena isinya berita Pending
+        type: 'GET',
+        success: function(res) {
+            if (res.status === 'success') {
+                const count = res.data.length;
+                const badge = $('#pendingCount');
+                
+                if (count > 0) {
+                    badge.text(count).show(); // Tampilkan angka kalau > 0
+                } else {
+                    badge.hide(); // Sembunyikan kalau 0 biar rapi
+                }
+            }
+        },
+        error: function(err) {
+            console.error("Gagal load badge redaksi", err);
+        }
+    });
+}
 
 function updateGlobalKomentarBadge() {
     $.ajax({

@@ -103,6 +103,7 @@ Route::middleware(['auth', 'RoleCheck:Editor'])->group(function () {
 #================= REDAKSI =================
 Route::middleware(['auth', 'RoleCheck:Redaksi'])->group(function () {
     Route::get('/redaksi-manajemen-berita', fn() => view('Redaksi.pages.manajemen_berita'));
+    Route::get('/redaksi/profil', fn() => view('Redaksi.pages.profil'));
 });
 
 #================= AUTH =================
