@@ -29,6 +29,7 @@
 @section('konten')
 <div class="container page-anim">
 
+
     <div class="hero-section" style="margin-bottom: 30px;">
         <div class="hero-grid" id="heroContainer">
             <div style="padding: 40px; text-align: center; width: 100%; grid-column: span 2; color: var(--muted);">

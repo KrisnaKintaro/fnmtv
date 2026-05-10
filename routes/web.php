@@ -46,6 +46,7 @@ Route::get('/', function () {
 Route::get('/search', function () {
     return view('Viewers.pages.beritaHasilSearch');
 });
+#================= ADMIN =================
 
 Route::get('/kategori/{slug}', function () {
     return view('Viewers.pages.tampilanTiapKategori');
