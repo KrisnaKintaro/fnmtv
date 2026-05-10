@@ -31,7 +31,7 @@
     <script src="{{ asset('viewers/js/modalManager.js') }}"></script>
     <script src="{{ asset('viewers/js/viewers_js.js') }}"></script>
 
-    <div id="modalLogoutConfirm" class="modal-backdrop">
+    <div id="modalLogoutConfirm" class="modal-backdrop" style="display:none;">
         <div class="modal" style="max-width:420px; padding:28px; text-align:center;">
             <div style="font-size:20px; font-weight:800; color:var(--text); margin-bottom:12px;">Yakin ingin keluar dari akun?</div>
             <div style="font-size:14px; color:var(--muted); line-height:1.7; margin-bottom:24px;">
