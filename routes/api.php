@@ -141,6 +141,8 @@ Route::middleware(['web', 'auth', 'RoleCheck:Editor'])->group(function () {
         Route::delete('/hapusBerita/{id_berita}', [BeritaController::class, 'hapusDataBerita']);
         Route::get('/ambilNotifikasi', [BeritaController::class, 'ambilNotifikasi']);
     });
+
+    Route::put('/editor/updateProfil', [AuthController::class, 'updateProfil']);
 });
 // Bagian Editor
 

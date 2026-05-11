@@ -9,9 +9,16 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('admin/css/admin_css.css') }}">
     <style>
         .s-role-badge{background:#1a7a3c;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;letter-spacing:1px;text-transform:uppercase;margin-left:auto;flex-shrink:0;}
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-textfield-decoration-container,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+        }
     </style>
     @yield('css')
 </head>
@@ -24,6 +31,11 @@
         @include('editor.layout.navbar')
         @yield('konten')
     </main>
+
+    <div id="toast" style="position:fixed; bottom:28px; right:28px; background:#1a1a1a; color:#fff; padding:14px 20px; border-radius:8px; font-size:13px; font-weight:600; display:none; align-items:center; gap:12px; box-shadow:0 8px 30px rgba(0,0,0,.3); z-index:9999; min-width:280px; max-width:400px; transition:opacity .3s; opacity:0;">
+        <span id="toastIco" style="font-size:20px;"></span>
+        <span id="toastMsg" style="line-height:1.4;"></span>
+    </div>
 
     <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
     <script src="{{ asset('admin/js/admin_js.js') }}"></script>
@@ -75,6 +87,60 @@
                     localStorage.removeItem('auth_token');
                     window.location.href = '/login';
                 }
+            });
+        }
+    </script>
+
+
+    <!-- Ganti script yang sudah ada di master -->
+    <script>
+        $.ajaxSetup({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            cache: false
+        });
+
+        // ✅ SATU showPage terpusat, pakai class bukan inline style
+        const pageTitles = {
+            'write-news': ['Tulis Berita Baru', 'Editor / Tulis Berita Baru'],
+            'my-news':    ['Berita Saya',        'Editor / Berita Saya'],
+            'profile':    ['Edit Profil',         'Editor / Edit Profil'],
+        };
+
+        function showPage(id, el) {
+            // Hapus active dari semua halaman — TANPA .hide() / .show()
+            $('.page').removeClass('active');
+
+            const target = document.getElementById('page-' + id);
+            if (!target) {
+                console.error("Elemen page-" + id + " tidak ditemukan.");
+                return;
+            }
+            $(target).addClass('active');
+
+            // Update sidebar active
+            if (el) {
+                $('.s-item').removeClass('active');
+                $(el).addClass('active');
+            }
+
+            // Update topbar
+            const titles = pageTitles[id] || ['Editor', 'Panel Editor'];
+            $('#tbTitle').text(titles[0]);
+            $('#tbCrumb').text(titles[1]);
+        }
+
+        function doLogout(e) {
+            if (e) e.preventDefault();
+            ModalManager.open('modalLogoutConfirm');
+        }
+
+        function performLogout() {
+            ModalManager.close('modalLogoutConfirm');
+            $.ajax({
+                url: '/api/auth/logout',
+                type: 'POST',
+                success: function () { localStorage.removeItem('auth_token'); window.location.href = '/login'; },
+                error:   function () { localStorage.removeItem('auth_token'); window.location.href = '/login'; }
             });
         }
     </script>

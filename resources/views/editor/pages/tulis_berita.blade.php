@@ -68,15 +68,8 @@
           <div class="form-title">Kategori</div>
           <div class="field" style="margin-bottom:0;">
             <label>Pilih Kategori *</label>
-            <select>
-              <option value="">-- Pilih Kategori --</option>
-              <option>Politik</option>
-              <option>Ekonomi</option>
-              <option>Teknologi</option>
-              <option>Olahraga</option>
-              <option>Kesehatan</option>
-              <option>Budaya</option>
-              <option>Internasional</option>
+            <select id="select-kategori" name="id_kategori">
+              <option value="">-- Memuat Kategori... --</option>
             </select>
           </div>
         </div>
@@ -149,6 +142,82 @@
     } else {
       document.getElementById('modalPending').style.display = 'none';
     }
+  }
+
+  $(document).ready(function() {
+      loadKategori();
+
+      $(document).on('click.togglePassword', '.toggle-password', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          $(this).toggleClass('fa-eye fa-eye-slash');
+          const input = $(this).parent().find('input');
+          if (input.length) {
+              input.attr('type', input.attr('type') === 'password' ? 'text' : 'password');
+          }
+      });
+  });
+
+  function loadKategori() {
+    $.ajax({
+      url: '/api/viewers/kategori',
+      type: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        let options = '<option value="">-- Pilih Kategori --</option>';
+        let data = [];
+
+        if (response && response.status === 'success' && Array.isArray(response.data)) {
+          data = response.data;
+        } else if (Array.isArray(response)) {
+          data = response;
+        }
+
+        data.forEach(function(item) {
+          options += `<option value="${item.id}">${item.nama_kategori}</option>`;
+        });
+
+        $('#select-kategori').html(options);
+      },
+      error: function(xhr) {
+        console.error('Gagal memuat kategori:', xhr);
+        $('#select-kategori').html('<option value="">Gagal memuat data</option>');
+      }
+    });
+  }
+
+  //const pageTitles = {
+      //'write-news': ['Tulis Berita Baru', 'Editor / Tulis Berita Baru'],
+      //'my-news': ['Berita Saya', 'Editor / Berita Saya'],
+      //'profile': ['Edit Profil', 'Editor / Edit Profil'],
+ //};
+
+  function showPage(id, el) {
+      console.log("Mencoba pindah ke halaman:", id); // Untuk debugging
+      
+      const target = document.getElementById('page-' + id);
+      if (!target) {
+          console.error("Gagal pindah! Elemen id='page-" + id + "' tidak ditemukan di HTML.");
+          return;
+      }
+
+      // Sembunyikan semua halaman
+      $('.page').removeClass('active').hide(); 
+      
+      // Tampilkan halaman target
+      $(target).addClass('active').show();
+
+      // Update Menu Sidebar
+      if (el) {
+          $('.s-item').removeClass('active');
+          $(el).addClass('active');
+      }
+
+      // Update Header/Breadcrumb
+      const titles = pageTitles[id] || ['Editor', 'Panel Editor'];
+      $('#tbTitle').text(titles[0]);
+      $('#tbCrumb').text(titles[1]);
   }
 </script>
 @endsection
