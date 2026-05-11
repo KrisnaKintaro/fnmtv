@@ -202,6 +202,78 @@
         </div>
     </div>
 
+    <!-- ══ PAGE: EDIT PROFIL ══ -->
+    <div id="page-profile" class="page">
+        <div class="section-title">Pengaturan Akun</div>
+
+        <!-- CARD STANDAR YANG LEBIH CLEAN -->
+        <div class="card" style="max-width: 800px; margin-top: 16px;">
+            <div class="card-hd">
+                <div class="card-ht">Profil Editor</div>
+                <div class="card-hm">Kelola identitas dan keamanan akun Anda</div>
+            </div>
+
+            <div style="padding: 24px;">
+                <form id="formProfilEditor">
+                    <!-- BAGIAN INFORMASI DASAR -->
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                            Informasi Dasar
+                        </h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="field" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block;">Username</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-user" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
+                                    <input type="text" id="profUsername" value="{{ Auth::user()->username }}" required style="width: 100%; padding: 10px 15px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
+                                </div>
+                            </div>
+                            <div class="field" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block;">Alamat Email</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-envelope" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
+                                    <input type="email" id="profEmail" value="{{ Auth::user()->email }}" required style="width: 100%; padding: 10px 15px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BAGIAN PASSWORD -->
+                    <div style="margin-bottom: 30px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 16px;">
+                            <h3 style="font-size: 14px; font-weight: 700; margin: 0;">Keamanan & Password</h3>
+                            <span style="font-size: 11px; color: var(--muted);">Kosongkan jika tidak diubah</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="field" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block;">Password Baru</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-key" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
+                                    <input type="password" id="profPassword" placeholder="Minimal 8 karakter" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
+                                    <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                                </div>
+                            </div>
+                            <div class="field" style="margin-bottom: 0;">
+                                <label style="font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block;">Konfirmasi Password</label>
+                                <div style="position: relative;">
+                                    <i class="fas fa-check-circle" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
+                                    <input type="password" id="profPasswordConfirm" placeholder="Ulangi password baru" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
+                                    <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn btn-red" id="btnSimpanProfil" style="padding: 10px 20px;">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     </main>
 
     <!-- ══ MODAL: Konfirmasi Statusnya Draft ══ -->
@@ -647,6 +719,7 @@
         const pageTitles = {
             'write-news': ['Tulis Berita Baru', 'Editor / Tulis Berita Baru'],
             'my-news': ['Berita Saya', 'Editor / Berita Saya'],
+            'profile': ['Profil Saya', 'Editor / Profil Saya'],
         };
 
         function lihatAlasanTolak(alasan) {
