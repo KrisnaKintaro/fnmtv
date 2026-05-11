@@ -90,9 +90,9 @@ Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
 #================= EDITOR =================
 Route::middleware(['auth', 'RoleCheck:Editor'])->group(function () {
     Route::get('/editor',          fn() => view('editor.pages.berita_saya'));
-    Route::get('/editor/profil',   fn() => view('editor.pages.berita_saya')); // ← ubah ini
+    Route::get('/editor/profil',   fn() => view('editor.pages.profil')); // ← ubah ini
     Route::get('/berita-saya',     fn() => view('editor.pages.berita_saya'));
-    Route::get('/tulis-editor',    fn() => view('editor.pages.berita_saya'));
+    Route::get('/tulis-editor',    fn() => view('editor.pages.tulis_berita'));
 });
 #================= REDAKSI =================
 Route::middleware(['auth', 'RoleCheck:Redaksi'])->group(function () {

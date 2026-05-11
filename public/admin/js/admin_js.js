@@ -7,15 +7,16 @@ $(document).ready(function () {
     // 2. Auto-Active Sidebar Menu
     const currentPath = window.location.pathname;
     $(".s-item").removeClass("active");
-    
+
     $(".s-item").each(function () {
         const link = $(this).attr("href");
         if (link === "/") {
             if (currentPath === "/") $(this).addClass("active");
         } else if (link && currentPath.includes(link)) {
             $(this).addClass("active");
+        } else if (currentPath === '/editor' && link === '/berita-saya') {
+            $(this).addClass("active");
         }
-        // HAPUS pemanggilan badge dari dalam loop ini!
     });
 
     // 3. Panggil update badge SEKALI SAJA dan HANYA JIKA elemennya ada di halaman
@@ -28,6 +29,10 @@ $(document).ready(function () {
 
     if ($('#pendingCount').length > 0) {
         updateGlobalRedaksiBadge();
+    }
+
+    if ($('#badgeEditorDitolak').length > 0) {
+        updateGlobalEditorBadge();
     }
 });
 
@@ -43,6 +48,30 @@ $(document).on('click', '.toggle-password', function() {
     }
 });
 
+function updateGlobalEditorBadge() {
+    $.ajax({
+        url: '/api/editor/manajemen_berita/ambilData',
+        type: 'GET',
+        success: function(res) {
+            // Karena ambilData ngembaliin array, bukan {status, data}
+            if (Array.isArray(res)) {
+                // Hitung yang statusnya Rejected
+                const rejectedCount = res.filter(b => b.status_berita === 'Rejected').length;
+                const badge = $('#badgeEditorDitolak');
+
+                if (rejectedCount > 0) {
+                    badge.text(rejectedCount).show();
+                } else {
+                    badge.hide();
+                }
+            }
+        },
+        error: function(err) {
+            console.error("Gagal load badge editor ditolak", err);
+        }
+    });
+}
+
 function updateGlobalRedaksiBadge() {
     $.ajax({
         url: '/api/redaksi/getNotifikasi', // Nembak ke API notifikasi karena isinya berita Pending
@@ -51,7 +80,7 @@ function updateGlobalRedaksiBadge() {
             if (res.status === 'success') {
                 const count = res.data.length;
                 const badge = $('#pendingCount');
-                
+
                 if (count > 0) {
                     badge.text(count).show(); // Tampilkan angka kalau > 0
                 } else {
