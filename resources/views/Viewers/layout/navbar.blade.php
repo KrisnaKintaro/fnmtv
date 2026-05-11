@@ -1,3 +1,7 @@
+<!-- TOAST VIew -->
+<div class="toast" id="toast"></div>
+
+<!-- TOP STRIP -->
 <div class="topstrip">
     <div class="ts-inner">
         <div class="ts-links">
@@ -89,3 +93,4 @@
         }
     });
 </script>
+
