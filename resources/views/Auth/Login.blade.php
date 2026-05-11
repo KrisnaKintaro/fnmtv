@@ -273,7 +273,7 @@
 
                 // Tembak API
                 $.ajax({
-                    url: '/api/auth/login', // 🔴 FIX: Sesuaikan dengan route API lu
+                    url: '/api/auth/login',
                     type: 'POST',
                     data: payload,
                     success: function(res) {

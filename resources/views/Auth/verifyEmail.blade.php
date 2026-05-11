@@ -158,9 +158,7 @@
                 <button type="submit" class="login-btn" id="btnResend">Kirim Ulang Link Verifikasi</button>
             </form>
 
-            <a href="/logout" style="text-decoration: none;">
-                <button class="login-btn btn-outline" onclick="doLogout(event)">Kembali Ke Beranda</button>
-            </a>
+            <button class="login-btn btn-outline" id="btnKembali">Kembali Ke Beranda</button>
         </div>
     </div>
 
@@ -180,37 +178,31 @@
                 }
             });
 
-            // Kita pake sessionStorage biar auto-klik ini cuma jalan 1x selama tab browsernya belum ditutup
+            // Auto kirim verifikasi 1x per sesi
             if (!sessionStorage.getItem('auto_verify_sent')) {
                 sessionStorage.setItem('auto_verify_sent', 'true');
-
-                // Kasih jeda setengah detik biar animasinya mulus, terus paksa tombolnya kepencet
                 setTimeout(() => {
                     $('#formResend').trigger('submit');
                 }, 500);
             }
 
+            // Polling cek status verifikasi tiap 3 detik
             let cekStatus = setInterval(function() {
                 $.get('/api/auth/checkVerify', function(res) {
                     if (res.verified) {
-                        clearInterval(cekStatus); // Stop nanya
-                        Toast.show('success', 'Verifikasi berhasil dari perangkat lain! Mengalihkan...');
-
-                        // Ganti teks di layar biar keliatan interaktif
+                        clearInterval(cekStatus);
+                        Toast.show('success', 'Verifikasi berhasil! Mengalihkan...');
                         $('.login-logo').text('Verifikasi Sukses! 🎉');
                         $('.login-sub').html('Akun anda udah aktif. <br>Bentar ya, lagi diarahkan ke beranda...');
-                        $('#btnResend').hide(); // Ilangin tombol resend
-
-                        setTimeout(() => {
-                            window.location.href = '/'; // Lempar ke beranda
-                        }, 2000);
+                        $('#btnResend').hide();
+                        setTimeout(() => { window.location.href = '/'; }, 2000);
                     }
                 });
             }, 3000);
 
+            // Kirim ulang verifikasi
             $('#formResend').on('submit', function(e) {
                 e.preventDefault();
-
                 const btn = $('#btnResend');
                 const originalText = btn.text();
                 btn.text('Mengirim...').prop('disabled', true);
@@ -218,9 +210,8 @@
                 $.ajax({
                     url: '/api/auth/email/verification-notification',
                     type: 'POST',
-                    success: function(res) {
+                    success: function() {
                         Toast.show('success', 'Link verifikasi baru udah dikirim. Cek email anda ya!');
-                        // Kasih cooldown 60 detik biar ga dispam
                         let timeLeft = 60;
                         const countdown = setInterval(function() {
                             if (timeLeft <= 0) {
@@ -232,38 +223,33 @@
                             }
                         }, 1000);
                     },
-                    error: function(err) {
+                    error: function() {
                         Toast.show('error', 'Gagal ngirim email, coba lagi nanti!');
                         btn.text(originalText).prop('disabled', false);
                     }
                 });
             });
 
-            function doLogout(e) {
-                e.preventDefault();
-                const btn = $(e.target);
+            // Tombol kembali ke beranda = logout dulu
+            $('#btnKembali').on('click', function() {
+                const btn = $(this);
                 btn.text('Keluar...').prop('disabled', true);
 
                 $.ajax({
                     url: '/api/auth/logout',
                     type: 'POST',
-                    success: function(res) {
+                    success: function() {
+                        localStorage.removeItem('auth_token');
+                        window.location.href = '/';
+                    },
+                    error: function() {
                         localStorage.removeItem('auth_token');
                         window.location.href = '/';
                     }
                 });
-            }
-            $(document).on('click', '.toggle-password', function() {
-                $(this).toggleClass('fa-eye fa-eye-slash');
-                // Cari inputan yang sejajar sama ikon ini
-                let input = $(this).siblings('input');
-                if (input.attr('type') === 'password') {
-                    input.attr('type', 'text');
-                } else {
-                    input.attr('type', 'password');
-                }
             });
-        });
+
+        }); // ← TUTUP document.ready — CUMA SATU
     </script>
 
 </body>

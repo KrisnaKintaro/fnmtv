@@ -1,3 +1,4 @@
+<!-- FOOTER VIEWERS -->
 <div class="footer">
     <div class="footer-inner">
         <div>
