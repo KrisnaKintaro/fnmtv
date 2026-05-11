@@ -170,38 +170,40 @@
         function loadKategori() {
             // PERBAIKAN: Menggunakan API Viewer yang tidak butuh Role Admin
             $.ajax({
-                url: '/api/admin/manajemen_kategori/ambilData',
+                url: '/api/viewers/kategori', // ← GANTI INI
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    if (response.status === 'success') {
-                        let optionsForm = '<option value="">-- Pilih Kategori --</option>';
-                        let optionsFilter = '<option value="all">Semua Kategori</option>';
-
-                        $.each(response.data, function(key, val) {
-                            optionsForm += `<option value="${val.id}">${val.nama_kategori}</option>`;
-                            optionsFilter += `<option value="${val.nama_kategori}">${val.nama_kategori}</option>`;
-                        });
-
-                        // Update Filter Kategori (Aman dari blank)
-                        const filterEl = $('#filterKategori');
-                        let currentFilter = filterEl.val(); // Simpan pilihan lama
-                        filterEl.html(optionsFilter);
-                        // Paksa pilih 'all' kalau sebelumnya kosong/blank gara-gara glitch browser
-                        filterEl.val(currentFilter ? currentFilter : 'all');
-
-                        // Update Form Kategori
-                        const formEl = $('select[name="kategori_id"]');
-                        let currentForm = formEl.val();
-                        formEl.html(optionsForm);
-                        formEl.val(currentForm);
-
-                        // KUNCI: Senggol tabel buat refresh setelah kategori siap!
-                        jalankanFilter();
+                    // Sesuaikan karena struktur response viewers berbeda
+                    let data = [];
+                    if (response.status === 'success' && Array.isArray(response.data)) {
+                        data = response.data;
+                    } else if (Array.isArray(response)) {
+                        data = response;
                     }
+
+                    let optionsForm = '<option value="">-- Pilih Kategori --</option>';
+                    let optionsFilter = '<option value="all">Semua Kategori</option>';
+
+                    data.forEach(function(val) {
+                        optionsForm += `<option value="${val.id}">${val.nama_kategori}</option>`;
+                        optionsFilter += `<option value="${val.nama_kategori}">${val.nama_kategori}</option>`;
+                    });
+
+                    const filterEl = $('#filterKategori');
+                    let currentFilter = filterEl.val();
+                    filterEl.html(optionsFilter);
+                    filterEl.val(currentFilter ? currentFilter : 'all');
+
+                    const formEl = $('select[name="kategori_id"]');
+                    let currentForm = formEl.val();
+                    formEl.html(optionsForm);
+                    formEl.val(currentForm);
+
+                    jalankanFilter();
                 },
                 error: function(xhr) {
-                    console.error("Gagal memuat kategori cuy!");
+                    console.error("Gagal memuat kategori:", xhr.status, xhr.responseText);
                 }
             });
         }
