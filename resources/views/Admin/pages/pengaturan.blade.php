@@ -1,5 +1,6 @@
 @extends('Admin.master_admin')
 @section('css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 @endsection
 @section('konten')
   <!-- ══ PAGE: SETTINGS ══ -->
@@ -44,30 +45,54 @@
       </script>
       @endif
 
+      {{-- Password Lama --}}
       <div class="field">
         <label>Password Lama</label>
-        <input type="password" name="password_lama" required>
-        @error('password_lama')
-          <span style="color: red; font-size: 12px;">{{ $message }}</span>
-        @enderror
+        <div style="position: relative;">
+            <i class="fas fa-lock" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none;"></i>
+            <input type="password" name="password_lama" required
+                style="width:100%; padding:10px 40px 10px 40px; border:1.5px solid var(--border); border-radius:6px; outline:none; font-size:13px;">
+            <i class="fas fa-eye toggle-password" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--muted); z-index:9999; pointer-events:auto;"></i>
+        </div>
       </div>
+
+      {{-- Password Baru --}}
       <div class="field">
         <label>Password Baru</label>
-        <input type="password" name="password_baru" required>
-        @error('password_baru')
-          <span style="color: red; font-size: 12px;">{{ $message }}</span>
-        @enderror
+        <div style="position: relative;">
+            <i class="fas fa-key" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none;"></i>
+            <input type="password" name="password_baru" required
+                style="width:100%; padding:10px 40px 10px 40px; border:1.5px solid var(--border); border-radius:6px; outline:none; font-size:13px;">
+            <i class="fas fa-eye toggle-password" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--muted); z-index:9999; pointer-events:auto;"></i>
+        </div>
       </div>
+
+      {{-- Konfirmasi Password Baru --}}
       <div class="field">
         <label>Konfirmasi Password Baru</label>
-        <input type="password" name="password_baru_confirmation" required>
-        @error('password_baru_confirmation')
-          <span style="color: red; font-size: 12px;">{{ $message }}</span>
-        @enderror
+        <div style="position: relative;">
+            <i class="fas fa-check-circle" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none;"></i>
+            <input type="password" name="password_baru_confirmation" required
+                style="width:100%; padding:10px 40px 10px 40px; border:1.5px solid var(--border); border-radius:6px; outline:none; font-size:13px;">
+            <i class="fas fa-eye toggle-password" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--muted); z-index:9999; pointer-events:auto;"></i>
+        </div>
       </div>
-      <button class="btn btn-red" type="submit">Update Password</button>
+
+      <button class="btn btn-red" type="submit">Update Password</button>  {{-- ← JANGAN LUPA INI --}}
     </div>
   </form>
 @endsection
+
 @section('js')
+<script>
+    $(document).on('click', '.toggle-password', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        $(this).toggleClass('fa-eye fa-eye-slash');
+        
+        const input = $(this).closest('div').find('input');
+        input.attr('type', input.attr('type') === 'password' ? 'text' : 'password');
+    });
+</script>
 @endsection

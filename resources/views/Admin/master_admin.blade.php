@@ -10,6 +10,11 @@
         href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('admin/css/admin_css.css') }}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('admin/css/admin_css.css') }}">
+    <link rel="stylesheet" href="{{ asset('admin/css/all.min.css') }}">
+    
     <style>
         /* PAKSA SEMUA ELEMEN PAKAI SOURCE SANS 3 */
         *,
@@ -26,6 +31,9 @@
         textarea,
         button {
             font-family: 'Source Sans 3', sans-serif !important;
+            .fas, .far, .fab, .fa {
+            font-family: "Font Awesome 6 Free" !important;
+            }
         }
 
         /* KHUSUS JUDUL PAKAI MERRIWEATHER */
@@ -45,6 +53,15 @@
         #inputSlugKategori,
         [style*="JetBrains Mono"] {
             font-family: 'JetBrains Mono', monospace !important;
+        }
+    </style>
+
+    <style>
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-textfield-decoration-container,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
         }
     </style>
     @yield('css')
