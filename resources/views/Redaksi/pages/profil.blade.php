@@ -45,7 +45,7 @@
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
                             <input type="password" id="profCurrentPass" placeholder="Masukkan password lama" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
-                            <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                            <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 10;"></i>
                         </div>
                     </div>
 
@@ -55,7 +55,7 @@
                             <div style="position: relative;">
                                 <i class="fas fa-key" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
                                 <input type="password" id="profPassword" placeholder="Minimal 8 karakter" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
-                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 10;"></i>
                             </div>
                         </div>
                         <div class="field" style="margin-bottom: 0;">
@@ -63,7 +63,7 @@
                             <div style="position: relative;">
                                 <i class="fas fa-check-circle" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
                                 <input type="password" id="profPasswordConfirm" placeholder="Ulangi password baru" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
-                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 10;"></i>
                             </div>
                         </div>
                     </div>
@@ -92,20 +92,6 @@
             $(this).css('border-color', 'var(--red)');
         }).on('blur', function() {
             $(this).css('border-color', 'var(--border)');
-        });
-
-        // FUNGSI TOGGLE MATA PASSWORD (Ditambahkan pointer-events biar bisa diklik)
-        $(document).on('click', '.toggle-password', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $(this).toggleClass('fa-eye fa-eye-slash');
-            let input = $(this).siblings('input');
-            if (input.attr('type') === 'password') {
-                input.attr('type', 'text');
-            } else {
-                input.attr('type', 'password');
-            }
         });
 
         // HANDLE SUBMIT FORM
@@ -140,7 +126,7 @@
                 _method: 'PUT',
                 username: $('#profUsername').val(),
                 email: $('#profEmail').val(),
-                current_password: currentPassword, // Ditambahkan ke payload
+                current_password: currentPassword,
                 password: password,
                 password_confirmation: confirmPassword
             };
@@ -156,7 +142,7 @@
                     // Kosongkan semua input password setelah berhasil
                     $('#profCurrentPass, #profPassword, #profPasswordConfirm').val('');
 
-                    // Update tampilan data diri di Sidebar Redaksi (Asumsi class s-uname dan s-avatar)
+                    // Update tampilan data diri di Sidebar
                     $('.s-uname').text(payload.username);
                     $('.s-avatar').text(payload.username.charAt(0).toUpperCase());
                 },
