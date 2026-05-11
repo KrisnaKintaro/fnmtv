@@ -120,8 +120,8 @@
         // ✅ SATU showPage terpusat, pakai class bukan inline style
         const pageTitles = {
             'write-news': ['Tulis Berita Baru', 'Editor / Tulis Berita Baru'],
-            'my-news': ['Berita Saya', 'Editor / Berita Saya'],
-            'profile': ['Edit Profil', 'Editor / Edit Profil'],
+            'my-news':    ['Berita Saya',        'Editor / Berita Saya'],
+            'profile':    ['Edit Profil',         'Editor / Edit Profil'],
         };
 
         function showPage(id, el) {
