@@ -50,7 +50,7 @@ class ViewerController extends Controller
             'kategori',
             'user',
             'komentar' => function($query) {
-                $query->where('status_moderasi', 'Approved')->latest();
+                $query->with('user')->where('status_moderasi', 'Approved')->latest();
             }
         ])
         ->where('slug', $slug)
