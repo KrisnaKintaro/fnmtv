@@ -59,6 +59,10 @@ Route::middleware(['auth', 'RoleCheck:Viewer'])->group(function () {
     Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
 });
 
+Route::get('/iklan', function () {
+    return view('Admin.pages.manajemen_iklan');
+});
+
 #================= ADMIN ===================
 Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
     Route::get('/kategori', function () {
