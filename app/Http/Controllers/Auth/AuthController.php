@@ -13,6 +13,34 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    public function gantiPassword(Request $request)
+    {
+        $request->validate([
+            'password_lama'       => 'required',
+            'password_baru'       => 'required|min:6',
+            'password_konfirmasi' => 'required|same:password_baru',
+        ], [
+            'password_konfirmasi.same' => 'Konfirmasi password tidak cocok!'
+        ]);
+
+        $user = Auth::user();
+
+        // Cek password lama
+        if (!Hash::check($request->password_lama, $user->password)) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Password saat ini salah!'
+            ], 422);
+        }
+
+        $user->password = Hash::make($request->password_baru);
+        $user->save();
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Password berhasil diganti!'
+        ]);
+    }
     public function register(Request $request)
     {
         $request->validate([

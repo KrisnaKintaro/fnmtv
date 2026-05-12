@@ -1237,6 +1237,36 @@ a {
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
+}
+
+/* ── MODAL BACKDROP ── */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop[style*="display:none"] {
+    display: none !important;
+}
+
+.modal-backdrop.open {
+    display: flex;
+}
+
+.modal {
+    background: var(--white);
+    border-radius: 12px;
+    max-width: 420px;
+    width: 95%;
+    box-shadow: 0 16px 60px rgba(0, 0, 0, 0.22);
+    padding: 28px;
+    text-align: center;
+}
     transition: 0.15s;
     background: var(--bg);
 }
