@@ -18,6 +18,10 @@ use App\Http\Controllers\Viewer\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/auth/ganti-password', [AuthController::class, 'gantiPassword']);
+});
+
 // Pinjem middleware 'web' biar bisa nulis Session buat Blade
 Route::prefix('auth')->middleware('web')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
