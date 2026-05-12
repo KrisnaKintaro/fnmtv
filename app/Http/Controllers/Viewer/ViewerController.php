@@ -162,4 +162,21 @@ class ViewerController extends Controller
             'data' => $berita
         ]);
     }
+
+    public function getIklanAktif()
+    {
+        $iklan = Iklan::where('status', 'aktif')
+            ->where(function($q){
+                $q->whereNull('tanggal_mulai')
+                ->orWhere('tanggal_mulai', '<=', now());
+            })
+            ->where(function($q){
+                $q->whereNull('tanggal_selesai')
+                ->orWhere('tanggal_selesai', '>=', now());
+            })
+            ->latest()
+            ->get();
+
+        return response()->json($iklan);
+    }
 }

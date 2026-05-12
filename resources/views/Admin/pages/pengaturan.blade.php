@@ -24,62 +24,138 @@
     </div>
   </form>
 
-  <form method="POST" action="{{ url('/pengaturan/password') }}">
-    @csrf
-    <div class="form-card">
-      <div class="form-title">Ganti Password Admin</div>
 
-      @if(session('success'))
-      <script>
-          document.addEventListener('DOMContentLoaded', function() {
-              Toast.show('success', @json(session('success')));
-          });
-      </script>
-      @endif
+  <form method="POST" action="{{ url('/pengaturan/profil') }}">
+      @csrf
+      
+      <div class="card profile-card">
 
-      @if($errors->any())
-      <script>
-          document.addEventListener('DOMContentLoaded', function() {
-              Toast.show('error', @json($errors->first()));
-          });
-      </script>
-      @endif
+          <div class="card-hd">
+              <div class="card-ht">Profil Admin</div>
+              <div class="card-hm">
+                  Kelola identitas dan keamanan akun Anda
+              </div>
+          </div>
 
-      {{-- Password Lama --}}
-      <div class="field">
-        <label>Password Lama</label>
-        <div style="position: relative;">
-            <i class="fas fa-lock" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none;"></i>
-            <input type="password" name="password_lama" required
-                style="width:100%; padding:10px 40px 10px 40px; border:1.5px solid var(--border); border-radius:6px; outline:none; font-size:13px;">
-            <i class="fas fa-eye toggle-password" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--muted); z-index:9999; pointer-events:auto;"></i>
-        </div>
+          <div class="profile-body">
+
+              {{-- INFORMASI DASAR --}}
+              <div class="profile-section">
+
+                  <div class="profile-section-title">
+                      <h3>Informasi Dasar</h3>
+                  </div>
+
+                  <div class="profile-grid">
+
+                      {{-- Username --}}
+                      <div class="field">
+                          <label>Username</label>
+
+                          <div class="profile-input-wrap">
+                              <i class="fas fa-user"></i>
+
+                              <input
+                                  type="text"
+                                  name="username"
+                                  value="{{ Auth::user()->username }}"
+                                  class="profile-input"
+                              >
+                          </div>
+                      </div>
+
+                      {{-- Email --}}
+                      <div class="field">
+                          <label>Email</label>
+
+                          <div class="profile-input-wrap">
+                              <i class="fas fa-envelope"></i>
+
+                              <input
+                                  type="email"
+                                  name="email"
+                                  value="{{ Auth::user()->email }}"
+                                  class="profile-input"
+                              >
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+
+              {{-- PASSWORD --}}
+              <div class="profile-section">
+
+                  <div class="profile-section-title">
+                      <h3>Keamanan & Password</h3>
+                      <span>Kosongkan jika tidak diubah</span>
+                  </div>
+
+                  {{-- Password Lama --}}
+                  <div class="field">
+                      <label>Password Lama</label>
+
+                      <div class="profile-input-wrap">
+                          <i class="fas fa-lock"></i>
+
+                          <input
+                              type="password"
+                              name="password_lama"
+                              placeholder="Masukkan password lama"
+                              class="profile-input"
+                          >
+
+                          <i class="fas fa-eye toggle-password"></i>
+                      </div>
+                  </div>
+
+                  <div class="profile-grid">
+
+                      {{-- Password Baru --}}
+                      <div class="field">
+                          <label>Password Baru</label>
+
+                          <div class="profile-input-wrap">
+                              <i class="fas fa-key"></i>
+
+                              <input
+                                  type="password"
+                                  name="password_baru"
+                                  placeholder="Minimal 8 karakter"
+                                  class="profile-input"
+                              >
+
+                              <i class="fas fa-eye toggle-password"></i>
+                          </div>
+                      </div>
+
+                      {{-- Konfirmasi --}}
+                      <div class="field">
+                          <label>Konfirmasi Password Baru</label>
+
+                          <div class="profile-input-wrap">
+                              <i class="fas fa-check-circle"></i>
+
+                              <input
+                                  type="password"
+                                  name="password_baru_confirmation"
+                                  placeholder="Ulangi password baru"
+                                  class="profile-input"
+                              >
+
+                              <i class="fas fa-eye toggle-password"></i>
+                          </div>
+                      </div>
+
+                  </div>
+              </div>
+
+              <button class="btn btn-red" type="submit">
+                  Simpan Perubahan
+              </button>
+
+          </div>
       </div>
-
-      {{-- Password Baru --}}
-      <div class="field">
-        <label>Password Baru</label>
-        <div style="position: relative;">
-            <i class="fas fa-key" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none;"></i>
-            <input type="password" name="password_baru" required
-                style="width:100%; padding:10px 40px 10px 40px; border:1.5px solid var(--border); border-radius:6px; outline:none; font-size:13px;">
-            <i class="fas fa-eye toggle-password" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--muted); z-index:9999; pointer-events:auto;"></i>
-        </div>
-      </div>
-
-      {{-- Konfirmasi Password Baru --}}
-      <div class="field">
-        <label>Konfirmasi Password Baru</label>
-        <div style="position: relative;">
-            <i class="fas fa-check-circle" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none;"></i>
-            <input type="password" name="password_baru_confirmation" required
-                style="width:100%; padding:10px 40px 10px 40px; border:1.5px solid var(--border); border-radius:6px; outline:none; font-size:13px;">
-            <i class="fas fa-eye toggle-password" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--muted); z-index:9999; pointer-events:auto;"></i>
-        </div>
-      </div>
-
-      <button class="btn btn-red" type="submit">Update Password</button>  {{-- ← JANGAN LUPA INI --}}
-    </div>
   </form>
 @endsection
 

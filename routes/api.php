@@ -71,6 +71,14 @@ Route::middleware(['web', 'auth', 'RoleCheck:Admin'])->group(function () {
     Route::prefix('admin/analitik_berita')->group(function () {
         Route::get('/ambilData', [AnalitikBeritaController::class, 'getAnaliticsData']);
     });
+
+    Route::prefix('admin/manajemen_iklan')->group(function () {
+        Route::get('/ambilData', [IklanController::class, 'getDaftarIklan']);
+        Route::post('/tambahData', [IklanController::class, 'tambahIklan']);
+        Route::put('/ubahData/{id_iklan}', [IklanController::class, 'ubahIklan']);
+        Route::delete('/hapusData/{id_iklan}', [IklanController::class, 'hapusIklan']);
+        Route::patch('/ubahStatus/{id_iklan}', [IklanController::class, 'ubahStatusIklan']);
+    });
 });
 
 // API untuk Viewers (Frontend)
@@ -83,6 +91,7 @@ Route::prefix('viewers')->group(function () {
     Route::get('/berita-populer', [ViewerController::class, 'getBeritaPopuler']);
     Route::get('/search', [ViewerController::class, 'searchBerita']);
     Route::get('/site-info', [SettingController::class, 'getSiteInfo']);
+    Route::get('/iklan', [IklanController::class, 'getIklanAktif']);
 });
 
 // API Viewers yang WAJIB BAWA TOKEN (Wajib login)

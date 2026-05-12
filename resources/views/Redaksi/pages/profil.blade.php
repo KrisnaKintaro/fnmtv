@@ -4,7 +4,7 @@
 <div id="page-profil" class="page active">
     <div class="section-title">Pengaturan Akun</div>
 
-    <div class="card" style="max-width: 800px; margin-top: 16px;">
+    <div class="card profile-card">
         <div class="card-hd">
             <div class="card-ht">Profil Redaksi</div>
             <div class="card-hm">Kelola identitas dan keamanan akun Anda</div>
