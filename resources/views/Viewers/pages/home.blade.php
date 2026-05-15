@@ -51,7 +51,7 @@
 
             <div class="news-grid-2" id="terkiniGrid"></div>
 
-            <div style="margin: 30px 0;">
+            <div style="margin: 30px 0;" id="space-iklan-tengah">
                 @include('Viewers.layout.ad_banner', [
                     'type' => 'horizontal',
                     'text' => 'SPACE IKLAN 728x90'
@@ -83,7 +83,37 @@
 <script>
     $(document).ready(function() {
         loadHomeData();
+        loadIklan();
     });
+
+    // --- FUNGSI BARU UNTUK LOAD IKLAN ---
+    function loadIklan() {
+        $.get('/api/viewers/iklan', function(res) {
+            // 1. Cari iklan untuk posisi Tengah
+            const iklanTengah = res.find(i => i.posisi === 'horizontal_728x90');
+            if (iklanTengah) {
+                $('#space-iklan-tengah').html(`
+                    <a href="${iklanTengah.link_tujuan || '#'}" target="_blank">
+                        <img src="/storage/${iklanTengah.gambar}" 
+                             alt="${iklanTengah.judul}" 
+                             style="width: 100%; max-width: 728px; height: auto; display: block; margin: 0 auto; border-radius: 8px;">
+                    </a>
+                `);
+            }
+
+            // 2. Cari iklan untuk posisi Sidebar
+            const iklanSidebar = res.find(i => i.posisi === 'sidebar_300x250');
+            if (iklanSidebar) {
+                $('#space-iklan-sidebar').html(`
+                    <a href="${iklanSidebar.link_tujuan || '#'}" target="_blank">
+                        <img src="/storage/${iklanSidebar.gambar}" 
+                             alt="${iklanSidebar.judul}" 
+                             style="width: 100%; max-width: 300px; height: auto; border-radius: 8px;">
+                    </a>
+                `);
+            }
+        });
+    }
 
     function loadHomeData() {
         $.ajax({

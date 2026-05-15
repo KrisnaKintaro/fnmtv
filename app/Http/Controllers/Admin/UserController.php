@@ -82,7 +82,8 @@ class UserController extends Controller
 
     public function hapusPengguna($id_user)
     {
-        $pengguna = User::find($id_user);
+        // Pake withTrashed() jaga-jaga kalau sebelumnya udah pernah di soft-delete
+        $pengguna = User::withTrashed()->find($id_user);
 
         if (!$pengguna) {
             return response()->json(['status' => 'error', 'message' => 'User gagal dihapus!'], 404);
@@ -95,11 +96,28 @@ class UserController extends Controller
             ], 403);
         }
 
-        $pengguna->delete();
+        // --- PROTEKSI PURGE: HANYA UNTUK VIEWER ---
+        if ($pengguna->role !== 'Viewer') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Akun Admin, Redaksi, atau Editor tidak boleh dihapus permanen! Gunakan fitur Nonaktifkan saja.'
+            ], 403);
+        }
+
+        // Hapus permanen data relasi (Komentar & Reaksi) biar nggak nyampah
+        if (method_exists($pengguna, 'komentar')) {
+            $pengguna->komentar()->forceDelete(); // forceDelete karena model Komentar lu pake SoftDeletes
+        }
+        if (method_exists($pengguna, 'reaksi')) {
+            $pengguna->reaksi()->delete();
+        }
+
+        // Hapus permanen usernya
+        $pengguna->forceDelete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Akun berhasil dihapus permanen!'
+            'message' => 'Akun Viewer dan seluruh datanya berhasil dimusnahkan!'
         ]);
     }
 

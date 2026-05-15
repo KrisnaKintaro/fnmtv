@@ -7,7 +7,7 @@
 <div id="page-profile" class="page active">
     <div class="section-title">Pengaturan Akun</div>
 
-    <div class="card" style="max-width: 800px; margin-top: 16px;">
+    <div class="card profile-card">
         <div class="card-hd">
             <div class="card-ht">Profil Editor</div>
             <div class="card-hm">Kelola identitas dan keamanan akun Anda</div>
@@ -48,7 +48,7 @@
                         <div style="position: relative;">
                             <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
                             <input type="password" id="profCurrentPass" placeholder="Masukkan password lama" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
-                            <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                            <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 10;"></i>
                         </div>
                     </div>
 
@@ -58,7 +58,7 @@
                             <div style="position: relative;">
                                 <i class="fas fa-key" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
                                 <input type="password" id="profPassword" placeholder="Minimal 8 karakter" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
-                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 10;"></i>
                             </div>
                         </div>
                         <div class="field" style="margin-bottom: 0;">
@@ -66,7 +66,7 @@
                             <div style="position: relative;">
                                 <i class="fas fa-check-circle" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted);"></i>
                                 <input type="password" id="profPasswordConfirm" placeholder="Ulangi password baru" style="width: 100%; padding: 10px 40px 10px 40px; border: 1.5px solid var(--border); border-radius: 6px; outline: none; font-size: 13px; transition: 0.2s;">
-                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 999;"></i>
+                                <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted); pointer-events: auto !important; z-index: 10;"></i>
                             </div>
                         </div>
                     </div>

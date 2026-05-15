@@ -14,16 +14,34 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // Kalau belum login, lempar ke halaman login
+        // 1. Kalau belum login
         if (!Auth::check()) {
+            // Cek apakah request dari fetch/ajax/api
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda harus login terlebih dahulu!'
+                ], 401); // 401 Unauthorized
+            }
+
+            // Kalau dari browser biasa, lempar ke halaman login
             return redirect()->route('login');
         }
 
-        // Kalau rolenya nggak sesuai dengan yang diminta, tendang balik
+        // 2. Kalau rolenya nggak sesuai dengan yang diminta
         if (!in_array(Auth::user()->role, $roles)) {
-            abort(403, 'HEy, lu nggak punya akses ke sini!');
+            // Cek apakah request dari fetch/ajax/api
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Akses ditolak! Role anda tidak cocok buat aksi ini.'
+                ], 403); // 403 Forbidden
+            }
+
+            // Kalau dari browser biasa, tampilin halaman error 403
+            abort(403, 'Hey, anda tidak punya akses ke sini!');
         }
 
         return $next($request);

@@ -76,7 +76,7 @@ class BeritaController extends Controller
                 'foto_thumbnail' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             ]);
 
-            $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id() ?? 1)->firstOrFail();
+            $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id())->firstOrFail();
 
             if (!in_array($berita->status_berita, ['Draft', 'Rejected'])) {
                 return response()->json(['message' => 'Berita tidak bisa diubah'], 403);
@@ -119,13 +119,13 @@ class BeritaController extends Controller
     {
         try {
             // Cari berita milik user yang login (atau ID 1 buat testing)
-            $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id() ?? 1)->firstOrFail();
+            $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id())->firstOrFail();
 
             // 1. Hapus file fisik foto thumbnail jika ada
-            $pathFoto = public_path('uploads/thumbnail/' . $berita->foto_thumbnail);
-            if (File::exists($pathFoto)) {
-                File::delete($pathFoto);
-            }
+            // $pathFoto = public_path('uploads/thumbnail/' . $berita->foto_thumbnail);
+            // if (File::exists($pathFoto)) {
+            //     File::delete($pathFoto);
+            // }
 
             // 2. Hapus data dari database (ini akan trigger SoftDeletes karena lu pake di Model)
             $berita->delete();
@@ -144,7 +144,7 @@ class BeritaController extends Controller
 
     public function ambilNotifikasi()
     {
-        $userId = Auth::id() ?? 1; // Ambil ID Editor yang login
+        $userId = Auth::id(); // Ambil ID Editor yang login
 
         // 1. Ambil data REJECTED (Selama statusnya masih Rejected, tampilin terus)
         $rejectedNotif = Berita::where('user_id', $userId)

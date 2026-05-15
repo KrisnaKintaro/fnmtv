@@ -216,7 +216,7 @@
         } else {
             komentarData.forEach(k => {
                 // Sesuai revisi Krisna, ambil dari relasi user.username
-                const nama = k.user;
+                const nama = (k.user && k.user.username) ? k.user.username : 'Anonim';
                 const initial = nama.charAt(0).toUpperCase();
 
                 const namaAman = $('<div>').text(nama).html();
