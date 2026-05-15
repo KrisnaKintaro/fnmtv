@@ -15,7 +15,7 @@ class IklanController extends Controller
      */
     public function getDaftarIklan()
     {
-        $data = Iklan::with('admin')->latest()->get();
+        $data = Iklan::with('user')->latest()->get();
         return response()->json($data);
     }
 
@@ -26,7 +26,7 @@ class IklanController extends Controller
     {
         $request->validate([
             'judul' => 'required|string|max:255',
-            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'posisi' => 'required|in:horizontal_728x90,sidebar_300x250',
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
@@ -36,22 +36,13 @@ class IklanController extends Controller
         $path = $request->file('gambar')->store('iklan', 'public');
 
         $iklan = Iklan::create([
+            'dibuat_oleh' => Auth::id(),
             'judul' => $request->judul,
             'gambar' => $path,
             'posisi' => $request->posisi,
-            'status' => 'aktif',
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_selesai' => $request->tanggal_selesai,
-            'dibuat_oleh' => Auth::id(), // Mengambil ID admin yang sedang login
+            'link_tujuan' => $request->link_tujuan,
+            'is_active' => true,
         ]);
-
-        if($request->hasFile('gambar')){
-
-            $path = $request->file('gambar')
-                ->store('iklan', 'public');
-
-            $iklan->gambar = $path;
-        }
 
         return response()->json(['message' => 'Iklan berhasil ditambahkan!', 'data' => $iklan]);
     }
@@ -67,7 +58,7 @@ class IklanController extends Controller
             'judul' => 'required|string|max:255',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'posisi' => 'required|in:horizontal_728x90,sidebar_300x250',
-            'status' => 'required|in:aktif,nonaktif',
+            'link_tujuan' => 'nullable|url',
         ]);
 
         // Jika ada gambar baru yang diupload
@@ -109,7 +100,7 @@ class IklanController extends Controller
     public function ubahStatusIklan($id)
     {
         $iklan = Iklan::findOrFail($id);
-        $iklan->status = ($iklan->status == 'aktif') ? 'nonaktif' : 'aktif';
+        $iklan->is_active = !$iklan->is_active;
         $iklan->save();
 
         return response()->json(['message' => 'Status iklan berhasil diubah!']);

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnalitikBeritaController;
+use App\Http\Controllers\Admin\IklanController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\LaporanFinansialController;
 use App\Http\Controllers\Admin\moderasiKomentarController;
@@ -75,10 +76,17 @@ Route::middleware(['web', 'auth', 'RoleCheck:Admin'])->group(function () {
     Route::prefix('admin/manajemen_iklan')->group(function () {
         Route::get('/ambilData', [IklanController::class, 'getDaftarIklan']);
         Route::post('/tambahData', [IklanController::class, 'tambahIklan']);
+        konfigurasi_viewers_2
+        Route::post('/ubahData/{id}', [IklanController::class, 'ubahIklan']);
+        Route::delete('/hapusData/{id}', [IklanController::class, 'hapusIklan']);
+        Route::patch('/ubahStatus/{id}', [IklanController::class, 'ubahStatusIklan']);
+    });
+
         Route::put('/ubahData/{id_iklan}', [IklanController::class, 'ubahIklan']);
         Route::delete('/hapusData/{id_iklan}', [IklanController::class, 'hapusIklan']);
         Route::patch('/ubahStatus/{id_iklan}', [IklanController::class, 'ubahStatusIklan']);
     });
+        main
 });
 
 // API untuk Viewers (Frontend)
