@@ -13,7 +13,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('admin/css/admin_css.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/css/all.min.css') }}">
     
     <style>
         /* PAKSA SEMUA ELEMEN PAKAI SOURCE SANS 3 */
