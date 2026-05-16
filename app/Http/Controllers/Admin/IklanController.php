@@ -111,8 +111,9 @@ class IklanController extends Controller
         return response()->json(['message' => 'Status iklan berhasil diubah!']);
     }
 
-        /**
+    /**
      * Ambil iklan aktif untuk ditampilkan di frontend viewers
+     * Format dikelompokkan per posisi agar JS bisa baca langsung
      */
     public function getIklanAktif()
     {
@@ -129,6 +130,15 @@ class IklanController extends Controller
             })
             ->get();
 
-        return response()->json($data);
+        // Kelompokkan per posisi agar JS bisa langsung akses per slot
+        $grouped = $data->groupBy('posisi');
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'horizontal_728x90' => $grouped->get('horizontal_728x90', collect())->values(),
+                'sidebar_300x250'   => $grouped->get('sidebar_300x250', collect())->values(),
+            ]
+        ]);
     }
 }
