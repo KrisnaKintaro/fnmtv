@@ -28,6 +28,7 @@ class IklanController extends Controller
             'judul' => 'required|string|max:255',
             'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'posisi' => 'required|in:horizontal_728x90,sidebar_300x250',
+            'link_tujuan' => 'nullable|url',
             'tanggal_mulai' => 'nullable|date',
             'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
         ]);
@@ -41,6 +42,8 @@ class IklanController extends Controller
             'gambar' => $path,
             'posisi' => $request->posisi,
             'link_tujuan' => $request->link_tujuan,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_selesai' => $request->tanggal_selesai,
             'is_active' => true,
         ]);
 
@@ -59,6 +62,8 @@ class IklanController extends Controller
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'posisi' => 'required|in:horizontal_728x90,sidebar_300x250',
             'link_tujuan' => 'nullable|url',
+            'tanggal_mulai' => 'nullable|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
         ]);
 
         // Jika ada gambar baru yang diupload
@@ -72,7 +77,7 @@ class IklanController extends Controller
         $iklan->update([
             'judul' => $request->judul,
             'posisi' => $request->posisi,
-            'status' => $request->status,
+            'link_tujuan' => $request->link_tujuan,
             'tanggal_mulai' => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,
         ]);
@@ -104,5 +109,26 @@ class IklanController extends Controller
         $iklan->save();
 
         return response()->json(['message' => 'Status iklan berhasil diubah!']);
+    }
+
+        /**
+     * Ambil iklan aktif untuk ditampilkan di frontend viewers
+     */
+    public function getIklanAktif()
+    {
+        $now = now()->toDateString();
+
+        $data = Iklan::where('is_active', true)
+            ->where(function($query) use ($now) {
+                $query->whereNull('tanggal_mulai')
+                    ->orWhere('tanggal_mulai', '<=', $now);
+            })
+            ->where(function($query) use ($now) {
+                $query->whereNull('tanggal_selesai')
+                    ->orWhere('tanggal_selesai', '>=', $now);
+            })
+            ->get();
+
+        return response()->json($data);
     }
 }

@@ -81,6 +81,14 @@ Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
         return view('Admin.pages.manajemen_user');
     });
 
+Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
+    Route::get('/iklan', function () {
+        return view('Admin.pages.manajemen_iklan');
+    });
+
+        // route admin lainnya...
+    });
+
     Route::get('/pengaturan', [PengaturanController::class, 'index']);
     Route::post('/pengaturan', [PengaturanController::class, 'updateIdentity']);
     Route::post('/pengaturan/password', [PengaturanController::class, 'updatePassword']);

@@ -72,8 +72,6 @@ Route::middleware(['web', 'auth', 'RoleCheck:Admin'])->group(function () {
     Route::prefix('admin/analitik_berita')->group(function () {
         Route::get('/ambilData', [AnalitikBeritaController::class, 'getAnaliticsData']);
     });
-<<<<<<< Updated upstream
-=======
 
     Route::prefix('admin/manajemen_iklan')->group(function () {
         Route::get('/ambilData', [IklanController::class, 'getDaftarIklan']);
@@ -82,7 +80,6 @@ Route::middleware(['web', 'auth', 'RoleCheck:Admin'])->group(function () {
         Route::delete('/hapusData/{id}', [IklanController::class, 'hapusIklan']);
         Route::patch('/ubahStatus/{id}', [IklanController::class, 'ubahStatusIklan']);
     });
->>>>>>> Stashed changes
 });
 
 // API untuk Viewers (Frontend)
@@ -94,6 +91,7 @@ Route::prefix('viewers')->group(function () {
     Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
     Route::get('/berita-populer', [ViewerController::class, 'getBeritaPopuler']);
     Route::get('/search', [ViewerController::class, 'searchBerita']);
+    Route::get('/iklan', [ViewerController::class, 'getIklan']);
     Route::get('/site-info', [SettingController::class, 'getSiteInfo']);
 });
 
