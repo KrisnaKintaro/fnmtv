@@ -1,10 +1,11 @@
 @php
-    // Default valuenya kalau ga diisi pas dipanggil
     $tipeIklan = $type ?? 'box';
-    $teksIklan = $text ?? 'SPACE IKLAN 300x250';
+    $ad = $ad ?? null;
+    $wrapperId = $id ?? null;
 @endphp
 
-<div class="ad-banner ad-{{ $tipeIklan }}">
+{{-- Tampil by default, JS akan sembunyikan kalau tidak ada iklan --}}
+<div class="ad-banner ad-{{ $tipeIklan }}" @if($wrapperId) id="{{ $wrapperId }}" @endif>
     <div class="ad-label">Advertisement</div>
-    <div class="ad-content">{{ $teksIklan }}</div>
+    <div class="ad-content"></div>
 </div>

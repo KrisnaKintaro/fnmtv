@@ -12,6 +12,11 @@ class Iklan extends Model
 
     protected $table = 'iklans';
     protected $guarded = ['id'];
+    protected $casts = [
+        'is_active' => 'boolean',
+        'tanggal_mulai' => 'date',
+        'tanggal_selesai' => 'date',
+    ];
 
     /**
      * Relationship dengan User

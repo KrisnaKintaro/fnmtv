@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Viewer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Berita;
+use App\Models\Iklan;
 use App\Models\Kategori;
 use App\Models\Reaksi;
 use App\Models\ViewLog;
@@ -40,6 +41,28 @@ class ViewerController extends Controller
                 'headline' => $headline,
                 'terbaru'  => $terbaru,
                 'trending' => $trending
+            ]
+        ]);
+    }
+
+    public function getIklan()
+    {
+        $iklan = Iklan::where('is_active', 1)
+            ->where(function ($query) {
+                $query->whereNull('tanggal_mulai')
+                      ->orWhereDate('tanggal_mulai', '<=', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('tanggal_selesai')
+                      ->orWhereDate('tanggal_selesai', '>=', now());
+            })
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'horizontal_728x90' => $iklan->where('posisi', 'horizontal_728x90')->values(),
+                'sidebar_300x250'  => $iklan->where('posisi', 'sidebar_300x250')->values(),
             ]
         ]);
     }

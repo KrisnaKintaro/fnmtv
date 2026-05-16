@@ -81,12 +81,6 @@ Route::middleware(['web', 'auth', 'RoleCheck:Admin'])->group(function () {
         Route::delete('/hapusData/{id}', [IklanController::class, 'hapusIklan']);
         Route::patch('/ubahStatus/{id}', [IklanController::class, 'ubahStatusIklan']);
     });
-
-        Route::put('/ubahData/{id_iklan}', [IklanController::class, 'ubahIklan']);
-        Route::delete('/hapusData/{id_iklan}', [IklanController::class, 'hapusIklan']);
-        Route::patch('/ubahStatus/{id_iklan}', [IklanController::class, 'ubahStatusIklan']);
-    });
-        main
 });
 
 // API untuk Viewers (Frontend)
@@ -98,6 +92,7 @@ Route::prefix('viewers')->group(function () {
     Route::get('/berita/{slug}', [ViewerController::class, 'getBeritaDetail']);
     Route::get('/berita-populer', [ViewerController::class, 'getBeritaPopuler']);
     Route::get('/search', [ViewerController::class, 'searchBerita']);
+    Route::get('/iklan', [ViewerController::class, 'getIklan']);
     Route::get('/site-info', [SettingController::class, 'getSiteInfo']);
     Route::get('/iklan', [IklanController::class, 'getIklanAktif']);
 });
