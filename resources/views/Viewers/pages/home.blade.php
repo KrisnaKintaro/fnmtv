@@ -49,7 +49,7 @@
 
             <div class="news-grid-2" id="terkiniGrid"></div>
 
-            <div style="margin: 30px 0;">
+            <div style="margin: 30px 0;" id="space-iklan-tengah">
                 @include('Viewers.layout.ad_banner', [
                     'id' => 'homeAdSpace',
                     'type' => 'horizontal'

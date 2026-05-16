@@ -76,6 +76,7 @@ Route::middleware(['web', 'auth', 'RoleCheck:Admin'])->group(function () {
     Route::prefix('admin/manajemen_iklan')->group(function () {
         Route::get('/ambilData', [IklanController::class, 'getDaftarIklan']);
         Route::post('/tambahData', [IklanController::class, 'tambahIklan']);
+        konfigurasi_viewers_2
         Route::post('/ubahData/{id}', [IklanController::class, 'ubahIklan']);
         Route::delete('/hapusData/{id}', [IklanController::class, 'hapusIklan']);
         Route::patch('/ubahStatus/{id}', [IklanController::class, 'ubahStatusIklan']);
@@ -93,6 +94,7 @@ Route::prefix('viewers')->group(function () {
     Route::get('/search', [ViewerController::class, 'searchBerita']);
     Route::get('/iklan', [ViewerController::class, 'getIklan']);
     Route::get('/site-info', [SettingController::class, 'getSiteInfo']);
+    Route::get('/iklan', [IklanController::class, 'getIklanAktif']);
 });
 
 // API Viewers yang WAJIB BAWA TOKEN (Wajib login)

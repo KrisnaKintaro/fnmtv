@@ -15,30 +15,36 @@ class AuthController extends Controller
 {
     public function gantiPassword(Request $request)
     {
-        $request->validate([
-            'password_lama'       => 'required',
-            'password_baru'       => 'required|min:6',
-            'password_konfirmasi' => 'required|same:password_baru',
-        ], [
-            'password_konfirmasi.same' => 'Konfirmasi password tidak cocok!'
-        ]);
+        $request->validate(
+            [
+                'password_lama' => 'required',
+                'password_baru' => 'required|min:6',
+                'password_konfirmasi' => 'required|same:password_baru',
+            ],
+            [
+                'password_konfirmasi.same' => 'Konfirmasi password tidak cocok!',
+            ],
+        );
 
         $user = Auth::user();
 
         // Cek password lama
         if (!Hash::check($request->password_lama, $user->password)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Password saat ini salah!'
-            ], 422);
+            return response()->json(
+                [
+                    'status' => 'error',
+                    'message' => 'Password saat ini salah!',
+                ],
+                422,
+            );
         }
 
         $user->password = Hash::make($request->password_baru);
         $user->save();
 
         return response()->json([
-            'status'  => 'success',
-            'message' => 'Password berhasil diganti!'
+            'status' => 'success',
+            'message' => 'Password berhasil diganti!',
         ]);
     }
     public function register(Request $request)
@@ -76,164 +82,172 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user && Hash::check($request->password, $user->password)) {
-            // Lapor ke Satpam Blade biar @auth lu jalan!
-                Auth::login($user);
-                $request->session()->regenerate();
+            if ($user->status === 'Nonaktif') {
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Akun lu dinonaktifkan/di-banned oleh Admin. Hubungi tim support jika ini kesalahan.',
+                    ],
+                    403,
+                );
+            }
+            Auth::login($user);
+            $request->session()->regenerate();
 
-                // Pengecekan Verifikasi buat role hanya digunakan untuk role viewers aja.
-                if (!$user->hasVerifiedEmail() && !in_array($user->role, ['Admin', 'Editor', 'Redaksi'])) {
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'Login sukses! Mengarahkan ke verifikasi...',
-                        'redirect' => '/email/verify',
-                    ]);
-                }
-
-                // Lapor ke Satpam API (Bikin Token)
-                $user->tokens()->delete();
-                $token = $user->createToken('FNM-Token')->plainTextToken;
-
-                $redirectUrl = '/'; // Default Viewer
-                if ($user->role === 'Admin') {
-                    $redirectUrl = '/analitik_statistik_berita';
-                } elseif ($user->role === 'Editor') {
-                    $redirectUrl = '/editor';
-                } elseif ($user->role === 'Redaksi') {
-                    $redirectUrl = '/redaksi-manajemen-berita';
-                }
-
+            // Pengecekan Verifikasi buat role hanya digunakan untuk role viewers aja.
+            if (!$user->hasVerifiedEmail() && !in_array($user->role, ['Admin', 'Editor', 'Redaksi'])) {
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Login Sukses',
-                    'token' => $token,
-                    'redirect' => $redirectUrl,
+                    'message' => 'Login sukses! Mengarahkan ke verifikasi...',
+                    'redirect' => '/email/verify',
                 ]);
             }
 
-            return response()->json(['status' => 'error', 'message' => 'Email atau password salah nih.'], 401);
-        }
+            // Lapor ke Satpam API (Bikin Token)
+            $user->tokens()->delete();
+            $token = $user->createToken('FNM-Token')->plainTextToken;
 
-        public function logout(Request $request)
-        {
-            // 1. Cabut Token API-nya
-            if (Auth::check()) {
-                /** @var \App\Models\User $user */ // Kasih bisikan ini ke VS Code
-                $user = Auth::user();
-                $user->tokens()->delete(); // Hapus semua token aja biar aman
+            $redirectUrl = '/'; // Default Viewer
+            if ($user->role === 'Admin') {
+                $redirectUrl = '/analitik_statistik_berita';
+            } elseif ($user->role === 'Editor') {
+                $redirectUrl = '/editor';
+            } elseif ($user->role === 'Redaksi') {
+                $redirectUrl = '/redaksi-manajemen-berita';
             }
-
-            // 2. Hapus buku tamu Satpam Blade (Session Cookie)
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return response()->json(['status' => 'success', 'message' => 'Logout berhasil!']);
-        }
-
-        public function checkVerify(Request $request)
-        {
-            return response()->json([
-                'verified' => $request->user() && $request->user()->hasVerifiedEmail(),
-            ]);
-        }
-
-        public function resendVerificationEmail(Request $request)
-        {
-            $request->user()->sendEmailVerificationNotification();
-            return response()->json(['status' => 'success', 'message' => 'Link dikirim!']);
-        }
-
-        // --- FUNGSI AKSI VERIFIKASI ---
-        public function verifyEmail($id, $hash)
-        {
-            // Panggil model User
-            $user = User::find($id);
-
-            if (!$user || !hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-                abort(403, 'Eitss, Link verifikasi tidak valid atau udah kadaluarsa cuy!');
-            }
-
-            if (!$user->hasVerifiedEmail()) {
-                $user->markEmailAsVerified();
-            }
-
-            return view('Auth.verifySuccess');
-        }
-
-        public function sendResetLinkEmail(Request $request)
-        {
-            $request->validate(['email' => 'required|email']);
-
-            // Bawaan Laravel buat ngirim email reset
-            $status = Password::sendResetLink($request->only('email'));
-
-            if ($status === Password::RESET_LINK_SENT) {
-                return response()->json(['status' => 'success', 'message' => 'Link reset password udah dikirim ke email anda!']);
-            }
-
-            return response()->json(['status' => 'error', 'message' => 'Gagal ngirim link, pastiin email anda terdaftar cuy.'], 400);
-        }
-
-        public function resetPassword(Request $request)
-        {
-            $request->validate([
-                'token' => 'required',
-                'email' => 'required|email',
-                'password' => 'required|min:8|confirmed',
-            ]);
-
-            $status = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($user, $password) {
-                $user->forceFill(['password' => Hash::make($password)])->setRememberToken(Str::random(60));
-                $user->save();
-            });
-
-            if ($status === Password::PASSWORD_RESET) {
-                return response()->json(['status' => 'success', 'message' => 'Mantap! Password berhasil diubah.']);
-            }
-
-            return response()->json(['status' => 'error', 'message' => 'Gagal reset password, token mungkin kadaluarsa.'], 400);
-        }
-
-        public function updateProfil(Request $request)
-        {
-            /** @var \App\Models\User $user */
-            $user = Auth::user();
-
-            $request->validate(
-                [
-                    'username' => 'required|string|max:255',
-                    'email' => 'required|email|unique:users,email,' . $user->id,
-                    'current_password' => 'required_with:password',
-                    'password' => 'nullable|min:8|confirmed',
-                ],
-                [
-                    'email.unique' => 'Email ini sudah dipakai, ganti yang lain.',
-                    'current_password.required_with' => 'Password sekarang wajib diisi kalau mau ganti password baru.',
-                    'password.confirmed' => 'Konfirmasi password baru ga sama nih.',
-                    'password.min' => 'Password minimal 8 karakter.',
-                ],
-            );
-
-            if ($request->filled('password')) {
-                if (!Hash::check($request->current_password, $user->password)) {
-                    return response()->json(
-                        [
-                            'status' => 'error',
-                            'message' => 'Password sekarang salah, gagal ganti password !',
-                        ],
-                        422,
-                    );
-                }
-                $user->password = Hash::make($request->password);
-            }
-
-            $user->username = $request->username;
-            $user->email = $request->email;
-            $user->save();
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Mantap! Profil berhasil diupdate.',
+                'message' => 'Login Sukses',
+                'token' => $token,
+                'redirect' => $redirectUrl,
             ]);
         }
+
+        return response()->json(['status' => 'error', 'message' => 'Email atau password salah nih.'], 401);
     }
+
+    public function logout(Request $request)
+    {
+        // 1. Cabut Token API-nya
+        if (Auth::check()) {
+            /** @var \App\Models\User $user */ // Kasih bisikan ini ke VS Code
+            $user = Auth::user();
+            $user->tokens()->delete(); // Hapus semua token aja biar aman
+        }
+
+        // 2. Hapus buku tamu Satpam Blade (Session Cookie)
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json(['status' => 'success', 'message' => 'Logout berhasil!']);
+    }
+
+    public function checkVerify(Request $request)
+    {
+        return response()->json([
+            'verified' => $request->user() && $request->user()->hasVerifiedEmail(),
+        ]);
+    }
+
+    public function resendVerificationEmail(Request $request)
+    {
+        $request->user()->sendEmailVerificationNotification();
+        return response()->json(['status' => 'success', 'message' => 'Link dikirim!']);
+    }
+
+    // --- FUNGSI AKSI VERIFIKASI ---
+    public function verifyEmail($id, $hash)
+    {
+        // Panggil model User
+        $user = User::find($id);
+
+        if (!$user || !hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            abort(403, 'Eitss, Link verifikasi tidak valid atau udah kadaluarsa cuy!');
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+        }
+
+        return view('Auth.verifySuccess');
+    }
+
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        // Bawaan Laravel buat ngirim email reset
+        $status = Password::sendResetLink($request->only('email'));
+
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json(['status' => 'success', 'message' => 'Link reset password udah dikirim ke email anda!']);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Gagal ngirim link, pastiin email anda terdaftar cuy.'], 400);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($user, $password) {
+            $user->forceFill(['password' => Hash::make($password)])->setRememberToken(Str::random(60));
+            $user->save();
+        });
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json(['status' => 'success', 'message' => 'Mantap! Password berhasil diubah.']);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Gagal reset password, token mungkin kadaluarsa.'], 400);
+    }
+
+    public function updateProfil(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $request->validate(
+            [
+                'username' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'current_password' => 'required_with:password',
+                'password' => 'nullable|min:8|confirmed',
+            ],
+            [
+                'email.unique' => 'Email ini sudah dipakai, ganti yang lain.',
+                'current_password.required_with' => 'Password sekarang wajib diisi kalau mau ganti password baru.',
+                'password.confirmed' => 'Konfirmasi password baru ga sama nih.',
+                'password.min' => 'Password minimal 8 karakter.',
+            ],
+        );
+
+        if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json(
+                    [
+                        'status' => 'error',
+                        'message' => 'Password sekarang salah, gagal ganti password !',
+                    ],
+                    422,
+                );
+            }
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->username = $request->username;
+        $user->email = $request->email;
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mantap! Profil berhasil diupdate.',
+        ]);
+    }
+}

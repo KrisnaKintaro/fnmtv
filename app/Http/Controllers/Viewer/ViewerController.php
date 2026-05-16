@@ -73,7 +73,7 @@ class ViewerController extends Controller
             'kategori',
             'user',
             'komentar' => function($query) {
-                $query->where('status_moderasi', 'Approved')->latest();
+                $query->with('user')->where('status_moderasi', 'Approved')->latest();
             }
         ])
         ->where('slug', $slug)
@@ -184,5 +184,22 @@ class ViewerController extends Controller
             'status' => 'success',
             'data' => $berita
         ]);
+    }
+
+    public function getIklanAktif()
+    {
+        $iklan = Iklan::where('status', 'aktif')
+            ->where(function($q){
+                $q->whereNull('tanggal_mulai')
+                ->orWhere('tanggal_mulai', '<=', now());
+            })
+            ->where(function($q){
+                $q->whereNull('tanggal_selesai')
+                ->orWhere('tanggal_selesai', '>=', now());
+            })
+            ->latest()
+            ->get();
+
+        return response()->json($iklan);
     }
 }
