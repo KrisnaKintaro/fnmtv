@@ -112,14 +112,8 @@
         var wrapper = document.getElementById(elementId);
         if (!wrapper) return;
 
-        // Kalau tidak ada iklan, sembunyikan wrapper sepenuhnya
-        if (!ad) {
-            wrapper.style.display = 'none';
-            return;
-        }
+        if (!ad) return; // tidak ada iklan, biarkan placeholder tampil
 
-        // Kalau ada iklan, tampilkan wrapper dan isi kontennya
-        wrapper.style.display = '';
         var content = wrapper.querySelector('.ad-content');
         if (!content) return;
 

@@ -46,25 +46,20 @@
     });
 
     function loadSidebarAd() {
-        const wrapper = document.getElementById('sidebarAdSpace');
+        var wrapper = document.getElementById('sidebarAdSpace'); // ← definisikan wrapper dulu
         if (!wrapper) return;
 
         fetch('/api/viewers/iklan')
             .then(response => response.json())
             .then(res => {
-                if (res.status !== 'success') return;
+                if (res.status !== 'success') return; // tidak ada iklan, biarkan placeholder tampil
 
                 const ads = res.data.sidebar_300x250 || [];
                 const ad = ads.length ? ads[0] : null;
 
-                // Kalau tidak ada iklan, wrapper tetap tersembunyi
-                if (!ad) {
-                    wrapper.style.display = 'none';
-                    return;
-                }
+                if (!ad) return; // tidak ada iklan, biarkan placeholder tampil
 
-                // Kalau ada iklan, tampilkan wrapper dan isi kontennya
-                wrapper.style.display = '';
+                // Ada iklan — timpa placeholder dengan konten iklan
                 const content = wrapper.querySelector('.ad-content');
                 if (!content) return;
 
