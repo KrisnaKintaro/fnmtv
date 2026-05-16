@@ -59,9 +59,6 @@ Route::middleware(['auth', 'RoleCheck:Viewer'])->group(function () {
     Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
 });
 
-Route::get('/iklan', function () {
-    return view('Admin.pages.manajemen_iklan');
-});
 
 #================= ADMIN ===================
 Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
@@ -85,18 +82,13 @@ Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
         return view('Admin.pages.manajemen_user');
     });
 
-Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
-    Route::get('/iklan', function () {
+    Route::get('/promo-iklan', function () {
         return view('Admin.pages.manajemen_iklan');
-    });
-
-        // route admin lainnya...
     });
 
     Route::get('/pengaturan', [PengaturanController::class, 'index']);
     Route::post('/pengaturan', [PengaturanController::class, 'updateIdentity']);
     Route::post('/pengaturan/password', [PengaturanController::class, 'updatePassword']);
-
 });
 
 #================= EDITOR =================
@@ -120,3 +112,13 @@ Route::get('/login', function () {
 Route::get('/register', function () {
     return view('Auth.register');
 })->name('register');
+
+
+Route::get('/buat-symlink', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('storage:link');
+        return 'Aman cuy, symlink ke storage berhasil dibuat!';
+    } catch (\Exception $e) {
+        return 'Waduh error nih: ' . $e->getMessage();
+    }
+});
