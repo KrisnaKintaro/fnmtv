@@ -46,6 +46,68 @@
             display: none;
         }
     }
+
+    /* ════════════════════════════════════════════════════════════
+       🔥 FIX: STYLING DROPDOWN KATEGORI 'LAINNYA' BIAR MUNCUL 🔥
+       ════════════════════════════════════════════════════════════ */
+    .nav-more {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+    }
+
+    .nav-more-dropdown {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: #ffffff;
+        border: 1px solid var(--border, #e0ddd6);
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        min-width: 180px;
+        z-index: 999999 !important; /* Z-index dewa biar selalu paling atas */
+        flex-direction: column;
+        padding: 5px 0;
+        margin-top: 5px;
+    }
+
+    /* Class .open ini yang ditrigger oleh JS lu */
+    .nav-more-dropdown.open {
+        display: flex !important;
+    }
+
+    .nmd-item {
+        padding: 10px 20px;
+        color: var(--text, #1a1a1a);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .nmd-item:last-child {
+        border-bottom: none;
+    }
+
+    .nmd-item:hover, .nmd-item.active {
+        background: var(--surface2, #f0eeea);
+        color: var(--red, #cc0000);
+    }
+
+    /* Mencegah Dropdown Terpotong oleh aturan overflow-x (scroll horizontal) di layar kecil/iPad */
+    @media screen and (max-width: 768px) {
+        .nav-inner {
+            overflow: visible !important;
+            flex-wrap: wrap !important;
+        }
+        .nav {
+            overflow: visible !important;
+        }
+    }
 </style>
 
 <div class="toast" id="toast"></div>
@@ -97,7 +159,7 @@
                         <i class="fas fa-chevron-down auth-text" style="font-size: 10px; color: var(--muted);"></i>
                     </div>
 
-                    <div id="profileDropdown" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; width: 180px; overflow: hidden; z-index: 100;">
+                    <div id="profileDropdown" style="display: none; position: absolute; top: 120%; right: 0; background: white; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; width: 180px; overflow: hidden; z-index: 999999;">
                         <a href="/profil" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; text-decoration: none; color: var(--text); border-bottom: 1px solid var(--border);">
                             <i class="fas fa-user-edit" style="color: var(--red);"></i> Edit Profil
                         </a>
