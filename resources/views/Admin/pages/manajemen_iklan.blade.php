@@ -207,10 +207,10 @@
     </div>
 </div>
 
-<!-- Modal Tambah -->
+<!-- Modal Tambah/Edit -->
 <div id="modalContentModule" class="modal-backdrop">
     <div class="modal special-announcement-modal">
-        <h3 class="modal-title" style="margin-bottom: 20px;">Tambah Konten Baru</h3>
+        <h3 class="modal-title" style="margin-bottom: 20px;" id="modalTitle">Tambah Konten Baru</h3>
         <form id="formContentModule" enctype="multipart/form-data">
             <div style="margin-bottom: 16px;">
                 <label style="display: block; margin-bottom: 8px; font-weight: 600;">Judul</label>
@@ -226,20 +226,20 @@
                 </select>
             </div>
             <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Mulai Tayang</label>
-                <input type="date" name="tanggal_mulai" class="form-control"
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Mulai Tayang <span style="color: var(--red);">*</span></label>
+                <input type="date" name="tanggal_mulai" class="form-control" required
                     style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); box-sizing: border-box;">
-                <small style="color: var(--muted);">Biarkan kosong kalau ingin tayang segera.</small>
+                <small style="color: var(--muted);">Tanggal wajib diisi.</small>
             </div>
             <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Berhenti Tayang</label>
-                <input type="date" name="tanggal_selesai" class="form-control"
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tanggal Berhenti Tayang <span style="color: var(--red);">*</span></label>
+                <input type="date" name="tanggal_selesai" class="form-control" required
                     style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); box-sizing: border-box;">
-                <small style="color: var(--muted);">Konten akan hilang otomatis setelah tanggal ini.</small>
+                <small style="color: var(--muted);">Harus lebih besar atau sama dengan tanggal mulai.</small>
             </div>
             <div style="margin-bottom: 16px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Unggah Gambar</label>
-                <input type="file" id="moduleImageInput" name="gambar" accept="image/png, image/jpeg, image/jpg" required style="display:none;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Unggah Gambar <span id="gambarRequired" style="color: var(--red);">*</span></label>
+                <input type="file" id="moduleImageInput" name="gambar" accept="image/png, image/jpeg, image/jpg" style="display:none;">
                 <div id="moduleUploadArea" class="upload-area">
                     <div id="moduleUploadContent" class="upload-area-content">
                         <div style="font-size: 28px; margin-bottom: 10px;">📁</div>
@@ -296,6 +296,24 @@
     }
 
     var pendingRemoveId = null;
+    var editingEntryId = null;
+
+    // Define functions outside of document.ready for global accessibility
+    function resetFormModule() {
+        $('#formContentModule')[0].reset();
+        resetUploadArea();
+        $('#moduleImageInput').val('');
+        $('#modalTitle').text('Tambah Konten Baru');
+        editingEntryId = null;
+    }
+
+    function resetUploadArea() {
+        $('#moduleUploadContent').html(
+            '<div style="font-size: 28px; margin-bottom: 10px;">📁</div>' +
+            '<div style="font-weight: 600; font-size: 15px;">Klik atau seret file ke sini</div>' +
+            '<div style="margin-top: 8px; font-size: 13px; color: #6b7280;">Format: JPG, PNG. Maks 2MB.</div>'
+        );
+    }
 
     $(document).ready(function() {
         setTopbarTitle();
@@ -303,23 +321,49 @@
 
         $('#formContentModule').on('submit', function(e) {
             e.preventDefault();
+            
+            // Validasi gambar (wajib untuk tambah, opsional untuk edit)
+            if (!editingEntryId && $('#moduleImageInput')[0].files.length === 0) {
+                Toast.show('error', '❌ Gambar wajib diupload untuk konten baru');
+                return;
+            }
+            
+            // Validasi tanggal
+            var tanggalMulai = new Date($('input[name="tanggal_mulai"]').val());
+            var tanggalSelesai = new Date($('input[name="tanggal_selesai"]').val());
+            
+            if (tanggalMulai > tanggalSelesai) {
+                Toast.show('error', '❌ Tanggal berhenti tidak boleh kurang dari tanggal mulai');
+                return;
+            }
+            
             var formData = new FormData(this);
+            var url = editingEntryId 
+                ? '/api/admin/manajemen_iklan/ubahData/' + editingEntryId
+                : '/api/admin/manajemen_iklan/tambahData';
+            var method = editingEntryId ? 'POST' : 'POST';
+            
             $.ajax({
-                url: '/api/admin/manajemen_iklan/tambahData',
-                type: 'POST',
+                url: url,
+                type: method,
                 data: formData,
                 processData: false,
                 contentType: false,
                 dataType: 'json',
                 success: function(res) {
                     ModalManager.close('modalContentModule');
-                    Toast.show('✅ ' + (res.message || 'Berhasil ditambahkan!'));
+                    Toast.show('success', res.message || 'Berhasil disimpan!');
                     loadContentModule();
                     resetFormModule();
+                    editingEntryId = null;
                 },
                 error: function(xhr, status, error) {
                     console.error('Error:', status, error, xhr.responseText);
-                    Toast.show('❌ Gagal menyimpan data');
+                    var errMsg = 'Gagal menyimpan data';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errMsg = xhr.responseJSON.message;
+                    }
+                    Toast.show('error', errMsg);
                 }
             });
         });
@@ -372,19 +416,6 @@
         } else {
             resetUploadArea();
         }
-    }
-
-    function resetUploadArea() {
-        $('#moduleUploadContent').html(
-            '<div style="font-size: 28px; margin-bottom: 10px;">📁</div>' +
-            '<div style="font-weight: 600; font-size: 15px;">Klik atau seret file ke sini</div>' +
-            '<div style="margin-top: 8px; font-size: 13px; color: #6b7280;">Format: JPG, PNG. Maks 2MB.</div>'
-        );
-    }
-
-    function resetFormModule() {
-        $('#formContentModule')[0].reset();
-        resetUploadArea();
     }
 
     function setTopbarTitle() {
@@ -442,7 +473,8 @@
                         html += '</button>';
                         html += '</td>';
 
-                        html += '<td style="padding: 14px 16px;">';
+                        html += '<td style="padding: 14px 16px;">';                       
+                        html += '<button onclick="editEntry(' + item.id + ')" class="remove-entry" title="Edit" style="color: var(--text);">✏️</button>';
                         html += '<button onclick="removeEntry(' + item.id + ')" class="remove-entry" title="Hapus">🗑️</button>';
                         html += '</td>';
 
@@ -463,11 +495,49 @@
             url: '/api/admin/manajemen_iklan/ubahStatus/' + id,
             type: 'PATCH',
             success: function(res) {
-                Toast.show('✅ Status diperbarui');
+                Toast.show('success', 'Status diperbarui');
                 loadContentModule();
             },
             error: function(err) {
-                Toast.show('❌ Gagal mengubah status');
+                Toast.show('error', 'Gagal mengubah status');
+                console.error('Error:', err);
+            }
+        });
+    }
+
+    function editEntry(id) {
+        $.ajax({
+            url: '/api/admin/manajemen_iklan/ambilData',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                var item = data.find(d => d.id == id);
+                if (item) {
+                    editingEntryId = id;
+                    $('#modalTitle').text('Edit Konten');
+                    $('input[name="judul"]').val(item.judul);
+                    $('select[name="posisi"]').val(item.posisi);
+                    function toInputDate(val) {
+                        if (!val) return '';
+                        return val.split('T')[0].split(' ')[0];
+                    }
+
+                    $('input[name="tanggal_mulai"]').val(toInputDate(item.tanggal_mulai));
+                    $('input[name="tanggal_selesai"]').val(toInputDate(item.tanggal_selesai));
+                    $('input[name="link_tujuan"]').val(item.link_tujuan || '');
+                    
+                    // Tampilkan gambar lama
+                    $('#moduleUploadContent').html(
+                        '<div style="font-size: 28px; margin-bottom: 10px;">📷</div>' +
+                        '<div style="font-weight: 600; font-size: 15px;">Gambar sudah ada</div>' +
+                        '<div style="margin-top: 8px; font-size: 13px; color: #6b7280;">Upload gambar baru untuk mengganti (opsional)</div>'
+                    );
+                    
+                    ModalManager.open('modalContentModule');
+                }
+            },
+            error: function(err) {
+                Toast.show('error', 'Gagal memuat data');
                 console.error('Error:', err);
             }
         });
@@ -485,13 +555,13 @@
             type: 'DELETE',
             success: function(res) {
                 ModalManager.close('modalRemoveConfirm');
-                Toast.show('🗑️ Konten dihapus');
+                Toast.show('success', '🗑️ Konten dihapus');
                 loadContentModule();
                 pendingRemoveId = null;
             },
             error: function(err) {
                 ModalManager.close('modalRemoveConfirm');
-                Toast.show('❌ Gagal menghapus');
+                Toast.show('error', '❌ Gagal menghapus');
                 console.error('Error:', err);
             }
         });
