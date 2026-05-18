@@ -15,6 +15,36 @@
         gap: 8px;
         align-items: center;
     }
+
+    /* ── FIX RESPONSIVE: Scroll Tabel Horizontal ── */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive table {
+        min-width: 700px; /* Paksa muncul scroll jika layar lebih sempit dari ini */
+    }
+
+    /* ── FIX RESPONSIVE: Mode HP (di bawah 768px) ── */
+    @media screen and (max-width: 768px) {
+        .finance-filters {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .filter-group {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .filter-group .filter-select,
+        .filter-group button {
+            width: 100%; /* Penuhi lebar layar agar ramah sentuhan jempol */
+        }
+    }
 </style>
 @endsection
 @section('konten')
@@ -77,20 +107,23 @@
             <div class="card-ht">Daftar Transaksi Pendapatan</div>
             <div class="card-hm" id="financeCount">Memuat data...</div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Judul Artikel</th>
-                    <th>Penulis</th>
-                    <th>Nominal</th>
-                    <th>Status Bayar</th>
-                    <th>Tgl Bayar</th>
-                    <th style="text-align:center;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="financeBody">
-            </tbody>
-        </table>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Judul Artikel</th>
+                        <th>Penulis</th>
+                        <th>Nominal</th>
+                        <th>Status Bayar</th>
+                        <th>Tgl Bayar</th>
+                        <th style="text-align:center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="financeBody">
+                </tbody>
+            </table>
+        </div>
 
         <div class="empty-state" id="emptyFinance" style="display:none;">
             <div class="ico">💸</div>
@@ -98,7 +131,7 @@
         </div>
 
         <div class="pager">
-            <div id="financePagination" style="display:flex; gap:4px;"></div>
+            <div id="financePagination" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
             <div class="pg-info" id="financeInfo">Menampilkan 0 dari 0 transaksi</div>
         </div>
     </div>
@@ -112,11 +145,11 @@
         <div class="modal-body">
             <div class="field">
                 <label>Judul Artikel</label>
-                <input type="text" id="editJudulArtikel" disabled style="background:#f5f5f5; color:#777;">
+                <input type="text" id="editJudulArtikel" disabled style="background:#f5f5f5; color:#777; width: 100%; box-sizing: border-box;">
             </div>
             <div class="field">
                 <label>Nominal Pendapatan (Rp)</label>
-                <input type="number" id="editNominalValue" placeholder="Contoh: 750000" min="0">
+                <input type="number" id="editNominalValue" placeholder="Contoh: 750000" min="0" style="width: 100%; box-sizing: border-box;">
             </div>
             <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
                 <button class="btn btn-outline" onclick="ModalManager.close('modalEditNominal')">Batal</button>
@@ -145,12 +178,20 @@
         $('#tbTitle').text('Administrasi Finansial');
         $('#tbCrumb').text('Admin / Finansial');
 
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.placeholder = 'Cari judul artikel atau penulis...';
-            searchInput.value = '';
-            searchInput.onkeyup = function() { terapkanFilterLokal(); };
-        }
+        // 🔥 FIX SINKRONISASI SEARCH BAR PC & HP 🔥
+        const placeholderText = 'Cari judul artikel atau penulis...';
+        const searchInputs = document.querySelectorAll('#searchInput, .mobile-search-input');
+
+        searchInputs.forEach(input => {
+            if(input) {
+                input.placeholder = placeholderText;
+                input.value = '';
+                // Tangkap event ketik dari PC maupun HP
+                input.addEventListener('keyup', function() {
+                    terapkanFilterLokal();
+                });
+            }
+        });
 
         // 🌟 FIX: FITUR NOTIFIKASI LONCENG
         SmartNotif.init({
@@ -258,8 +299,10 @@
         document.getElementById('filterBulan').value = '';
         document.getElementById('filterTahun').value = '';
 
-        const searchInput = document.getElementById('searchInput');
-        if(searchInput) searchInput.value = '';
+        const searchInputs = document.querySelectorAll('#searchInput, .mobile-search-input');
+        searchInputs.forEach(input => {
+            if(input) input.value = '';
+        });
 
         // Terapkan filter manual langsung ke DataEngine
         const dataSorotan = financeDB.filter(val => val.id === idTransaksi);
@@ -289,14 +332,25 @@
         document.getElementById('filterBulan').value = '';
         document.getElementById('filterTahun').value = '';
         document.getElementById('filterStatus').value = 'all';
-        if(document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
+
+        const searchInputs = document.querySelectorAll('#searchInput, .mobile-search-input');
+        searchInputs.forEach(input => {
+            if(input) input.value = '';
+        });
+
         terapkanFilterLokal();
         Toast.show('success', 'Menampilkan semua waktu (All Time)');
     }
 
     // --- FILTER ARRAY & STATS ---
     function terapkanFilterLokal() {
-        const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
+        // Ambil value dari salah satu input search yang terisi (karena sudah disinkron via JS)
+        const desktopSearch = document.getElementById('searchInput');
+        const mobileSearch = document.querySelector('.mobile-search-input');
+        let keyword = '';
+        if (desktopSearch && desktopSearch.value) keyword = desktopSearch.value.toLowerCase();
+        else if (mobileSearch && mobileSearch.value) keyword = mobileSearch.value.toLowerCase();
+
         const statusSelected = document.getElementById('filterStatus').value;
         const bulanSelected = document.getElementById('filterBulan').value;
         const tahunSelected = document.getElementById('filterTahun').value;

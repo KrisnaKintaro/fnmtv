@@ -183,12 +183,16 @@ document.addEventListener("click", function (e) {
 });
 
 /**
- * 4. SIDEBAR RESPONSIVE (OPTIONAL)
- * Jika nanti kamu ingin sidebar bisa ditarik/tutup di layar kecil (mobile).
+ * 4. SIDEBAR TOGGLE
+ * Pakai window assignment (bukan function declaration) supaya selalu
+ * override versi lama yang mungkin sudah di-hoist sebelumnya.
+ * Target toggle HARUS document.body, bukan element sidebar langsung.
  */
-function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    if (sidebar) {
-        sidebar.classList.toggle("mobile-open");
+window.toggleSidebar = function () {
+    document.body.classList.toggle('sidebar-toggled');
+    if (document.body.classList.contains('sidebar-toggled')) {
+        localStorage.setItem('sidebarClosed', '1');
+    } else {
+        localStorage.removeItem('sidebarClosed');
     }
-}
+};

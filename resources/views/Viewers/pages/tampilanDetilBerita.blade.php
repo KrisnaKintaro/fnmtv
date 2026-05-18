@@ -106,17 +106,17 @@
 </div>
 
 <div id="modalAuthSuggest" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
-    <div style="background: white; width: 90%; max-width: 400px; text-align: center; padding: 40px 30px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; animation: modalPop 0.3s ease-out forwards;">
+    <div style="background: white; width: 95%; max-width: 400px; text-align: center; padding: 30px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; animation: modalPop 0.3s ease-out forwards;">
 
         <div style="font-size: 56px; margin-bottom: 20px; line-height: 1;">🔐</div>
 
         <h2 style="font-family: 'Merriweather', serif; font-size: 24px; margin-bottom: 12px; color: #1a1a1a;">Eitss, Login Dulu Cuy!</h2>
 
-        <p style="font-size: 15px; color: #666; margin-bottom: 30px; line-height: 1.6;">
+        <p style="font-size: 14px; color: #666; margin-bottom: 24px; line-height: 1.6;">
             Biar interaksi lu makin asik, lu harus masuk ke akun FNM dulu buat ngasih komentar atau reaksi. Cuma butuh semenit kok!
         </p>
 
-        <div style="display: flex; gap: 12px;">
+        <div style="display: flex; gap: 10px;">
             <button onclick="tutupModalLogin()" style="flex:1; padding: 12px; border-radius: 8px; border: 1px solid #ccc; background: white; color: #555; font-weight: 600; cursor: pointer; transition: 0.2s;">Nanti Aja</button>
 
             <a href="/login" style="flex:1; padding: 12px; border-radius: 8px; background: #cc0000; color: white; text-decoration: none; font-weight: 600; display: flex; align-items: center; justify-content: center; transition: 0.2s;">Gas Login!</a>
@@ -202,8 +202,16 @@
 
         let img = b.foto_thumbnail;
         if (img && !img.startsWith('http')) img = `/uploads/thumbnail/${img}`;
+
+        // Thumbnail utama JANGAN di-lazy load agar First Paint cepat
         $('#artThumbnail').html(img ? `<img src="${img}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="font-size: 50px; color: var(--muted);">📰</div>`);
-        $('#artBody').html(b.isi_berita);
+
+        // 🔥 SUNTIK LAZY LOAD UNTUK GAMBAR DI DALAM ARTIKEL 🔥
+        let isiBeritaAman = b.isi_berita || '';
+        isiBeritaAman = isiBeritaAman.replace(/<img\b/gi, '<img loading="lazy" ');
+        isiBeritaAman = isiBeritaAman.replace(/<iframe\b/gi, '<iframe loading="lazy" ');
+
+        $('#artBody').html(isiBeritaAman);
         document.title = `${b.judul_berita} - FNM`;
     }
 
@@ -215,7 +223,6 @@
             html = '<div style="text-align: center; color: var(--muted); padding: 20px;">Belum ada komentar. Jadilah yang pertama!</div>';
         } else {
             komentarData.forEach(k => {
-                // Sesuai revisi Krisna, ambil dari relasi user.username
                 const nama = (k.user && k.user.username) ? k.user.username : 'Anonim';
                 const initial = nama.charAt(0).toUpperCase();
 

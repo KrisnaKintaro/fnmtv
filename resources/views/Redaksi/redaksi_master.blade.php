@@ -10,9 +10,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('admin/css/redaksi_css.css') }}">
     @yield('css')
+
+    {{-- ── Sidebar toggle tersedia sebelum DOM & script lain ── --}}
+    <script>
+        (function () {
+            if (localStorage.getItem('sidebarClosed') === '1') {
+                document.documentElement.classList.add('sidebar-toggled-pre');
+            }
+        })();
+
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-toggled');
+            if (document.body.classList.contains('sidebar-toggled')) {
+                localStorage.setItem('sidebarClosed', '1');
+            } else {
+                localStorage.removeItem('sidebarClosed');
+            }
+        }
+    </script>
 </head>
 
 <body>
+    <div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
     @include('Redaksi.layout.sidebar')
     <!-- ═══════════ MAIN ═══════════ -->
@@ -54,7 +73,7 @@
             },
             cache: false
         });
-    
+
         function doLogout(e) {
             if (e) e.preventDefault();
             ModalManager.open('modalLogoutConfirm');
@@ -76,6 +95,13 @@
                 }
             });
         }
+
+        /* ── RESTORE STATE SIDEBAR ── */
+        (function () {
+            if (localStorage.getItem('sidebarClosed') === '1') {
+                document.body.classList.add('sidebar-toggled');
+            }
+        })();
     </script>
     @yield('js')
 </body>

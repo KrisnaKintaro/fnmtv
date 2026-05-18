@@ -192,7 +192,9 @@
 
             let img = item.foto_thumbnail;
             if (img && !img.startsWith('http')) img = `/uploads/thumbnail/${img}`;
-            const thumb = img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">` : `📰`;
+
+            // 🔥 SUNTIK LAZY LOADING DI SINI 🔥
+            const thumb = img ? `<img src="${img}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">` : `📰`;
 
             html += `
                 <div class="news-list-item" onclick="window.location.href='/berita/${item.slug}'">

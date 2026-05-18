@@ -1,7 +1,7 @@
 @extends('Viewers.master_viewers')
 
 @section('konten')
-<div class="container page-anim" style="max-width: 800px; margin: 40px auto; min-height: 60vh;">
+<div class="container page-anim user-profile-container" style="max-width: 800px; margin: 20px auto; min-height: 60vh; padding: 10px 15px;">
     <div style="background: var(--white); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
 
         {{-- HEADER --}}
@@ -13,129 +13,155 @@
             <p style="margin: 0; opacity: 0.8; font-size: 14px;">Kelola identitas dan keamanan akun FNM Anda</p>
         </div>
 
-        <div style="padding: 40px;">
+        {{-- FORM BODY (Padding dibuat dinamis lewat style class di bawah) --}}
+        <div class="profile-body-content">
 
-            {{-- ── SECTION 1: INFORMASI DASAR ── --}}
-            <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--text);">
-                <i class="fas fa-id-card" style="color: var(--muted); margin-right: 8px;"></i> Informasi Dasar
-            </h3>
+            {{-- ── SECTION 1: INFORMASI PROFIL ── --}}
+            <div style="margin-bottom: 40px;">
+                <h3 style="font-family: 'Merriweather', serif; font-size: 18px; color: var(--text); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--border);">
+                    <i class="fas fa-id-card" style="color: var(--red); margin-right: 8px;"></i>Informasi Dasar
+                </h3>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                <div class="field">
-                    <label style="display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:8px;">Username</label>
-                    <div style="position: relative;">
-                        <i class="fas fa-at" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted);"></i>
-                        <input type="text" id="inputUsername" placeholder="Username Anda"
-                            value="{{ Auth::user()->username }}"
-                            style="width:100%; padding:12px 15px 12px 40px; border:1px solid var(--border); border-radius:8px; outline:none; font-family:inherit; font-size:14px;">
+                <div class="profile-form-group">
+                    <label class="profile-form-label">Username</label>
+                    <div style="flex: 1; width: 100%;">
+                        <input type="text" id="inputUsername" class="profile-form-input" placeholder="Masukkan username baru" value="{{ Auth::user()->username }}">
+                        <small style="color: var(--muted); font-size: 12px; display: block; margin-top: 4px;">Nama pengguna lu yang bakal tampil di kolom komentar.</small>
                     </div>
                 </div>
 
-                <div class="field">
-                    <label style="display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:8px;">Alamat Email</label>
-                    <div style="position: relative;">
-                        <i class="fas fa-envelope" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted);"></i>
-                        <input type="email" id="inputEmail" placeholder="Email Anda"
-                            value="{{ Auth::user()->email }}"
-                            style="width:100%; padding:12px 15px 12px 40px; border:1px solid var(--border); border-radius:8px; outline:none; font-family:inherit; font-size:14px;">
-                    </div>
-                </div>
-            </div>
-
-            <div style="display:flex; justify-content:flex-end; margin-bottom:40px;">
-                <button class="btn btn-red" id="btnSimpanProfil" onclick="simpanProfil()" style="padding:12px 24px; border-radius:8px;">
-                    <i class="fas fa-save" style="margin-right:5px;"></i> Simpan Profil
-                </button>
-            </div>
-
-            <hr style="border:none; border-top:1px dashed var(--border); margin-bottom:30px;">
-
-            {{-- ── SECTION 2: GANTI PASSWORD ── --}}
-            <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--text);">
-                <i class="fas fa-lock" style="color: var(--muted); margin-right: 8px;"></i> Ganti Password
-            </h3>
-
-            <div style="display:grid; grid-template-columns: 1fr; gap: 16px; margin-bottom:32px;">
-
-                {{-- Password Lama --}}
-                <div class="field">
-                    <label style="display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:8px;">Password Saat Ini</label>
-                    <div style="position:relative; display:flex; align-items:center;">
-                        <i class="fas fa-lock" style="position:absolute; left:15px; color:var(--muted); pointer-events:none;"></i>
-                        <input type="password" id="inputPasswordLama" placeholder="Masukkan password saat ini"
-                            style="width:100%; padding:12px 45px 12px 40px; border:1px solid var(--border); border-radius:8px; outline:none; font-family:inherit; font-size:14px;">
-                        <i class="fas fa-eye" id="toggleLama"
-                            style="position:absolute; right:15px; cursor:pointer; color:var(--muted);"
-                            onclick="togglePass('inputPasswordLama', 'toggleLama')"></i>
+                <div class="profile-form-group">
+                    <label class="profile-form-label">Alamat Email</label>
+                    <div style="flex: 1; width: 100%;">
+                        <input type="email" class="profile-form-input" value="{{ Auth::user()->email }}" disabled style="background: #f9f8f5; cursor: not-allowed; color: var(--muted);">
+                        <small style="color: var(--muted); font-size: 12px; display: block; margin-top: 4px;">Email utama terverifikasi. Bagian ini nggak bisa diganti cuy.</small>
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
-                    {{-- Password Baru --}}
-                    <div class="field">
-                        <label style="display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:8px;">Password Baru</label>
-                        <div style="position:relative; display:flex; align-items:center;">
-                            <i class="fas fa-key" style="position:absolute; left:15px; color:var(--muted); pointer-events:none;"></i>
-                            <input type="password" id="inputPasswordBaru" placeholder="Minimal 6 karakter"
-                                style="width:100%; padding:12px 45px 12px 40px; border:1px solid var(--border); border-radius:8px; outline:none; font-family:inherit; font-size:14px;">
-                            <i class="fas fa-eye" id="toggleBaru"
-                                style="position:absolute; right:15px; cursor:pointer; color:var(--muted);"
-                                onclick="togglePass('inputPasswordBaru', 'toggleBaru')"></i>
-                        </div>
-                    </div>
-
-                    {{-- Konfirmasi Password Baru --}}
-                    <div class="field">
-                        <label style="display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:8px;">Konfirmasi Password Baru</label>
-                        <div style="position:relative; display:flex; align-items:center;">
-                            <i class="fas fa-check-circle" style="position:absolute; left:15px; color:var(--muted); pointer-events:none;"></i>
-                            <input type="password" id="inputPasswordKonfirmasi" placeholder="Ulangi password baru"
-                                style="width:100%; padding:12px 45px 12px 40px; border:1px solid var(--border); border-radius:8px; outline:none; font-family:inherit; font-size:14px;">
-                            <i class="fas fa-eye" id="toggleKonfirmasi"
-                                style="position:absolute; right:15px; cursor:pointer; color:var(--muted);"
-                                onclick="togglePass('inputPasswordKonfirmasi', 'toggleKonfirmasi')"></i>
-                        </div>
-                    </div>
+                <div class="profile-form-action-row">
+                    <button class="btn btn-red profile-submit-btn" id="btnSimpanProfil" onclick="simpanProfil()">
+                        <i class="fas fa-save" style="margin-right: 5px;"></i>Simpan Perubahan
+                    </button>
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:flex-end; gap:15px;">
-                <button type="button" class="btn btn-outline" style="padding:12px 24px; border-radius:8px;" onclick="window.history.back()">
-                    Kembali
-                </button>
-                <button type="button" class="btn btn-red" id="btnGantiPassword" onclick="gantiPassword()" style="padding:12px 24px; border-radius:8px;">
-                    <i class="fas fa-key" style="margin-right:5px;"></i> Ganti Password
-                </button>
+            {{-- ── SECTION 2: KEAMANAN / PASSWORD ── --}}
+            <div>
+                <h3 style="font-family: 'Merriweather', serif; font-size: 18px; color: var(--text); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--border);">
+                    <i class="fas fa-shield-alt" style="color: var(--red); margin-right: 8px;"></i>Keamanan Akun
+                </h3>
+
+                <div class="profile-form-group">
+                    <label class="profile-form-label">Password Lama</label>
+                    <input type="password" id="inputPasswordLama" class="profile-form-input" placeholder="Masukkan password lama lu">
+                </div>
+
+                <div class="profile-form-group">
+                    <label class="profile-form-label">Password Baru</label>
+                    <input type="password" id="inputPasswordBaru" class="profile-form-input" placeholder="Minimal 6 karakter">
+                </div>
+
+                <div class="profile-form-group">
+                    <label class="profile-form-label">Konfirmasi Password</label>
+                    <input type="password" id="inputPasswordKonfirmasi" class="profile-form-input" placeholder="Ulangi password baru">
+                </div>
+
+                <div class="profile-form-action-row">
+                    <button class="btn btn-outline profile-submit-btn" id="btnGantiPassword" onclick="gantiPassword()">
+                        <i class="fas fa-key" style="margin-right: 5px;"></i>Ganti Password
+                    </button>
+                </div>
             </div>
 
         </div>
+
     </div>
 </div>
+
+{{-- ── CSS RESPONSIVE OVERRIDE KHUSUS HALAMAN PROFIL ── --}}
+<style>
+    /* Styling Dasar agar flexbox bekerja dinamis */
+    .profile-body-content {
+        padding: 40px;
+    }
+    .profile-form-group {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .profile-form-label {
+        width: 200px;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text);
+        padding-top: 10px;
+        flex-shrink: 0;
+    }
+    .profile-form-input {
+        width: 100%;
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--text);
+        outline: none;
+        transition: 0.15s;
+        box-sizing: border-box;
+    }
+    .profile-form-input:focus {
+        border-color: var(--red);
+    }
+    .profile-form-action-row {
+        padding-left: 200px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .profile-submit-btn {
+        padding: 11px 24px;
+        font-size: 14px;
+        border-radius: 8px;
+    }
+
+    /* ── MEDIA QUERIES RESPONSIVITAS HP & TABLET ── */
+    @media screen and (max-width: 650px) {
+        .profile-body-content {
+            padding: 24px 16px; /* Perkecil padding kontainer utama di HP */
+        }
+        .profile-form-group {
+            flex-direction: column; /* Label pindah ke atas inputan (Mode vertikal) */
+            align-items: stretch;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .profile-form-label {
+            width: 100%; /* Lebar label penuhi layar */
+            padding-top: 0;
+            font-size: 13px;
+        }
+        .profile-form-action-row {
+            padding-left: 0; /* Kembalikan offset padding tombol ke kiri */
+        }
+        .profile-submit-btn {
+            width: 100%; /* Tombol penuhi lebar HP agar mudah di-tap jempol */
+            display: flex;
+            justify-content: center;
+        }
+    }
+</style>
 @endsection
 
 @section('js')
 <script>
-    /* ── TOGGLE SHOW/HIDE PASSWORD ── */
-    function togglePass(inputId, iconId) {
-        const input = document.getElementById(inputId);
-        const icon  = document.getElementById(iconId);
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.replace('fa-eye-slash', 'fa-eye');
-        }
-    }
-
-    /* ── SIMPAN PROFIL (Username & Email) ── */
+    // FUNGSI SIMPAN INFO PROFIL (AJAX AMAN 100%)
     function simpanProfil() {
-        const btn      = document.getElementById('btnSimpanProfil');
         const username = document.getElementById('inputUsername').value.trim();
-        const email    = document.getElementById('inputEmail').value.trim();
+        const btn      = document.getElementById('btnSimpanProfil');
 
-        if (!username || !email) {
-            Toast.show('warning', 'Username dan email tidak boleh kosong!');
+        if (!username) {
+            Toast.show('warning', 'Username nggak boleh kosong cuy!');
             return;
         }
 
@@ -143,37 +169,35 @@
         btn.disabled  = true;
 
         $.ajax({
-            url: '/api/redaksi/updateProfil',
-            type: 'PUT',
-            data: { username, email },
+            url: '/api/auth/update-profil',
+            type: 'POST',
+            data: { username: username },
             success: function(res) {
                 Toast.show('success', res.message || 'Profil berhasil diperbarui!');
+                // Update text di navbar secara live kalau ada elemen targetnya
+                const navNameEl = document.querySelector('.user-profile-menu span');
+                if (navNameEl) navNameEl.textContent = username;
             },
             error: function(xhr) {
-                const msg = xhr.responseJSON?.message || 'Gagal menyimpan profil.';
+                const msg = xhr.responseJSON?.message || 'Gagal memperbarui profil.';
                 Toast.show('error', msg);
             },
             complete: function() {
-                btn.innerHTML = '<i class="fas fa-save" style="margin-right:5px;"></i> Simpan Profil';
+                btn.innerHTML = '<i class="fas fa-save" style="margin-right:5px;"></i> Simpan Perubahan';
                 btn.disabled  = false;
             }
         });
     }
 
-    /* ── GANTI PASSWORD ── */
+    // FUNGSI GANTI PASSWORD (AJAX AMAN 100%)
     function gantiPassword() {
-        const btn          = document.getElementById('btnGantiPassword');
-        const passwordLama = document.getElementById('inputPasswordLama').value;
-        const passwordBaru = document.getElementById('inputPasswordBaru').value;
-        const konfirmasi   = document.getElementById('inputPasswordKonfirmasi').value;
+        const passwordLama       = document.getElementById('inputPasswordLama').value;
+        const passwordBaru       = document.getElementById('inputPasswordBaru').value;
+        const konfirmasi         = document.getElementById('inputPasswordKonfirmasi').value;
+        const btn                = document.getElementById('btnGantiPassword');
 
-        // Validasi sisi klien
-        if (!passwordLama) {
-            Toast.show('warning', 'Masukkan password saat ini dulu!');
-            return;
-        }
-        if (!passwordBaru) {
-            Toast.show('warning', 'Password baru tidak boleh kosong!');
+        if (!passwordLama || !passwordBaru || !konfirmasi) {
+            Toast.show('warning', 'Semua field password wajib diisi cuy!');
             return;
         }
         if (passwordBaru.length < 6) {
@@ -198,7 +222,6 @@
             },
             success: function(res) {
                 Toast.show('success', res.message || 'Password berhasil diganti!');
-                // Kosongkan field setelah sukses
                 document.getElementById('inputPasswordLama').value        = '';
                 document.getElementById('inputPasswordBaru').value        = '';
                 document.getElementById('inputPasswordKonfirmasi').value  = '';

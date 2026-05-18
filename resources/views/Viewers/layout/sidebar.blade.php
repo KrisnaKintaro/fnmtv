@@ -66,10 +66,12 @@
                 let html = '';
                 if (promo.link_tujuan) {
                     html += '<a href="' + promo.link_tujuan + '" target="_blank" rel="noopener noreferrer" style="display:block; width:100%;">'
-                        + '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
+                        // DI SINI KITA TAMBAHIN loading="lazy" BIAR HEMAT KUOTA
+                        + '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" loading="lazy" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
                         + '</a>';
                 } else {
-                    html += '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
+                    // DI SINI JUGA
+                    html += '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" loading="lazy" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
                 }
                 if (promo.judul) {
                     html += '<div style="margin-top: 10px; font-size: 14px; font-weight: 700;">' + promo.judul + '</div>';

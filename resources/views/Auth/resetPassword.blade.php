@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Reset Password</title>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -30,6 +30,8 @@
             color: var(--text);
             min-height: 100vh;
             display: flex;
+            /* Tambahan agar saat layar kecil bisa di-scroll */
+            overflow-x: hidden;
         }
 
         .login-wrap {
@@ -40,6 +42,9 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
+            /* Tambahan padding biar card gak nempel dinding di mobile */
+            padding: 20px;
+            overflow-y: auto;
         }
 
         .login-card {
@@ -50,6 +55,8 @@
             width: 100%;
             max-width: 420px;
             box-shadow: 0 8px 40px rgba(0, 0, 0, .1);
+            /* Pastikan card relatif untuk berjaga-jaga */
+            position: relative;
         }
 
         .login-logo {
@@ -132,6 +139,41 @@
             align-items: center;
             gap: 10px;
             z-index: 9999;
+        }
+
+        /* =========================================
+           MEDIA QUERIES (RESPONSIVITAS UNTUK HP & TABLET)
+           ========================================= */
+        @media screen and (max-width: 576px) {
+            .login-wrap {
+                align-items: flex-start;
+                padding-top: 50px; /* Cukup 50px karena gak ada tombol back di atasnya */
+                padding-bottom: 30px;
+            }
+
+            .login-card {
+                padding: 30px 24px;
+                border-radius: 12px;
+            }
+
+            .login-logo {
+                font-size: 24px !important;
+            }
+
+            #toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                min-width: unset;
+                justify-content: center;
+            }
+        }
+
+        /* Penyesuaian khusus untuk HP lipat (Fold) */
+        @media screen and (max-width: 320px) {
+            .login-card {
+                padding: 24px 16px;
+            }
         }
     </style>
 </head>

@@ -6,7 +6,9 @@
         background-color: var(--border);
         gap: 2px;
         border: 2px solid var(--border);
-        height: 400px;
+        /* FIX RESPONSIVE: Jangan pakai fixed height, pakai min-height biar di HP bisa stack ke bawah */
+        min-height: 400px;
+        height: auto;
     }
     .hero-main {
         height: 100%;
@@ -112,7 +114,7 @@
         var wrapper = document.getElementById(elementId);
         if (!wrapper) return;
 
-        if (!promo) return; // tidak ada promo, biarkan placeholder tampil
+        if (!promo) return;
 
         var content = wrapper.querySelector('.promo-content');
         if (!content) return;
@@ -120,10 +122,12 @@
         var html = '';
         if (promo.link_tujuan) {
             html += '<a href="' + promo.link_tujuan + '" target="_blank" rel="noopener noreferrer" style="display:block; width:100%;">'
-                + '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
+                // SUNTIK LAZY LOADING
+                + '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" loading="lazy" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
                 + '</a>';
         } else {
-            html += '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
+            // SUNTIK LAZY LOADING
+            html += '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" loading="lazy" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
         }
         if (promo.judul) {
             html += '<div style="margin-top: 10px; font-size: 14px; font-weight: 700;">' + promo.judul + '</div>';
@@ -188,6 +192,7 @@
         var imgMain = main.foto_thumbnail;
         if (imgMain && !imgMain.startsWith('http')) imgMain = '/uploads/thumbnail/' + imgMain;
 
+        // Headline utama sengaja TIDAK pakai lazy loading agar LCP (First Paint) cepat
         var thumbMain = imgMain
             ? '<div class="hero-img" style="opacity: 1;"><img src="' + imgMain + '" style="width:100%;height:100%;object-fit:cover;"></div>'
             : '<div class="hero-img">📰</div>';
@@ -209,8 +214,9 @@
                 var imgSide = side.foto_thumbnail;
                 if (imgSide && !imgSide.startsWith('http')) imgSide = '/uploads/thumbnail/' + imgSide;
 
+                // Headline samping pakai lazy loading
                 var thumbSide = imgSide
-                    ? '<div class="ht-img" style="opacity: 1;"><img src="' + imgSide + '" style="width:100%;height:100%;object-fit:cover;"></div>'
+                    ? '<div class="ht-img" style="opacity: 1;"><img src="' + imgSide + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;"></div>'
                     : '<div class="ht-img" style="font-size:40px;opacity:0.2;">📰</div>';
 
                 html += '<div class="hero-thumb" onclick="window.location.href=\'/berita/' + side.slug + '\'">'
@@ -249,8 +255,9 @@
             var img = item.foto_thumbnail;
             if (img && !img.startsWith('http')) img = '/uploads/thumbnail/' + img;
 
+            // Suntik LAZY LOADING di semua thumbnail berita
             if (index < 2) {
-                var thumb = img ? '<img src="' + img + '" style="width:100%;height:100%;object-fit:cover;">' : '📰';
+                var thumb = img ? '<img src="' + img + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;">' : '📰';
                 gridHtml += '<div class="news-card" onclick="window.location.href=\'/berita/' + item.slug + '\'">'
                     + '<div class="nc-img" style="' + (img ? 'padding:0;' : '') + '">' + thumb + '</div>'
                     + '<div class="nc-cat ' + getCatClass(cat) + '">' + cat + '</div>'
@@ -258,7 +265,7 @@
                     + '<div class="nc-meta">' + formatWaktu(item.waktu_publikasi) + ' · 👁 ' + fmtNum(item.jumlah_view) + ' views</div>'
                     + '</div>';
             } else {
-                var thumb = img ? '<img src="' + img + '" style="width:100%;height:100%;object-fit:cover;">' : '📰';
+                var thumb = img ? '<img src="' + img + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;">' : '📰';
                 listHtml += '<div class="news-list-item" onclick="window.location.href=\'/berita/' + item.slug + '\'">'
                     + '<div class="nli-img" style="' + (img ? 'padding:0; overflow:hidden;' : '') + '">' + thumb + '</div>'
                     + '<div>'

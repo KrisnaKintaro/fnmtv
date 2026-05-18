@@ -3,13 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Verifikasi Email</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS Konsisten dengan Login & Register */
         :root {
             --red: #cc0000;
             --red-dark: #990000;
@@ -32,6 +31,8 @@
             color: var(--text);
             min-height: 100vh;
             display: flex;
+            /* Tambahan agar saat layar kecil bisa di-scroll */
+            overflow-x: hidden;
         }
 
         .login-wrap {
@@ -42,6 +43,9 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
+            /* Tambahan padding biar card gak nempel dinding di mobile */
+            padding: 20px;
+            overflow-y: auto;
         }
 
         .login-card {
@@ -53,6 +57,8 @@
             max-width: 420px;
             box-shadow: 0 8px 40px rgba(0, 0, 0, .1);
             text-align: center;
+            /* Pastikan card relatif untuk berjaga-jaga */
+            position: relative;
         }
 
         .login-logo {
@@ -67,22 +73,6 @@
             font-size: 13px;
             color: var(--muted);
             margin-bottom: 24px;
-        }
-
-        .login-role-chip {
-            margin-bottom: 24px;
-        }
-
-        .login-role-chip span {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #e6ecf4;
-            color: #1a3a7a;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 5px 14px;
-            border-radius: 20px;
         }
 
         .login-btn {
@@ -138,6 +128,44 @@
             min-width: 250px;
             transition: opacity .3s;
         }
+
+        /* =========================================
+           MEDIA QUERIES (RESPONSIVITAS UNTUK HP & TABLET)
+           ========================================= */
+        @media screen and (max-width: 576px) {
+            .login-wrap {
+                align-items: flex-start;
+                padding-top: 50px;
+                padding-bottom: 30px;
+            }
+
+            .login-card {
+                padding: 30px 24px;
+                border-radius: 12px;
+            }
+
+            .login-logo {
+                font-size: 24px !important;
+            }
+
+            #toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                min-width: unset;
+                justify-content: center;
+            }
+        }
+
+        /* Penyesuaian khusus untuk HP lipat (Fold) */
+        @media screen and (max-width: 320px) {
+            .login-card {
+                padding: 24px 16px;
+            }
+            .login-sub {
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 
@@ -178,7 +206,6 @@
                 }
             });
 
-            // Auto kirim verifikasi 1x per sesi
             if (!sessionStorage.getItem('auto_verify_sent')) {
                 sessionStorage.setItem('auto_verify_sent', 'true');
                 setTimeout(() => {
@@ -186,7 +213,6 @@
                 }, 500);
             }
 
-            // Polling cek status verifikasi tiap 3 detik
             let cekStatus = setInterval(function() {
                 $.get('/api/auth/checkVerify', function(res) {
                     if (res.verified) {
@@ -200,7 +226,6 @@
                 });
             }, 3000);
 
-            // Kirim ulang verifikasi
             $('#formResend').on('submit', function(e) {
                 e.preventDefault();
                 const btn = $('#btnResend');
@@ -230,7 +255,6 @@
                 });
             });
 
-            // Tombol kembali ke beranda = logout dulu
             $('#btnKembali').on('click', function() {
                 const btn = $(this);
                 btn.text('Keluar...').prop('disabled', true);
@@ -249,9 +273,8 @@
                 });
             });
 
-        }); // ← TUTUP document.ready — CUMA SATU
+        });
     </script>
 
 </body>
-
 </html>
