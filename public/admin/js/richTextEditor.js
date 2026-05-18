@@ -3,47 +3,70 @@
    ========================================== */
 
 const RTE = {
-    // 1. Inisialisasi otomatis untuk semua editor di halaman
     init: function (selector = ".rte-body") {
         const editors = document.querySelectorAll(selector);
 
         editors.forEach((editor) => {
-            // Pasang event listener buat update status tombol toolbar
-            editor.addEventListener("keyup", () =>
-                this.updateToolbarState(editor),
-            );
-            editor.addEventListener("mouseup", () =>
-                this.updateToolbarState(editor),
-            );
-            editor.addEventListener("click", () =>
-                this.updateToolbarState(editor),
-            );
+            editor.addEventListener("keyup", () => this.updateToolbarState());
+            editor.addEventListener("mouseup", () => this.updateToolbarState());
+            editor.addEventListener("click", () => this.updateToolbarState());
 
-            // Pasang fitur Clean Paste (Hanya teks polos)
+            // Clean Paste
             editor.addEventListener("paste", (e) => {
                 e.preventDefault();
-                const text = (e.originalEvent || e).clipboardData.getData(
-                    "text/plain",
-                );
+                const text = (e.originalEvent || e).clipboardData.getData("text/plain");
                 document.execCommand("insertText", false, text);
             });
         });
     },
 
-    // 2. Eksekusi Perintah (Bold, Italic, dll)
-    exec: function (command, value = null, editorId = null) {
+    exec: function (command, value = null) {
         document.execCommand(command, false, value);
-
-        // Fokus balik ke editor biar kursor ga ilang
-        if (editorId) {
-            document.getElementById(editorId).focus();
-        }
-
-        // Update visual tombol toolbar
         this.updateToolbarState();
     },
 
-    // 3. Fitur Tambah Link
+    // FITUR BARU: APPLY HEADING & NORMAL (Tanpa sistem toggle yang bikin ribet)
+    applyHeading: function (tag) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const text = selection.toString();
+
+        if (tag === 'normal') {
+            // TOMBOL NORMAL: Hapus semua styling (inline span) & balikin ke Paragraf
+            document.execCommand("removeFormat", false, null);
+            try { document.execCommand("formatBlock", false, "P"); }
+            catch (e) { document.execCommand("formatBlock", false, "<p>"); }
+        } else {
+            // TOMBOL H1, H2, H3
+            if (text.length > 0) {
+                const node = selection.anchorNode;
+                let parentBlock = node;
+                while (parentBlock && parentBlock.nodeType !== 1) {
+                    parentBlock = parentBlock.parentNode;
+                }
+                const parentText = parentBlock ? parentBlock.textContent : "";
+
+                if (text.trim() === parentText.trim()) {
+                    // Full 1 baris
+                    try { document.execCommand("formatBlock", false, tag); }
+                    catch (e) { document.execCommand("formatBlock", false, `<${tag}>`); }
+                } else {
+                    // Sebagian teks (Inline) -> Hapus format lama, timpa yg baru (Misal H3 diganti ke H1)
+                    document.execCommand("removeFormat", false, null);
+                    let size = tag.toLowerCase() === 'h1' ? '28px' : (tag.toLowerCase() === 'h2' ? '24px' : '20px');
+                    const html = `<span style="font-size: ${size}; font-weight: bold;">${text}</span>`;
+                    document.execCommand("insertHTML", false, html);
+                }
+            } else {
+                // Kursor diam (Tidak blok teks)
+                try { document.execCommand("formatBlock", false, tag); }
+                catch (e) { document.execCommand("formatBlock", false, `<${tag}>`); }
+            }
+        }
+        this.updateToolbarState();
+    },
+
     insertLink: function () {
         const url = prompt("Masukkan URL link:", "https://");
         if (url && url !== "https://") {
@@ -51,9 +74,7 @@ const RTE = {
         }
     },
 
-    // 4. Update Visual Tombol (Aktif/Tidak)
     updateToolbarState: function () {
-        // 1. Cek Formatting Dasar (Bold, Italic, Underline)
         const basicCommands = {
             bold: ".rte-btn-bold",
             italic: ".rte-btn-italic",
@@ -69,15 +90,14 @@ const RTE = {
             }
         });
 
-        // 2. Cek Heading (H1, H2, H3)
-        // formatBlock akan mengembalikan nama tag yang sedang aktif, misal "h1" atau "h2"
-        const currentBlock = document.queryCommandValue("formatBlock");
-        const headings = ["h1", "h2", "h3"];
+        const currentBlock = document.queryCommandValue("formatBlock") || "";
+        const headings = ["h1", "h2", "h3", "p"];
 
         headings.forEach((h) => {
-            const btn = document.querySelector(`.rte-btn-${h}`);
+            // Cek kalau tag-nya P, berarti tombol Normal yang aktif
+            const btn = document.querySelector(h === 'p' ? '.rte-btn-normal' : `.rte-btn-${h}`);
             if (btn) {
-                currentBlock === h
+                (currentBlock.toLowerCase() === h)
                     ? btn.classList.add("active")
                     : btn.classList.remove("active");
             }
@@ -85,5 +105,6 @@ const RTE = {
     },
 };
 
-// Auto-init saat dokumen siap
-$(document).ready(() => RTE.init());
+document.addEventListener("DOMContentLoaded", function() {
+    RTE.init();
+});

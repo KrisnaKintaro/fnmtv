@@ -31,7 +31,6 @@ body {
     display: flex;
 }
 
-/* ── SIDEBAR ── */
 .sidebar {
     width: var(--sidebar-w);
     min-height: 100vh;
@@ -43,6 +42,7 @@ body {
     left: 0;
     bottom: 0;
     z-index: 200;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .s-brand {
@@ -198,6 +198,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    min-width: 0;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ── TOPBAR ── */
@@ -219,6 +221,9 @@ body {
     font-weight: 700;
     font-size: 17px;
     flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .tb-breadcrumb {
@@ -570,7 +575,7 @@ body {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 10px;
-    overflow: hidden;
+    overflow-x: auto;
     margin-bottom: 20px;
 }
 
@@ -580,6 +585,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .card-ht {
@@ -608,6 +615,7 @@ th {
     border-bottom: 1px solid var(--border);
     font-weight: 600;
     background: #fcfbf9;
+    white-space: nowrap;
 }
 
 td {
@@ -615,6 +623,11 @@ td {
     font-size: 13px;
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
+    white-space: nowrap;
+}
+
+td .tbl-title {
+    white-space: nowrap;
 }
 
 tr:last-child td {
@@ -680,8 +693,8 @@ tr:hover td {
 }
 
 .b-reject {
-    background-color: #fde8e8 !important; /* Merah muda */
-    color: #cc0000 !important; /* Merah tua */
+    background-color: #fde8e8 !important;
+    color: #cc0000 !important;
     border: 1px solid #f5b8b8 !important;
 }
 
@@ -710,7 +723,6 @@ tr:hover td {
     color: var(--success);
 }
 
-/* Container buat tombol aksi */
 .act-btns {
     display: flex;
     gap: 8px;
@@ -718,7 +730,6 @@ tr:hover td {
     align-items: center;
 }
 
-/* Base style buat tiap tombol */
 .ico-btn {
     width: 34px;
     height: 34px;
@@ -733,7 +744,6 @@ tr:hover td {
     background-color: #f1f5f9;
 }
 
-/* Aksen Biru (Edit) */
 .ico-btn.btn-edit {
     background-color: #e0f2fe;
 }
@@ -743,7 +753,6 @@ tr:hover td {
     transform: translateY(-2px);
 }
 
-/* Aksen Hijau (Unban / Aktifkan) */
 .ico-btn.btn-unban {
     background-color: #dcfce7;
 }
@@ -753,7 +762,6 @@ tr:hover td {
     transform: translateY(-2px);
 }
 
-/* Aksen Merah (Ban & Purge) */
 .ico-btn.btn-ban, .ico-btn.btn-purge {
     background-color: #fee2e2;
 }
@@ -763,7 +771,6 @@ tr:hover td {
     transform: translateY(-2px);
 }
 
-/* State Disabled (Buat akun sendiri / role yang dilindungi) */
 .ico-btn.btn-disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -782,6 +789,7 @@ tr:hover td {
     display: flex;
     align-items: center;
     gap: 4px;
+    flex-wrap: wrap;
 }
 
 .pg-btn {
@@ -846,6 +854,7 @@ tr:hover td {
     background: var(--surface2);
     border-radius: 7px;
     padding: 4px;
+    overflow-x: auto;
 }
 
 .tab-p {
@@ -856,6 +865,7 @@ tr:hover td {
     color: var(--muted);
     transition: 0.15s;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .tab-p.active {
@@ -961,7 +971,7 @@ textarea {
     background: var(--surface2);
 }
 
-.rte-sep {
+.rte-sidebar-sep, .rte-sep {
     width: 1px;
     background: var(--border);
     margin: 2px 4px;
@@ -1133,6 +1143,7 @@ textarea {
 
 .cmt-body {
     flex: 1;
+    min-width: 0;
 }
 
 .cmt-user {
@@ -1144,12 +1155,16 @@ textarea {
     font-size: 11px;
     color: var(--muted);
     margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .cmt-text {
     font-size: 13px;
     line-height: 1.5;
     color: var(--text);
+    word-break: break-word;
 }
 
 .cmt-time {
@@ -1162,6 +1177,7 @@ textarea {
     display: flex;
     gap: 6px;
     margin-top: 8px;
+    flex-wrap: wrap;
 }
 
 /* ── CATEGORY ── */
@@ -1181,6 +1197,7 @@ textarea {
     align-items: center;
     justify-content: space-between;
     transition: 0.15s;
+    gap: 10px;
 }
 
 .cat-chip:hover {
@@ -1190,6 +1207,9 @@ textarea {
 .cat-name {
     font-weight: 700;
     font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .cat-count {
@@ -1230,6 +1250,7 @@ textarea {
     align-items: center;
     justify-content: center;
     background: var(--bg);
+    padding: 20px;
 }
 
 .login-card {
@@ -1360,6 +1381,7 @@ textarea {
     display: none;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .modal-backdrop.open {
@@ -1373,6 +1395,8 @@ textarea {
     width: 100%;
     max-width: 480px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-title {
@@ -1391,6 +1415,7 @@ textarea {
     margin-top: 20px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
+    flex-wrap: wrap;
 }
 
 /* ── MISC ── */
@@ -1415,19 +1440,8 @@ textarea {
     align-items: center;
 }
 
-.btn-ghost {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    border-radius: 6px;
-}
-
 .btn-pill {
     border-radius: 999px;
-}
-
-.btn-ghost:hover {
-    background: var(--border);
 }
 
 .empty-state {
@@ -1488,6 +1502,7 @@ textarea {
     display: flex;
     gap: 16px;
     margin-top: 12px;
+    flex-wrap: wrap;
 }
 
 .leg-item {
@@ -1545,23 +1560,6 @@ textarea {
     color: var(--muted);
     margin-top: 2px;
 }
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.page.active {
-    animation: fadeIn 0.2s ease;
-}
-
 
 /* ── PROFILE SETTINGS ── */
 .profile-card {
@@ -1635,4 +1633,140 @@ textarea {
 
 .profile-input:focus {
     border-color: var(--red);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page.active {
+    animation: fadeIn 0.2s ease;
+}
+
+
+/* =========================================================
+   🔥 ARSITEKTUR SIDEBAR DUA ALAM (DESKTOP & MOBILE RESPONSIVE) 🔥
+   ========================================================= */
+
+/* Efek transisi halus untuk animasi geser/menyusut */
+.sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.main {
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Wadah dasar backdrop overlay (blur screen) */
+.sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 190; /* Berada di bawah sidebar (200) tapi di atas topbar (100) */
+    cursor: pointer;
+    animation: fadeIn 0.2s ease;
+}
+
+/* ── STYLING BASE SEARCH BOX HP (Disembunyikan di versi web desktop) ── */
+.mobile-search-wrap {
+    display: none;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    width: 100%;
+    box-sizing: border-box;
+    position: sticky;
+    top: var(--topbar-h); /* Menempel pas di bawah topbar (60px) */
+    z-index: 99;
+}
+.mobile-search-wrap .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 13px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.mobile-search-wrap .search-box input {
+    background: none;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--text);
+    width: 100%;
+}
+
+/* ── A. KONDISI LAYAR DESKTOP / PC (min-width: 769px) ── */
+@media screen and (min-width: 769px) {
+    body.sidebar-toggled .sidebar {
+        transform: translateX(-100%);
+    }
+    body.sidebar-toggled .main {
+        margin-left: 0;
+    }
+}
+
+/* ── B. KONDISI LAYAR HP & TABLET (max-width: 768px) ── */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .main {
+        margin-left: 0 !important;
+    }
+
+    body.sidebar-toggled .sidebar {
+        transform: translateX(0) !important;
+    }
+    body.sidebar-toggled .sidebar-backdrop {
+        display: block;
+    }
+    body.sidebar-toggled {
+        overflow: hidden; /* Kunci halaman belakang pas laci drawer aktif */
+    }
+
+    /* 🔥 SAKTI: Munculkan baris search mobile & matikan search bar bawaan topbar atas 🔥 */
+    .mobile-search-wrap {
+        display: block;
+    }
+    .topbar .search-wrap {
+        display: none !important;
+    }
+
+    .stats-grid, .finance-grid, .profile-grid, .two-col-dash, .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .page {
+        padding: 20px 16px;
+    }
+}
+
+/* ── C. SMARTPHONE SUPER KECIL / FOLD (max-width: 400px) ── */
+@media screen and (max-width: 400px) {
+    .topbar { gap: 8px; }
+    .tb-title { font-size: 14px; }
+    .btn { padding: 8px 12px; font-size: 12px; }
+    .act-btns { gap: 4px; }
+    .ico-btn { width: 30px; height: 30px; font-size: 13px; }
+}
+
+/* ── ANTI-FLASH: Pre-apply sidebar state sebelum body render ── */
+/* Class ini di-set di <html> element sebelum body paint, lalu di-replace ke body oleh JS */
+html.sidebar-toggled-pre .sidebar {
+    transform: translateX(-100%);
+}
+html.sidebar-toggled-pre .main {
+    margin-left: 0;
 }

@@ -38,7 +38,7 @@ Route::get('/reset-password/{token}', function (Request $request, $token) {
 
 #================= VIEWERS =================
 Route::get('/', function () {
-    return view('viewers.pages.home');
+    return view('Viewers.pages.home');
     // return view('viewers.pages.tampilanDetilBerita');
     // return view('viewers.pages.tampilanTiapKategori');
 });
@@ -55,10 +55,11 @@ Route::get('/kategori/{slug}', function () {
 Route::get('berita/{slug}', function () {
     return view('Viewers.pages.tampilanDetilBerita');
 });
-Route::middleware(['auth', 'RoleCheck:Viewer'])->group(function () {
-    Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
-});
+// Route::middleware(['auth', 'RoleCheck:Viewer'])->group(function () {
+//     Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
+// });
 
+Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
 
 #================= ADMIN ===================
 Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {

@@ -3,13 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ... (Bagian CSS lu tetep sama persis kayak sebelumnya, ga ada yang berubah) ... */
         :root {
             --red: #cc0000;
             --red-dark: #990000;
@@ -32,6 +31,8 @@
             color: var(--text);
             min-height: 100vh;
             display: flex;
+            /* Tambahan agar saat layar kecil bisa di-scroll kalau kontennya kepanjangan */
+            overflow-x: hidden;
         }
 
         .login-wrap {
@@ -42,6 +43,9 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
+            /* Tambahan padding biar card gak nempel dinding di mobile */
+            padding: 20px;
+            overflow-y: auto;
         }
 
         .login-card {
@@ -52,6 +56,8 @@
             width: 100%;
             max-width: 420px;
             box-shadow: 0 8px 40px rgba(0, 0, 0, .1);
+            /* Pastikan card relatif untuk berjaga-jaga */
+            position: relative;
         }
 
         .login-logo {
@@ -158,7 +164,6 @@
             text-decoration: underline;
         }
 
-        /* Tombol Kembali */
         .back-btn {
             position: absolute;
             top: 24px;
@@ -185,7 +190,6 @@
             transform: translateY(-2px);
         }
 
-        /* TOAST BAWAAN LU */
         #toast {
             position: fixed;
             bottom: 28px;
@@ -204,13 +208,62 @@
             min-width: 250px;
             transition: opacity .3s;
         }
+
+        /* =========================================
+           MEDIA QUERIES (RESPONSIVITAS UNTUK HP & TABLET)
+           ========================================= */
+        @media screen and (max-width: 576px) {
+            .login-wrap {
+                /* Ubah align-items jika layar terlalu kecil agar bisa di-scroll vertikal */
+                align-items: flex-start;
+                padding-top: 80px; /* Beri ruang untuk tombol back di atas */
+                padding-bottom: 30px;
+            }
+
+            .login-card {
+                padding: 30px 24px; /* Kurangi padding dalam card agar inputan tidak terlalu sempit */
+                border-radius: 12px;
+            }
+
+            .back-btn {
+                top: 16px;
+                left: 16px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .login-logo {
+                font-size: 28px; /* Perkecil logo sedikit di HP */
+            }
+
+            #toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px; /* Buat toast full width dengan margin di HP */
+                min-width: unset;
+                justify-content: center;
+            }
+        }
+
+        /* Penyesuaian khusus untuk HP lipat (Fold) yang layarnya sangat sempit (sekitar 280px) */
+        @media screen and (max-width: 320px) {
+            .login-card {
+                padding: 24px 16px;
+            }
+            .back-btn span {
+                display: none; /* Sembunyikan teks "Kembali ke Beranda", sisakan ikon panahnya saja kalau di Fold */
+            }
+            .back-btn::after {
+                content: "Kembali"; /* Teks pengganti yang lebih pendek */
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div class="login-wrap">
-        <a href="/" class="back-btn">⬅ Kembali ke Beranda</a>
+        <a href="/" class="back-btn">⬅ <span>Kembali ke Beranda</span></a>
 
         <div class="login-card">
             <div class="login-logo" id="loginLogo">FNM</div>
@@ -260,18 +313,16 @@
             });
 
             $('#formLogin').on('submit', function(e) {
-                e.preventDefault(); // Cegah reload halaman
+                e.preventDefault();
 
                 const btn = $('#btnSubmitLogin');
                 btn.text('Memproses...').prop('disabled', true);
 
-                // Ambil data
                 const payload = {
                     email: $('#email').val(),
                     password: $('#password').val()
                 };
 
-                // Tembak API
                 $.ajax({
                     url: '/api/auth/login',
                     type: 'POST',
@@ -288,7 +339,7 @@
                         }
                     },
                     error: function(err) {
-                        btn.text('Masuk').prop('disabled', false); // Nyalain tombol lagi
+                        btn.text('Masuk').prop('disabled', false);
 
                         let msg = 'Gagal login, cek email/password anda.';
                         if (err.responseJSON && err.responseJSON.message) {
@@ -298,6 +349,7 @@
                     }
                 });
             });
+
             $(document).ready(function() {
                 $.ajax({
                     url: '/api/viewers/site-info',
@@ -305,9 +357,7 @@
                     success: function(res) {
                         if (res.status === 'success') {
                             const data = res.data;
-                            // Update title
                             document.title = data.nama_situs + ' — Masuk';
-                            // Update logo jika ada element dengan id login-logo
                             if (document.getElementById('loginLogo')) {
                                 document.getElementById('loginLogo').textContent = data.nama_situs;
                             }
@@ -318,7 +368,6 @@
 
             $(document).on('click', '.toggle-password', function() {
                 $(this).toggleClass('fa-eye fa-eye-slash');
-                // Cari inputan yang sejajar sama ikon ini
                 let input = $(this).siblings('input');
                 if (input.attr('type') === 'password') {
                     input.attr('type', 'text');
@@ -330,5 +379,4 @@
     </script>
 
 </body>
-
 </html>

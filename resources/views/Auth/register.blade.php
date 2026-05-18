@@ -3,13 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>FNM — Register</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS Sama persis kayak form login */
         :root {
             --red: #cc0000;
             --red-dark: #990000;
@@ -32,6 +31,8 @@
             color: var(--text);
             min-height: 100vh;
             display: flex;
+            /* Tambahan agar saat layar kecil bisa di-scroll kalau kontennya kepanjangan */
+            overflow-x: hidden;
         }
 
         .login-wrap {
@@ -42,6 +43,9 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
+            /* Tambahan padding biar card gak nempel dinding di mobile */
+            padding: 20px;
+            overflow-y: auto;
         }
 
         .login-card {
@@ -52,6 +56,8 @@
             width: 100%;
             max-width: 420px;
             box-shadow: 0 8px 40px rgba(0, 0, 0, .1);
+            /* Pastikan card relatif untuk berjaga-jaga */
+            position: relative;
         }
 
         .login-logo {
@@ -202,13 +208,61 @@
             min-width: 250px;
             transition: opacity .3s;
         }
+
+        /* =========================================
+           MEDIA QUERIES (RESPONSIVITAS UNTUK HP & TABLET)
+           ========================================= */
+        @media screen and (max-width: 576px) {
+            .login-wrap {
+                align-items: flex-start;
+                padding-top: 80px; /* Beri ruang untuk tombol back di atas */
+                padding-bottom: 30px;
+            }
+
+            .login-card {
+                padding: 30px 24px; /* Kurangi padding dalam card agar inputan tidak terlalu sempit */
+                border-radius: 12px;
+            }
+
+            .back-btn {
+                top: 16px;
+                left: 16px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .login-logo {
+                font-size: 28px;
+            }
+
+            #toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                min-width: unset;
+                justify-content: center;
+            }
+        }
+
+        /* Penyesuaian khusus untuk HP lipat (Fold) */
+        @media screen and (max-width: 320px) {
+            .login-card {
+                padding: 24px 16px;
+            }
+            .back-btn span {
+                display: none;
+            }
+            .back-btn::after {
+                content: "Kembali";
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div class="login-wrap">
-        <a href="/" class="back-btn">⬅ Kembali ke Beranda</a>
+        <a href="/" class="back-btn">⬅ <span>Kembali ke Beranda</span></a>
 
         <div class="login-card">
             <div class="login-logo">FNM</div>
@@ -287,11 +341,10 @@
                         }
                     },
                     error: function(err) {
-                        btn.text('Daftar').prop('disabled', false); // Nyalain tombol lagi
+                        btn.text('Daftar').prop('disabled', false);
 
                         let msg = 'Gagal mendaftar, cek lagi data anda.';
 
-                        // Tangkep error validasi dari Laravel (misal email udah kepake)
                         if (err.responseJSON && err.responseJSON.errors) {
                             const firstError = Object.values(err.responseJSON.errors)[0][0];
                             msg = firstError;
@@ -306,7 +359,6 @@
 
             $(document).on('click', '.toggle-password', function() {
                 $(this).toggleClass('fa-eye fa-eye-slash');
-                // Cari inputan yang sejajar sama ikon ini
                 let input = $(this).siblings('input');
                 if (input.attr('type') === 'password') {
                     input.attr('type', 'text');
@@ -318,5 +370,4 @@
     </script>
 
 </body>
-
 </html>

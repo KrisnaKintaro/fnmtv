@@ -42,7 +42,7 @@ class InitialUserSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            // Menggunakan updateOrCreate berdasarkan email agar aman saat deploy berkali-kali
+            // Menggunakan updateOrCreatee berdasarkan email agar aman saat deploy berkali-kali
             User::updateOrCreate(
                 ['email' => $userData['email']], // Kunci pengecekan unik
                 $userData

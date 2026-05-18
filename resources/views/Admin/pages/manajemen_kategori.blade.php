@@ -1,11 +1,23 @@
 @extends('Admin.master_admin')
 
 @section('css')
+<style>
+    /* ── FIX RESPONSIVE: Scroll Tabel Horizontal ── */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive table {
+        min-width: 600px; /* Paksa muncul scroll jika layar lebih sempit dari ini */
+    }
+</style>
 @endsection
 
 @section('konten')
 <div id="page-categories" class="page active">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px; flex-wrap: wrap; gap: 10px;">
         <div class="section-title" style="margin:0;">Manajemen Kategori</div>
         <button class="btn btn-red" onclick="bukaModalCat()">+ Tambah Kategori</button>
     </div>
@@ -23,26 +35,29 @@
         <div class="card-hd">
             <div class="card-ht">Semua Kategori & Detail</div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nama Kategori</th>
-                    <th>Slug</th>
-                    <th>Jumlah Artikel</th>
-                    <th>Terakhir Diupdate</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="catBody">
-            </tbody>
-        </table>
 
-        <div class="empty-state" id="emptyState" style="display:none;">
-            <div class="ico">📭</div>
-            <p>Belum ada kategori yang ditambahkan.</p>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Kategori</th>
+                        <th>Slug</th>
+                        <th>Jumlah Artikel</th>
+                        <th>Terakhir Diupdate</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="catBody">
+                </tbody>
+            </table>
         </div>
-        <div class="pager">
-            <div id="paginationControls" style="display:flex; gap:4px;"></div>
+
+        <div class="empty-state" id="emptyState" style="display:none; padding: 40px; text-align: center;">
+            <div class="ico" style="font-size: 40px; margin-bottom: 10px;">📭</div>
+            <p style="color: var(--muted);">Belum ada kategori yang ditambahkan atau tidak ditemukan.</p>
+        </div>
+        <div class="pager" style="flex-wrap:wrap;">
+            <div id="paginationControls" style="display:flex; gap:4px; flex-wrap:wrap;"></div>
             <div class="pg-info" id="pagerInfo">Menampilkan 0 dari 0 kategori</div>
         </div>
     </div>
@@ -55,11 +70,11 @@
 
             <div class="modal-close" onclick="closeModalCat()" style="
             position: absolute;
-            right: -10px;    /* Lompat 10px ke kanan */
-            top: -15px;      /* Lompat 15px ke atas */
+            right: -10px;
+            top: -15px;
             cursor: pointer;
             font-size: 22px;
-            color: #999;     /* Warna abu-abu kusam biar ga norak */
+            color: #999;
             width: 30px;
             height: 30px;
             display: flex;
@@ -69,14 +84,14 @@
         ">✕</div>
         </div>
 
-        <div class="modal-body">
+        <div class="modal-body" style="padding-top: 20px;">
             <div class="field">
                 <label>Nama Kategori</label>
-                <input type="text" id="inputNamaKategori" placeholder="Misal: Politik">
+                <input type="text" id="inputNamaKategori" placeholder="Misal: Politik" style="width: 100%; box-sizing: border-box;">
             </div>
             <div class="field">
                 <label>Slug Kategori</label>
-                <input type="text" id="inputSlugKategori" placeholder="misal: politik" style="font-family:'JetBrains Mono',monospace;">
+                <input type="text" id="inputSlugKategori" placeholder="misal: politik" style="font-family:'JetBrains Mono',monospace; width: 100%; box-sizing: border-box;">
             </div>
             <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
                 <button class="btn btn-outline" onclick="closeModalCat()">Batal</button>
@@ -94,8 +109,8 @@
             Yakin ingin menghapus kategori ini?
         </p>
         <div style="display:flex; justify-content:center; gap:10px;">
-            <button class="btn btn-outline" onclick="closeModalDelete()">Batal</button>
-            <button class="btn btn-red" onclick="prosesHapusKategori()" id="btnConfirmDelete">Ya, Hapus</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="closeModalDelete()">Batal</button>
+            <button class="btn btn-red" style="flex:1;" onclick="prosesHapusKategori()" id="btnConfirmDelete">Ya, Hapus</button>
         </div>
     </div>
 </div>
@@ -110,19 +125,20 @@
     let editCatId = null;
 
     $(document).ready(function() {
-        // 1. "Bajak" Input Search di Navbar khusus untuk halaman ini
         $('#tbTitle').text('Manajemen Kategori');
         $('#tbCrumb').text('Admin / Manajemen Kategori');
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.placeholder = 'Cari kategori...'; // Ubah placeholder
-            searchInput.value = ''; // Kosongin dulu pas load
 
-            // Hapus event listener lama (kalau ada) dan pasang yang baru
-            searchInput.onkeyup = function() {
-                jalankanFilter();
-            };
-        }
+        // 🔥 FIX SINKRONISASI SEARCH BAR PC & HP 🔥
+        const searchInputs = document.querySelectorAll('#searchInput, .mobile-search-input');
+        searchInputs.forEach(input => {
+            if(input) {
+                input.placeholder = 'Cari kategori...';
+                input.value = '';
+                input.addEventListener('keyup', function() {
+                    jalankanFilter();
+                });
+            }
+        });
 
         loadDataKategoriFromAPI();
     });
@@ -148,9 +164,9 @@
                 <td>${val.berita_count || 0}</td>
                 <td style="color:var(--muted);font-size:12px">${date}</td>
                 <td>
-                    <div class="act-btns">
-                        <div class="ico-btn" onclick="editKategori(${val.id})" title="Edit">✏️</div>
-                        <div class="ico-btn" onclick="konfirmasiHapus(${val.id}, ${val.berita_count || 0})" title="Hapus">🗑</div>
+                    <div class="act-btns" style="justify-content:flex-start;">
+                        <div class="ico-btn btn-edit" onclick="editKategori(${val.id})" title="Edit">✏️</div>
+                        <div class="ico-btn btn-purge" onclick="konfirmasiHapus(${val.id}, ${val.berita_count || 0})" title="Hapus">🗑</div>
                     </div>
                 </td>
             </tr>`;
@@ -184,23 +200,23 @@
         dataToRender.forEach(val => {
             html += `
             <div class="cat-chip">
-                <div>
+                <div style="min-width:0; flex:1;">
                     <div class="cat-name">${val.nama_kategori}</div>
                     <div class="cat-count">${val.berita_count || 0} artikel</div>
                 </div>
                 <div class="cat-actions">
-                    <div class="ico-btn" onclick="editKategori(${val.id})">✏️</div>
-                    <div class="ico-btn" onclick="konfirmasiHapus(${val.id}, ${val.berita_count || 0})">🗑</div>
+                    <div class="ico-btn btn-edit" onclick="editKategori(${val.id})">✏️</div>
+                    <div class="ico-btn btn-purge" onclick="konfirmasiHapus(${val.id}, ${val.berita_count || 0})">🗑</div>
                 </div>
             </div>`;
         });
 
         // Selalu tambahkan Card 'Tambah Kategori' di urutan paling belakang
         html += `
-        <div class="cat-chip" style="border-style:dashed;cursor:pointer;justify-content:center;color:var(--muted);" onclick="bukaModalCat()">
+        <div class="cat-chip" style="border-style:dashed;cursor:pointer;justify-content:center;color:var(--muted);transition:0.2s;" onclick="bukaModalCat()" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
             <div style="text-align:center">
                 <div style="font-size:22px;">+</div>
-                <div style="font-size:12px;">Tambah Kategori</div>
+                <div style="font-size:12px; font-weight:600;">Tambah Kategori</div>
             </div>
         </div>`;
 
@@ -209,7 +225,12 @@
 
     // Filter Global (CARD & TABLE)
     function jalankanFilter() {
-        const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
+        const desktopSearch = document.getElementById('searchInput');
+        const mobileSearch = document.querySelector('.mobile-search-input');
+        let keyword = '';
+
+        if (desktopSearch && desktopSearch.value) keyword = desktopSearch.value.toLowerCase();
+        else if (mobileSearch && mobileSearch.value) keyword = mobileSearch.value.toLowerCase();
 
         // 1. Filter Data Untuk Tabel via DataTableEngine
         catTable.setFilterAndSearch((val) => {

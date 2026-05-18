@@ -62,12 +62,12 @@
     <div class="s-avatar">
       {{ strtoupper(substr(Auth::user()->username ?? 'U', 0, 1)) }}
     </div>
-    <div>
-      <div class="s-uname"> {{ Auth::user()->username ?? 'User' }} </div>
-      <div class="s-urole"> {{ Auth::user()->role ?? 'User' }} </div>
+    <div style="min-width: 0; flex: 1;">
+      <div class="s-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::user()->username ?? 'User' }}</div>
+      <div class="s-urole">{{ Auth::user()->role ?? 'User' }}</div>
     </div>
     @endauth
-    <div class="s-logout" onclick="doLogout(event)" title="Keluar">
+    <div class="s-logout" onclick="doLogout(event)" title="Keluar" style="flex-shrink: 0;">
       <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
     </div>
   </div>

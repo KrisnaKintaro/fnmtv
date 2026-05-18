@@ -1,4 +1,4 @@
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="s-brand">
     <div>
       <div class="s-logo">FNM</div>
