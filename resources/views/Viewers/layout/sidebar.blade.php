@@ -5,8 +5,8 @@
     </div>
 
     <div style="margin-bottom: 20px;">
-        @include('Viewers.layout.ad_banner', [
-            'id' => 'sidebarAdSpace',
+        @include('Viewers.layout.promo_banner', [
+            'id' => 'sidebarPromoSpace',
             'type' => 'box'
         ])
     </div>
@@ -42,40 +42,40 @@
             })
             .catch(err => console.error("Gagal load kategori sidebar:", err));
 
-        loadSidebarAd();
+        loadSidebarPromo();
     });
 
-    function loadSidebarAd() {
-        var wrapper = document.getElementById('sidebarAdSpace'); // ← definisikan wrapper dulu
+    function loadSidebarPromo() {
+        var wrapper = document.getElementById('sidebarPromoSpace'); // ← definisikan wrapper dulu
         if (!wrapper) return;
 
         fetch('/api/viewers/iklan')
             .then(response => response.json())
             .then(res => {
-                if (res.status !== 'success') return; // tidak ada iklan, biarkan placeholder tampil
+                if (res.status !== 'success') return; // tidak ada promo, biarkan placeholder tampil
 
-                const ads = res.data.sidebar_300x250 || [];
-                const ad = ads.length ? ads[0] : null;
+                const promos = res.data.sidebar_300x250 || [];
+                const promo = promos.length ? promos[0] : null;
 
-                if (!ad) return; // tidak ada iklan, biarkan placeholder tampil
+                if (!promo) return; // tidak ada promo, biarkan placeholder tampil
 
-                // Ada iklan — timpa placeholder dengan konten iklan
-                const content = wrapper.querySelector('.ad-content');
+                // Ada promo — timpa placeholder dengan konten promo
+                const content = wrapper.querySelector('.promo-content');
                 if (!content) return;
 
                 let html = '';
-                if (ad.link_tujuan) {
-                    html += '<a href="' + ad.link_tujuan + '" target="_blank" rel="noopener noreferrer" style="display:block; width:100%;">'
-                        + '<img src="/storage/' + ad.gambar + '" alt="' + ad.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
+                if (promo.link_tujuan) {
+                    html += '<a href="' + promo.link_tujuan + '" target="_blank" rel="noopener noreferrer" style="display:block; width:100%;">'
+                        + '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
                         + '</a>';
                 } else {
-                    html += '<img src="/storage/' + ad.gambar + '" alt="' + ad.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
+                    html += '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
                 }
-                if (ad.judul) {
-                    html += '<div style="margin-top: 10px; font-size: 14px; font-weight: 700;">' + ad.judul + '</div>';
+                if (promo.judul) {
+                    html += '<div style="margin-top: 10px; font-size: 14px; font-weight: 700;">' + promo.judul + '</div>';
                 }
                 content.innerHTML = html;
             })
-            .catch(err => console.error('Gagal load iklan sidebar:', err));
+            .catch(err => console.error('Gagal load promo sidebar:', err));
     }
 </script>

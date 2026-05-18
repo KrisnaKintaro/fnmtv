@@ -822,8 +822,8 @@ a {
 .tr-badge.up  { background: #e8f8e8; color: #1a7a3c; }
 .tr-badge.hot { background: #ffe8e8; color: var(--red); }
 
-/* ── AD BANNER ── */
-.ad-banner {
+/* ── PROMO BANNER ── */
+.promo-banner {
     background: var(--text);
     color: var(--white);
     border-radius: 4px;
@@ -836,17 +836,17 @@ a {
     overflow: hidden;
 }
 
-.ad-box {
+.promo-box {
     aspect-ratio: 300 / 250;
     width: 100%;
 }
 
-.ad-horizontal {
+.promo-horizontal {
     aspect-ratio: 728 / 90;
     width: 100%;
 }
 
-.ad-label {
+.promo-label {
     font-size: 10px;
     letter-spacing: 2px;
     opacity: 0.4;
@@ -854,7 +854,7 @@ a {
     margin-bottom: 4px;
 }
 
-.ad-content {
+.promo-content {
     font-family: "Merriweather", serif;
     font-size: clamp(12px, 2.5vw, 18px);
     font-weight: 900;

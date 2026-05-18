@@ -49,9 +49,9 @@
 
             <div class="news-grid-2" id="terkiniGrid"></div>
 
-            <div style="margin: 30px 0;" id="space-iklan-tengah">
-                @include('Viewers.layout.ad_banner', [
-                    'id' => 'homeAdSpace',
+            <div style="margin: 30px 0;" id="space-promo-tengah">
+                @include('Viewers.layout.promo_banner', [
+                    'id' => 'homePromoSpace',
                     'type' => 'horizontal'
                 ])
             </div>
@@ -83,10 +83,10 @@
 <script>
     $(document).ready(function() {
         loadHomeData();
-        loadViewerAds();
+        loadViewerPromos();
     });
 
-    function loadViewerAds() {
+    function loadViewerPromos() {
         $.ajax({
             url: '/api/viewers/iklan',
             type: 'GET',
@@ -94,39 +94,39 @@
             success: function(res) {
                 if (res.status !== 'success') return;
 
-                var desktopAd = res.data.horizontal_728x90 && res.data.horizontal_728x90.length
+                var desktopPromo = res.data.horizontal_728x90 && res.data.horizontal_728x90.length
                     ? res.data.horizontal_728x90[0] : null;
-                var sidebarAd = res.data.sidebar_300x250 && res.data.sidebar_300x250.length
+                var sidebarPromo = res.data.sidebar_300x250 && res.data.sidebar_300x250.length
                     ? res.data.sidebar_300x250[0] : null;
 
-                renderAdSlot('homeAdSpace', desktopAd);
-                renderAdSlot('sidebarAdSpace', sidebarAd);
+                renderPromoSlot('homePromoSpace', desktopPromo);
+                renderPromoSlot('sidebarPromoSpace', sidebarPromo);
             },
             error: function(err) {
-                console.error('Gagal load iklan viewer:', err);
+                console.error('Gagal load promo viewer:', err);
             }
         });
     }
 
-    function renderAdSlot(elementId, ad) {
+    function renderPromoSlot(elementId, promo) {
         var wrapper = document.getElementById(elementId);
         if (!wrapper) return;
 
-        if (!ad) return; // tidak ada iklan, biarkan placeholder tampil
+        if (!promo) return; // tidak ada promo, biarkan placeholder tampil
 
-        var content = wrapper.querySelector('.ad-content');
+        var content = wrapper.querySelector('.promo-content');
         if (!content) return;
 
         var html = '';
-        if (ad.link_tujuan) {
-            html += '<a href="' + ad.link_tujuan + '" target="_blank" rel="noopener noreferrer" style="display:block; width:100%;">'
-                + '<img src="/storage/' + ad.gambar + '" alt="' + ad.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
+        if (promo.link_tujuan) {
+            html += '<a href="' + promo.link_tujuan + '" target="_blank" rel="noopener noreferrer" style="display:block; width:100%;">'
+                + '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">'
                 + '</a>';
         } else {
-            html += '<img src="/storage/' + ad.gambar + '" alt="' + ad.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
+            html += '<img src="/storage/' + promo.gambar + '" alt="' + promo.judul + '" style="width:100%; height:auto; border-radius: 8px; object-fit:contain;">';
         }
-        if (ad.judul) {
-            html += '<div style="margin-top: 10px; font-size: 14px; font-weight: 700;">' + ad.judul + '</div>';
+        if (promo.judul) {
+            html += '<div style="margin-top: 10px; font-size: 14px; font-weight: 700;">' + promo.judul + '</div>';
         }
         content.innerHTML = html;
     }
