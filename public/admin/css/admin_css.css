@@ -33,7 +33,8 @@ body {
 
 .sidebar {
     width: var(--sidebar-w);
-    min-height: 100vh;
+    height: 100%;
+    height: 100dvh;
     background: var(--sidebar);
     display: flex;
     flex-direction: column;
@@ -43,6 +44,7 @@ body {
     bottom: 0;
     z-index: 200;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
 }
 
 .s-brand {

@@ -1,4 +1,5 @@
 <style>
+    /* Tombol burger dibuat selalu siap sedia di PC maupun HP */
     .burger-menu-btn {
         display: inline-flex;
         background: none;
@@ -13,9 +14,19 @@
         transition: background 0.15s;
         flex-shrink: 0;
         margin-right: 6px;
+
+        /* FIX BUG 3: Paksa posisi dan optimasi klik layar sentuh */
+        position: relative;
+        z-index: 9999;
+        touch-action: manipulation; /* Menghilangkan delay tap/klik */
+        -webkit-tap-highlight-color: transparent;
     }
-    .burger-menu-btn:hover {
-        background: var(--surface2, #f0eeea);
+
+    /* FIX BUG 3: Hover hanya aktif di perangkat yang benar-benar punya mouse/kursor */
+    @media (hover: hover) and (pointer: fine) {
+        .burger-menu-btn:hover {
+            background: var(--surface2, #f0eeea);
+        }
     }
 </style>
 

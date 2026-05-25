@@ -14,9 +14,19 @@
         transition: background 0.15s;
         flex-shrink: 0;
         margin-right: 6px;
+
+        /* FIX BUG 3: Paksa posisi dan optimasi klik layar sentuh */
+        position: relative;
+        z-index: 9999;
+        touch-action: manipulation; /* Menghilangkan delay tap/klik */
+        -webkit-tap-highlight-color: transparent;
     }
-    .burger-menu-btn:hover {
-        background: var(--surface2, #f0eeea);
+
+    /* FIX BUG 3: Hover hanya aktif di perangkat yang benar-benar punya mouse/kursor */
+    @media (hover: hover) and (pointer: fine) {
+        .burger-menu-btn:hover {
+            background: var(--surface2, #f0eeea);
+        }
     }
 </style>
 
@@ -31,7 +41,7 @@
       <div class="tb-title" id="tbTitle">Dashboard</div>
       <div class="tb-breadcrumb" id="tbCrumb">Admin / Dashboard</div>
     </div>
-    
+
     <div class="search-wrap">
         <svg width="13" height="13" fill="none" stroke="#7a7570" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8" stroke-width="2"/>
@@ -64,12 +74,12 @@
     document.addEventListener("DOMContentLoaded", function() {
         var desktopSearch = document.getElementById('searchInput');
         var mobileSearch = document.querySelector('.mobile-search-input');
-        
+
         if (desktopSearch && mobileSearch) {
             // Ketika admin ngetik di HP, oper nilainya ke input asli desktop & paksa trigger event keyup-nya
             mobileSearch.addEventListener('input', function() {
                 desktopSearch.value = this.value;
-                
+
                 var inputEvent = new Event('input', { bubbles: true });
                 var keyupEvent = new KeyboardEvent('keyup', { bubbles: true });
                 desktopSearch.dispatchEvent(inputEvent);

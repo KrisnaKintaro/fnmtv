@@ -152,20 +152,6 @@
 @section('js')
 <script>
     $(document).ready(function() {
-        // Fitur Hide/Show Password
-        $(document).on('click', '.toggle-password', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $(this).toggleClass('fa-eye fa-eye-slash');
-
-            const input = $(this).siblings('input');
-            if (input.attr('type') === 'password') {
-                input.attr('type', 'text');
-            } else {
-                input.attr('type', 'password');
-            }
-        });
 
         $('#formProfilRedaksi').on('submit', function(e) {
             e.preventDefault();

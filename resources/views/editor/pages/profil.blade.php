@@ -152,20 +152,6 @@
 @section('js')
 <script>
     $(document).ready(function() {
-        // Fitur Toggle icon mata (hide/show password)
-        $(document).on('click', '.toggle-password', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            $(this).toggleClass('fa-eye fa-eye-slash');
-
-            const input = $(this).siblings('input');
-            if (input.attr('type') === 'password') {
-                input.attr('type', 'text');
-            } else {
-                input.attr('type', 'password');
-            }
-        });
 
         $('#formProfilEditor').on('submit', function(e) {
             e.preventDefault();

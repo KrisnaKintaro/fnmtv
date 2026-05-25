@@ -173,21 +173,5 @@
         $('#tbTitle').text('Pengaturan Sistem');
         $('#tbCrumb').text('Admin / Pengaturan');
     });
-
-    $(document).on('click', '.toggle-password', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Ganti icon mata terbuka/tertutup
-        $(this).toggleClass('fa-eye fa-eye-slash');
-
-        // Cari input di sebelahnya dan ganti tipe (text / password)
-        const input = $(this).closest('.profile-input-wrap').find('input');
-        if (input.attr('type') === 'password') {
-            input.attr('type', 'text');
-        } else {
-            input.attr('type', 'password');
-        }
-    });
 </script>
 @endsection
