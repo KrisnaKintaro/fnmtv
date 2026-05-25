@@ -1,4 +1,4 @@
-@extends('Viewers.master_viewers')
+@extends('viewers.master_viewers')
 
 @section('konten')
 <div class="container page-anim">
@@ -29,7 +29,7 @@
         </div>
 
         <div class="sidebar-col">
-            @include('Viewers.layout.sidebar')
+            @include('viewers.layout.sidebar')
         </div>
 
     </div>

@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\PengaturanController;
 
 Route::prefix('email')->group(function () {
     Route::get('/verify', function () {
-        return view('Auth.verifyEmail');
+        return view('auth.verifyemail');
     })->middleware('auth')->name('verification.notice');
 
     // Proses saat link di email diklik (Tetap di web karena merespons HTML/Browser)
@@ -24,13 +24,13 @@ Route::prefix('email')->group(function () {
 
 #================= LUPA PASSWORD =================
 // Tampilan Lupa Password
-Route::view('/forgot-password', 'Auth.forgotPassword')
+Route::view('/forgot-password', 'auth.forgotpassword')
     ->middleware('guest')
     ->name('password.request');
 
 // Tampilan Reset Password (Pakai closure karena butuh nangkep $token dan $request->email)
 Route::get('/reset-password/{token}', function (Request $request, $token) {
-    return view('Auth.resetPassword', [
+    return view('auth.resetpassword', [
         'token' => $token,
         'email' => $request->query('email')
     ]);
@@ -38,53 +38,53 @@ Route::get('/reset-password/{token}', function (Request $request, $token) {
 
 #================= VIEWERS =================
 Route::get('/', function () {
-    return view('Viewers.pages.home');
+    return view('viewers.pages.home');
     // return view('viewers.pages.tampilanDetilBerita');
     // return view('viewers.pages.tampilanTiapKategori');
 });
 
 Route::get('/search', function () {
-    return view('Viewers.pages.beritaHasilSearch');
+    return view('viewers.pages.beritahasilsearch');
 });
 #================= ADMIN =================
 
 Route::get('/kategori/{slug}', function () {
-    return view('Viewers.pages.tampilanTiapKategori');
+    return view('viewers.pages.tampilantiapkategori');
 });
 
 Route::get('berita/{slug}', function () {
-    return view('Viewers.pages.tampilanDetilBerita');
+    return view('viewers.pages.tampilandetilberita');
 });
 // Route::middleware(['auth', 'RoleCheck:Viewer'])->group(function () {
 //     Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
 // });
 
-Route::get('/profil', fn() => view('Viewers.pages.userProfil'));
+Route::get('/profil', fn() => view('viewers.pages.userprofil'));
 
 #================= ADMIN ===================
 Route::middleware(['auth', 'RoleCheck:Admin'])->group(function () {
     Route::get('/kategori', function () {
-        return view('Admin.pages.manajemen_kategori');
+        return view('admin.pages.manajemen_kategori');
     });
 
     Route::get('/komentar', function () {
-        return view('Admin.pages.komentar');
+        return view('admin.pages.komentar');
     });
 
     Route::get('/analitik_statistik_berita', function () {
-        return view('Admin.pages.analitikStatistikBerita');
+        return view('admin.pages.analitikstatistikberita');
     });
 
     Route::get('/finansial', function () {
-        return view('Admin.pages.finansial');
+        return view('admin.pages.finansial');
     });
 
     Route::get('/user', function () {
-        return view('Admin.pages.manajemen_user');
+        return view('admin.pages.manajemen_user');
     });
 
     Route::get('/promo-iklan', function () {
-        return view('Admin.pages.manajemen_iklan');
+        return view('admin.pages.manajemen_iklan');
     });
 
     Route::get('/pengaturan', [PengaturanController::class, 'index']);
@@ -101,25 +101,16 @@ Route::middleware(['auth', 'RoleCheck:Editor'])->group(function () {
 });
 #================= REDAKSI =================
 Route::middleware(['auth', 'RoleCheck:Redaksi'])->group(function () {
-    Route::get('/redaksi-manajemen-berita', fn() => view('Redaksi.pages.manajemen_berita'));
-    Route::get('/redaksi/profil', fn() => view('Redaksi.pages.profil'));
+    Route::get('/redaksi-manajemen-berita', fn() => view('redaksi.pages.manajemen_berita'));
+    Route::get('/redaksi/profil', fn() => view('redaksi.pages.profil'));
 });
 
 #================= AUTH =================
 Route::get('/login', function () {
-    return view('Auth.login');
+    return view('auth.login');
 })->name('login');
 
 Route::get('/register', function () {
-    return view('Auth.register');
+    return view('auth.register');
 })->name('register');
 
-
-Route::get('/buat-symlink', function () {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('storage:link');
-        return 'Aman cuy, symlink ke storage berhasil dibuat!';
-    } catch (\Exception $e) {
-        return 'Waduh error nih: ' . $e->getMessage();
-    }
-});

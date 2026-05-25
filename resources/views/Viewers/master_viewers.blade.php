@@ -20,11 +20,11 @@
         <span id="toastMsg"></span>
     </div>
 
-    @include('Viewers.layout.navbar')
+    @include('viewers.layout.navbar')
 
     @yield('konten')
 
-    @include('Viewers.layout.footer')
+    @include('viewers.layout.footer')
 
     <script src="{{ asset('viewers/js/jquery.min.js') }}"></script>
     <script src="{{ asset('viewers/js/toast.js') }}"></script>

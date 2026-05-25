@@ -1,4 +1,4 @@
-@extends('Viewers.master_viewers')
+@extends('viewers.master_viewers')
 
 @section('css')
 <style>
@@ -52,7 +52,7 @@
             <div class="news-grid-2" id="terkiniGrid"></div>
 
             <div style="margin: 30px 0;" id="space-promo-tengah">
-                @include('Viewers.layout.promo_banner', [
+                @include('viewers.layout.promo_banner', [
                     'id' => 'homePromoSpace',
                     'type' => 'horizontal'
                 ])
@@ -74,7 +74,7 @@
         </div>
 
         <div class="sidebar-col">
-            @include('Viewers.layout.sidebar')
+            @include('viewers.layout.sidebar')
         </div>
 
     </div>

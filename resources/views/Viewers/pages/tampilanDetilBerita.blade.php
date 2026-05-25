@@ -1,4 +1,4 @@
-@extends('Viewers.master_viewers')
+@extends('viewers.master_viewers')
 @section('css')
 <style>
     @keyframes modalPop {
@@ -100,7 +100,7 @@
         </div>
 
         <div class="sidebar-col">
-            @include('Viewers.layout.sidebar')
+            @include('viewers.layout.sidebar')
         </div>
     </div>
 </div>

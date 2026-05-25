@@ -1,4 +1,4 @@
-@extends('Admin.master_admin')
+@extends('admin.master_admin')
 @section('css')
     <style>
         /* Container Tab Pills */

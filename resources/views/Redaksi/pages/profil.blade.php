@@ -1,4 +1,4 @@
-@extends('Redaksi.redaksi_master')
+@extends('redaksi.redaksi_master')
 
 @section('title', 'Profil Saya')
 @section('breadcrumb', 'Redaksi / Profil')

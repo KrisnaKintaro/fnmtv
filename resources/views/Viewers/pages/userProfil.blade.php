@@ -1,4 +1,4 @@
-@extends('Viewers.master_viewers')
+@extends('viewers.master_viewers')
 
 @section('konten')
 <div class="container page-anim user-profile-container" style="max-width: 800px; margin: 20px auto; min-height: 60vh; padding: 10px 15px;">
