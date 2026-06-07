@@ -44,31 +44,22 @@
 
             <div class="sec-head">
                 <div class="sec-bar"></div>
-                <div class="sec-title">Berita Terkini</div>
+                <div class="sec-title">Berita Terbaru</div>
                 <a href="/search?q=" class="sec-link">Lihat Semua ➔</a>
             </div>
             <hr class="sec-divider">
 
-            <div class="news-grid-2" id="terkiniGrid"></div>
+            <div class="news-grid-2" id="terkiniGrid">
+                <div style="text-align: center; color: var(--muted); padding: 20px; grid-column: 1 / -1;">
+                    Memuat berita terbaru...
+                </div>
+            </div>
 
             <div style="margin: 30px 0;" id="space-promo-tengah">
                 @include('viewers.layout.promo_banner', [
                     'id' => 'homePromoSpace',
                     'type' => 'horizontal'
                 ])
-            </div>
-
-            <div class="sec-head">
-                <div class="sec-bar"></div>
-                <div class="sec-title">Baru Saja Rilis</div>
-            </div>
-
-            <hr class="sec-divider">
-
-            <div class="news-list" id="latestNewsContainer">
-                <div style="text-align: center; color: var(--muted); padding: 20px;">
-                    Memuat berita terbaru...
-                </div>
             </div>
 
         </div>
@@ -234,51 +225,35 @@
 
     function renderTerbaru(data) {
         var gridContainer = document.getElementById('terkiniGrid');
-        var listContainer = document.getElementById('latestNewsContainer');
 
         if (!data || data.length === 0) {
             gridContainer.innerHTML = '<div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; background: var(--white); border-radius: 12px; border: 2px dashed var(--border); text-align: center;">'
                 + '<div style="font-size: 48px; margin-bottom: 16px;">🕵️‍♂️</div>'
-                + '<div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px;">Wah, Berita Terkini Masih Kosong!</div>'
+                + '<div style="font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px;">Wah, Berita Terbaru Masih Kosong!</div>'
                 + '<div style="font-size: 14px; color: var(--muted);">Jadilah yang pertama tahu saat ada update berita terbaru nanti.</div>'
                 + '</div>';
-            listContainer.innerHTML = '';
             return;
         }
 
         var gridHtml = '';
-        var listHtml = '';
 
-        data.forEach(function(item, index) {
+        // FIX OPSI 2: Semua berita sekarang dimasukkan dengan format Grid yang rapi
+        data.forEach(function(item) {
             var cat = item.kategori ? item.kategori.nama_kategori : 'Umum';
-            var penulis = item.user ? item.user.username : 'FNM Redaksi';
             var img = item.foto_thumbnail;
             if (img && !img.startsWith('http')) img = '/uploads/thumbnail/' + img;
 
-            // Suntik LAZY LOADING di semua thumbnail berita
-            if (index < 2) {
-                var thumb = img ? '<img src="' + img + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;">' : '📰';
-                gridHtml += '<div class="news-card" onclick="window.location.href=\'/berita/' + item.slug + '\'">'
-                    + '<div class="nc-img" style="' + (img ? 'padding:0;' : '') + '">' + thumb + '</div>'
-                    + '<div class="nc-cat ' + getCatClass(cat) + '">' + cat + '</div>'
-                    + '<div class="nc-title">' + item.judul_berita + '</div>'
-                    + '<div class="nc-meta">' + formatWaktu(item.waktu_publikasi) + ' · 👁 ' + fmtNum(item.jumlah_view) + ' views</div>'
-                    + '</div>';
-            } else {
-                var thumb = img ? '<img src="' + img + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;">' : '📰';
-                listHtml += '<div class="news-list-item" onclick="window.location.href=\'/berita/' + item.slug + '\'">'
-                    + '<div class="nli-img" style="' + (img ? 'padding:0; overflow:hidden;' : '') + '">' + thumb + '</div>'
-                    + '<div>'
-                    + '<div class="nli-cat ' + getCatClass(cat) + '">' + cat + '</div>'
-                    + '<div class="nli-title">' + item.judul_berita + '</div>'
-                    + '<div class="nli-meta">' + formatWaktu(item.waktu_publikasi) + ' · Oleh ' + penulis + '</div>'
-                    + '</div>'
-                    + '</div>';
-            }
+            var thumb = img ? '<img src="' + img + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;">' : '📰';
+
+            gridHtml += '<div class="news-card" onclick="window.location.href=\'/berita/' + item.slug + '\'">'
+                + '<div class="nc-img" style="' + (img ? 'padding:0;' : '') + '">' + thumb + '</div>'
+                + '<div class="nc-cat ' + getCatClass(cat) + '">' + cat + '</div>'
+                + '<div class="nc-title">' + item.judul_berita + '</div>'
+                + '<div class="nc-meta">' + formatWaktu(item.waktu_publikasi) + ' · 👁 ' + fmtNum(item.jumlah_view) + ' views</div>'
+                + '</div>';
         });
 
         gridContainer.innerHTML = gridHtml;
-        listContainer.innerHTML = listHtml;
     }
 
     function renderTrending(data) {
