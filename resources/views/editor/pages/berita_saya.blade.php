@@ -3,8 +3,6 @@
 @section('title', 'Berita Saya')
 @section('breadcrumb', 'Editor / Berita Saya')
 
-<<<<<<< Updated upstream
-=======
 @section('css')
 <style>
     /* ── FIX RESPONSIVE: Filter Bar & Tab Pills ── */
@@ -22,7 +20,7 @@
         gap: 4px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        padding-bottom: 4px;
+        padding-bottom: 4px; /* Biar scrollbar ga nabrak */
         max-width: 100%;
     }
 
@@ -40,7 +38,7 @@
     }
 
     .table-responsive table {
-        min-width: 800px;
+        min-width: 800px; /* Paksa muncul scroll jika layar HP sempit */
     }
 
     @media screen and (max-width: 768px) {
@@ -53,13 +51,12 @@
             justify-content: space-between;
         }
         .filter-actions .filter-select {
-            flex: 1;
+            flex: 1; /* Dropdown penuhi setengah layar di HP */
         }
     }
 </style>
 @endsection
 
->>>>>>> Stashed changes
 @section('konten')
     <div id="page-my-news" class="page active">
         <div class="section-title">Berita Saya</div>
@@ -75,17 +72,21 @@
                 <div class="tab-p" onclick="filterTab(this,'pending')">Pending <span
                         style="margin-left:4px;background:#e6ecf4;color:var(--blue);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
                 </div>
-<<<<<<< Updated upstream
-=======
+
                 <div class="tab-p" onclick="filterTab(this,'published')"> Dipublikasikan
                     <span style="margin-left:4px;background:#e6f4f0;color:var(--success);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
                 </div>
->>>>>>> Stashed changes
+
+                <div class="tab-p" onclick="filterTab(this,'published')"> Dipublikasikan 
+                    <span style="margin-left:4px;background:#e6f4f0;color:var(--success);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
+                </div>
+
                 <div class="tab-p" onclick="filterTab(this,'rejected')">Ditolak <span
                         style="margin-left:4px;background:#fde8e8;color:var(--red);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
                 </div>
             </div>
-            <div style="margin-left:auto;display:flex;gap:8px;">
+
+            <div class="filter-actions">
                 <select class="filter-select select-kategori-ajax" id="filterKategori" onchange="jalankanFilter()"
                     style="font-size:12px;padding:6px 10px;">
                     <option value="all">Semua Kategori</option>
@@ -103,68 +104,46 @@
                 <div class="card-ht">Daftar Berita</div>
                 <div class="card-hm" id="tableCount"></div>
             </div>
-            <table id="newsTable">
-                <thead>
-                    <tr>
-                        <th>Thumbnail</th>
-                        <th>Judul &amp; Informasi</th>
-                        <th>Kategori</th>
-                        <th>Status</th>
-                        <th>Tanggal</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="newsBody">
-                </tbody>
-            </table>
 
-            <div class="pager">
-                <div id="paginationControls" style="display:flex; gap:4px;">
+            <div class="table-responsive">
+                <table id="newsTable">
+                    <thead>
+                        <tr>
+                            <th>Thumbnail</th>
+                            <th>Judul &amp; Informasi</th>
+                            <th>Kategori</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="newsBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pager" style="flex-wrap: wrap;">
+                <div id="paginationControls" style="display:flex; gap:4px; flex-wrap: wrap;">
                 </div>
                 <div class="pg-info" id="pagerInfo">Menampilkan 0 dari 0 artikel</div>
             </div>
         </div>
     </div>
 
-<<<<<<< Updated upstream
-    <div id="modalDelete"
-        style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
-        <div
-            style="background:var(--white);border-radius:12px;padding:32px;max-width:380px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
-            <div style="font-size:32px;text-align:center;margin-bottom:12px;">🗑</div>
-            <div
-                style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">
-                Hapus Artikel?</div>
-            <div style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:24px;">Artikel yang dihapus tidak
-                dapat dipulihkan. Pastikan Anda yakin sebelum melanjutkan.</div>
-=======
     {{-- Modal Hapus --}}
     <div id="modalDelete" class="modal-backdrop" style="display:none;">
         <div class="modal" style="max-width:380px; text-align:center; padding:32px 20px;">
             <div style="font-size:40px; margin-bottom:12px;">🗑</div>
             <div style="font-family:'Merriweather',serif;font-size:18px;font-weight:700;margin-bottom:8px;">Hapus Artikel?</div>
             <div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5;">Artikel yang dihapus tidak dapat dipulihkan. Pastikan Anda yakin sebelum melanjutkan.</div>
->>>>>>> Stashed changes
+
             <div style="display:flex;gap:10px;">
-                <button class="btn btn-outline" style="flex:1;" onclick="closeDelete()">Batal</button>
-                <button class="btn btn-red" style="flex:1;" onclick="doDelete()">Ya, Hapus</button>
+                <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeDelete()">Batal</button>
+                <button class="btn btn-red" style="flex:1; justify-content:center;" onclick="doDelete()">Ya, Hapus</button>
             </div>
         </div>
     </div>
 
-<<<<<<< Updated upstream
-    <div id="modalAlasanTolak"
-        style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;">
-        <div
-            style="background:var(--white);border-radius:12px;padding:32px;max-width:400px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.2);">
-            <div style="font-size:32px;text-align:center;margin-bottom:12px;">❌</div>
-            <div
-                style="font-family:'Merriweather',serif;font-size:16px;font-weight:700;text-align:center;margin-bottom:8px;">
-                Artikel Ditolak</div>
-            <div
-                style="font-size:13px;color:var(--text);background:#fde8e8;padding:12px;border-radius:8px;border:1px solid #f5b8b8;margin-bottom:24px;line-height:1.5;">
-                <strong>Catatan Redaksi:</strong><br>
-=======
     {{-- Modal Alasan Tolak --}}
     <div id="modalAlasanTolak" class="modal-backdrop" style="display:none;">
         <div class="modal" style="max-width:400px; text-align:center; padding:32px 20px;">
@@ -172,11 +151,11 @@
             <div style="font-family:'Merriweather',serif;font-size:18px;font-weight:700;margin-bottom:8px;">Artikel Ditolak</div>
             <div style="font-size:13px;color:var(--text);background:#fde8e8;padding:16px;border-radius:8px;border:1px solid #f5b8b8;margin-bottom:24px;line-height:1.6;text-align:left;">
                 <strong style="color:var(--red);">Catatan Redaksi:</strong><br>
->>>>>>> Stashed changes
+
                 <span id="teksAlasanTolak"></span>
             </div>
             <div style="display:flex;justify-content:center;">
-                <button class="btn btn-outline" onclick="ModalManager.close('modalAlasanTolak')">Tutup</button>
+                <button class="btn btn-outline" style="width:100%; justify-content:center;" onclick="ModalManager.close('modalAlasanTolak')">Tutup</button>
             </div>
         </div>
     </div>
@@ -211,9 +190,18 @@
             loadKategori();
             loadDaftarBerita();
 
-<<<<<<< Updated upstream
+            // SETUP EVENT LISTENER PENCARIAN DUA ALAM (PC & HP)
+            const searchInputs = document.querySelectorAll('#searchInput, .mobile-search-input');
+            searchInputs.forEach(input => {
+                if(input) {
+                    input.addEventListener('keyup', function() {
+                        jalankanFilter();
+                    });
+                }
+            });
+
             // INIT NOTIFIKASI KHUSUS EDITOR
-=======
+            
             // Setup event listener pencarian (PC & HP)
             const searchInputs = document.querySelectorAll('#searchInput, .mobile-search-input');
             searchInputs.forEach(input => {
@@ -225,7 +213,6 @@
             });
 
             /* ── SmartNotif: notifikasi dropdown + sinkronisasi badge sidebar ── */
->>>>>>> Stashed changes
             SmartNotif.init({
                 apiUrl: '/api/editor/manajemen_berita/ambilNotifikasi',
 
@@ -286,16 +273,19 @@
 
                 return `
                 <tr data-key="${val.id}">
-<<<<<<< Updated upstream
-                    <td><div class="tbl-img"><img src="/uploads/thumbnail/${val.foto_thumbnail}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"></div></td>
-=======
                     <td>
                         <div class="tbl-img">
                             <img src="/uploads/thumbnail/${val.foto_thumbnail}" loading="lazy"
                                  style="width:56px;height:40px;object-fit:cover;border-radius:4px;">
                         </div>
                     </td>
->>>>>>> Stashed changes
+                    
+                    <td>
+                        <div class="tbl-img">
+                            <img src="/uploads/thumbnail/${val.foto_thumbnail}" loading="lazy" style="width:56px;height:40px;object-fit:cover;border-radius:4px;">
+                        </div>
+                    </td>
+
                     <td>
                         <div class="tbl-title">${val.judul_berita}</div>
                         <div class="tbl-meta">Slug: ${val.slug}</div>
@@ -310,19 +300,18 @@
                         ${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}
                     </td>
                     <td>
-                        <div class="act-btns">
+                        <div class="act-btns" style="justify-content:flex-start;">
                             ${btnInfoTolak}
-<<<<<<< Updated upstream
-                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">✏️</div>`}
-                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn" style="opacity:.4;cursor:not-allowed;">🗑</div>`}
-=======
                             ${val.status_berita !== 'Pending'
                                 ? `<div class="ico-btn btn-edit" onclick="editBerita(${val.id})">✏️</div>`
                                 : `<div class="ico-btn btn-disabled" title="Sedang direview">✏️</div>`}
                             ${val.status_berita !== 'Pending'
                                 ? `<div class="ico-btn btn-purge" onclick="confirmDelete(${val.id})">🗑</div>`
                                 : `<div class="ico-btn btn-disabled" title="Sedang direview">🗑</div>`}
->>>>>>> Stashed changes
+
+                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn btn-edit" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn btn-disabled" title="Sedang direview">✏️</div>`}
+                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn btn-purge" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn btn-disabled" title="Sedang direview">🗑</div>`}
+
                         </div>
                     </td>
                 </tr>`;
@@ -333,20 +322,17 @@
          *  LOAD KATEGORI
          * ════════════════════════════════════════════════════════════ */
         function loadKategori() {
-            // PERBAIKAN: Menggunakan API Viewer yang tidak butuh Role Admin
             $.ajax({
-<<<<<<< Updated upstream
-                url: '/api/viewers/kategori', // ← GANTI INI
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    // Sesuaikan karena struktur response viewers berbeda
-=======
                 url:      '/api/viewers/kategori',
                 type:     'GET',
                 dataType: 'json',
                 success: function (response) {
->>>>>>> Stashed changes
+
+                url: '/api/viewers/kategori',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+
                     let data = [];
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         data = response.data;
@@ -371,7 +357,6 @@
                     let currentForm = formEl.val();
                     formEl.html(optionsForm);
                     formEl.val(currentForm);
-
                     jalankanFilter();
                 },
                 error: function (xhr) {
@@ -395,31 +380,26 @@
                     jalankanFilter();
 
                     if (response && Array.isArray(response)) {
-<<<<<<< Updated upstream
-                        const all = response.length;
-                        const draft = response.filter(b => b.status_berita === 'Draft').length;
-                        const pending = response.filter(b => b.status_berita === 'Pending').length;
-                        const rejected = response.filter(b => b.status_berita === 'Rejected').length;
-=======
                         const all       = response.length;
                         const draft     = response.filter(b => b.status_berita === 'Draft').length;
                         const pending   = response.filter(b => b.status_berita === 'Pending').length;
                         const rejected  = response.filter(b => b.status_berita === 'Rejected').length;
                         const published = response.filter(b => b.status_berita === 'Published').length;
->>>>>>> Stashed changes
 
                         // Update counter di tab pills
+
+                        const published = response.filter(b => b.status_berita === 'Published').length;
+
+                        $('#editorSidebarBadge').text(all);
+
                         const tabs = $('#tabPills .tab-p span');
                         if (tabs.length >= 5) {
                             $(tabs[0]).text(all);
                             $(tabs[1]).text(draft);
                             $(tabs[2]).text(pending);
-<<<<<<< Updated upstream
-                            $(tabs[3]).text(rejected);
-=======
                             $(tabs[3]).text(published);
                             $(tabs[4]).text(rejected);
->>>>>>> Stashed changes
+                            $(tabs[4]).text(published);
                         }
 
                         /*
@@ -441,25 +421,16 @@
             });
         }
 
-<<<<<<< Updated upstream
-        // --- NAVIGASI KE HALAMAN EDIT ---
-=======
         /* ════════════════════════════════════════════════════════════
          *  EDIT BERITA
          * ════════════════════════════════════════════════════════════ */
->>>>>>> Stashed changes
         function editBerita(id) {
-            // Redirect ke form tulis berita dengan membawa parameter ID
             window.location.href = `/tulis-editor?id=${id}`;
         }
 
-<<<<<<< Updated upstream
-        // --- FUNGSI HAPUS ---
-=======
         /* ════════════════════════════════════════════════════════════
          *  DELETE BERITA
          * ════════════════════════════════════════════════════════════ */
->>>>>>> Stashed changes
         let idBeritaYangAkanDihapus = null;
 
         function confirmDelete(id) {
@@ -523,9 +494,14 @@
         function jalankanFilter() {
             let kategoriDipilih = document.getElementById('filterKategori').value;
             const urutanDipilih = document.getElementById('filterUrutan').value;
-<<<<<<< Updated upstream
-            const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase();
-=======
+
+            // 🔥 SINKRONISASI PENCARIAN DARI NAVBAR PC DAN HP 🔥
+            const desktopSearch = document.getElementById('searchInput');
+            const mobileSearch = document.querySelector('.mobile-search-input');
+            let keyword = '';
+
+            if (desktopSearch && desktopSearch.value) keyword = desktopSearch.value.toLowerCase();
+            else if (mobileSearch && mobileSearch.value) keyword = mobileSearch.value.toLowerCase();
 
             // Sinkronisasi pencarian dari navbar PC dan HP
             const desktopSearch = document.getElementById('searchInput');
@@ -534,7 +510,6 @@
 
             if (desktopSearch && desktopSearch.value)     keyword = desktopSearch.value.toLowerCase();
             else if (mobileSearch && mobileSearch.value)  keyword = mobileSearch.value.toLowerCase();
->>>>>>> Stashed changes
 
             if (!kategoriDipilih || kategoriDipilih === '') {
                 kategoriDipilih = 'all';

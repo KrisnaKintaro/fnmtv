@@ -15,6 +15,8 @@ class IklanController extends Controller
      */
     public function getDaftarIklan()
     {
+        $this->disableExpiredIklan();
+
         $data = Iklan::with('user')->latest()->get();
         return response()->json($data);
     }
@@ -25,31 +27,45 @@ class IklanController extends Controller
     public function tambahIklan(Request $request)
     {
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'posisi' => 'required|in:horizontal_728x90,sidebar_300x250',
-            'link_tujuan' => 'nullable|url',
-            'tanggal_mulai' => 'nullable|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'judul'           => 'required|string|max:255',
+            'gambar'          => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'posisi'          => 'required|in:horizontal_728x90,sidebar_300x250',
+            'link_tujuan'     => 'nullable|url',
+            'tanggal_mulai'   => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
         ]);
 
-        // Proses Upload Gambar
         $path = $request->file('gambar')->store('iklan', 'public');
 
+        $this->disableExpiredIklan();
+
+        // Cek apakah sudah ada iklan aktif di posisi yang sama dan masih dalam rentang tayang
+        $now = now()->toDateString();
+        $adaYangAktif = Iklan::where('posisi', $request->posisi)
+            ->where('is_active', true)
+            ->where(function($query) use ($now) {
+                $query->whereNull('tanggal_mulai')
+                    ->orWhere('tanggal_mulai', '<=', $now);
+            })
+            ->where(function($query) use ($now) {
+                $query->whereNull('tanggal_selesai')
+                    ->orWhere('tanggal_selesai', '>=', $now);
+            })
+            ->exists();
+
         $iklan = Iklan::create([
-            'dibuat_oleh' => Auth::id(),
-            'judul' => $request->judul,
-            'gambar' => $path,
-            'posisi' => $request->posisi,
-            'link_tujuan' => $request->link_tujuan,
-            'tanggal_mulai' => $request->tanggal_mulai,
+            'dibuat_oleh'     => Auth::id(),
+            'judul'           => $request->judul,
+            'gambar'          => $path,
+            'posisi'          => $request->posisi,
+            'link_tujuan'     => $request->link_tujuan,
+            'tanggal_mulai'   => $request->tanggal_mulai,
             'tanggal_selesai' => $request->tanggal_selesai,
-            'is_active' => true,
+            'is_active'       => !$adaYangAktif, // aktif hanya jika belum ada yang aktif
         ]);
 
         return response()->json(['message' => 'Iklan berhasil ditambahkan!', 'data' => $iklan]);
     }
-
     /**
      * Update Data Iklan
      */
@@ -62,8 +78,12 @@ class IklanController extends Controller
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'posisi' => 'required|in:horizontal_728x90,sidebar_300x250',
             'link_tujuan' => 'nullable|url',
-            'tanggal_mulai' => 'nullable|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+        ], [
+            'tanggal_mulai.required' => 'Tanggal mulai wajib diisi',
+            'tanggal_selesai.required' => 'Tanggal selesai wajib diisi',
+            'tanggal_selesai.after_or_equal' => 'Tanggal selesai harus lebih besar atau sama dengan tanggal mulai',
         ]);
 
         // Jika ada gambar baru yang diupload
@@ -74,13 +94,20 @@ class IklanController extends Controller
             $iklan->gambar = $request->file('gambar')->store('iklan', 'public');
         }
 
-        $iklan->update([
-            'judul' => $request->judul,
-            'posisi' => $request->posisi,
-            'link_tujuan' => $request->link_tujuan,
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_selesai' => $request->tanggal_selesai,
-        ]);
+        $updateData = [
+            'judul'          => $request->judul,
+            'posisi'         => $request->posisi,
+            'link_tujuan'    => $request->link_tujuan,
+            'tanggal_mulai'  => $request->tanggal_mulai,
+            'tanggal_selesai'=> $request->tanggal_selesai,
+        ];
+
+        if ($request->hasFile('gambar')) {
+            Storage::disk('public')->delete($iklan->gambar);
+            $updateData['gambar'] = $request->file('gambar')->store('iklan', 'public');
+        }
+
+        $iklan->update($updateData);
 
         return response()->json(['message' => 'Iklan berhasil diperbarui!']);
     }
@@ -105,10 +132,32 @@ class IklanController extends Controller
     public function ubahStatusIklan($id)
     {
         $iklan = Iklan::findOrFail($id);
+
+        // Jika akan diaktifkan, nonaktifkan dulu iklan lain di posisi yang sama
+        if (!$iklan->is_active) {
+            Iklan::where('posisi', $iklan->posisi)
+                ->where('id', '!=', $id)
+                ->where('is_active', true)
+                ->update(['is_active' => false]);
+        }
+
         $iklan->is_active = !$iklan->is_active;
         $iklan->save();
 
         return response()->json(['message' => 'Status iklan berhasil diubah!']);
+    }
+
+    /**
+     * Disabled expired ads before returning data
+     */
+    private function disableExpiredIklan()
+    {
+        $now = now()->toDateString();
+
+        Iklan::where('is_active', true)
+            ->whereNotNull('tanggal_selesai')
+            ->where('tanggal_selesai', '<', $now)
+            ->update(['is_active' => false]);
     }
 
     /**
@@ -117,6 +166,8 @@ class IklanController extends Controller
      */
     public function getIklanAktif()
     {
+        $this->disableExpiredIklan();
+
         $now = now()->toDateString();
 
         $data = Iklan::where('is_active', true)

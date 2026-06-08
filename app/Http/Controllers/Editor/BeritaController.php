@@ -17,7 +17,7 @@ class BeritaController extends Controller
     {
         $data = Berita::with('kategori:id,nama_kategori')
             ->where('user_id', Auth::id())
-            ->where('status_berita', '!=', 'Published')
+            //->where('status_berita', '!=', 'Published')
             ->latest()
             ->get();
         return response()->json($data);

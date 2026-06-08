@@ -121,6 +121,7 @@ class AuthController extends Controller
                 'message' => 'Login Sukses',
                 'token' => $token,
                 'redirect' => $redirectUrl,
+                'user' => $user->only('id', 'username', 'email', 'role', 'status'),
             ]);
         }
 

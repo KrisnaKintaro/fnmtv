@@ -17,7 +17,7 @@ class PengaturanController extends Controller
             ->pluck('value', 'key')
             ->toArray();
 
-        return view('Admin.pages.pengaturan', compact('settings'));
+        return view('admin.pages.pengaturan', compact('settings'));
     }
 
     public function updateIdentity(Request $request)

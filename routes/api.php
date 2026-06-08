@@ -101,6 +101,8 @@ Route::prefix('viewers')->middleware('auth:sanctum')->group(function () {
     // Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi'])->middleware('throttle:10,1');
     Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar']);
     Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
+    Route::put('/komentar/{id}', [KomentarController::class, 'editKomentar']);
+    Route::delete('/komentar/{id}', [KomentarController::class, 'hapusKomentar']);
 });
 
 

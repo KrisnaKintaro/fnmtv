@@ -1,4 +1,4 @@
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="s-brand">
     <div>
       <div class="s-logo">FNM</div>
@@ -18,29 +18,6 @@
       Berita Saya
       <span class="s-badge" id="badgeEditorDitolak" style="background:var(--red);color:#fff;display:none;">0</span>
     </a>
-  </div>
-
-  <div class="s-section">
-      <div class="s-label">Konten</div>
-      
-      <a href="/tulis-editor" class="s-item">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        Tulis Berita Baru
-      </a>
-
-      <a href="/berita-saya" class="s-item">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l6 6v8a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21" stroke-width="2" stroke-linecap="round"/></svg>
-        Berita Saya
-        <span class="s-badge" id="badgeEditorDitolak" style="background:var(--red);color:#fff;display:none;">0</span>
-      </a>
-
-      <!-- TAMBAHKAN MENU IKLAN DI SINI -->
-      <a href="/iklan" class="s-item {{ Request::is('iklan') ? 'active' : '' }}">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
-        </svg>
-        Manajemen Iklan
-      </a>
   </div>
 
   <div class="s-section">
