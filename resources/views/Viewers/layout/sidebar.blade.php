@@ -43,10 +43,57 @@
             .catch(err => console.error("Gagal load kategori sidebar:", err));
 
         loadSidebarPromo();
+        loadSidebarTrending();
+    });
+
+    function loadSidebarTrending() {
+        fetch('/api/viewers/berita')
+            .then(response => response.json())
+            .then(res => {
+                if (res.status === 'success' && res.data && Array.isArray(res.data.trending)) {
+                    renderSidebarTrending(res.data.trending);
+                }
+            })
+            .catch(err => console.error('Gagal load trending sidebar:', err));
+    }
+
+    function renderSidebarTrending(trendingData) {
+        const container = document.getElementById('trendingContainer');
+        if (!container) return;
+
+        if (!trendingData || trendingData.length === 0) {
+            container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 12px;background:#f9f9f9;border-radius:12px;border:1px solid var(--border);text-align:center;color:var(--muted);">'
+                + '<div style="font-size:28px;margin-bottom:10px;">📉</div>'
+                + '<div style="font-size:14px;font-weight:700;">Belum ada berita trending</div>'
+                + '<div style="font-size:12px;line-height:1.5;margin-top:8px;">Cek kembali nanti untuk berita yang lebih ramai dibaca.</div>'
+                + '</div>';
+            return;
+        }
+
+        let html = '';
+        trendingData.slice(0, 5).forEach((item, index) => {
+            const views = item.jumlah_view ? item.jumlah_view.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '0';
+            html += '<a href="/berita/' + item.slug + '" class="trending-item" style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;">'
+                + '<div class="tr-rank" style="min-width:28px;font-weight:700;color:var(--red);">' + (index + 1) + '</div>'
+                + '<div style="flex:1;">'
+                    + '<div class="tr-title" style="font-size:13px;font-weight:700;line-height:1.3;">' + item.judul_berita + '</div>'
+                    + '<div class="tr-views" style="font-size:12px;color:var(--muted);margin-top:6px;">👁 ' + views + ' views</div>'
+                + '</div>'
+                + '</a>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    function loadSidebarPromo() {
+        var wrapper = document.getElementById('sidebarPromoSpace'); // ← definisikan wrapper dulu
+
+        loadSidebarPromo();
     });
 
     function loadSidebarPromo() {
         var wrapper = document.getElementById('sidebarPromoSpace'); // ← definisikan wrapper dulu
+
         if (!wrapper) return;
 
         fetch('/api/viewers/iklan')

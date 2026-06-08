@@ -121,6 +121,11 @@
             <a href="/kategori/populer" class="ts-link {{ request()->is('kategori/populer') ? 'active' : '' }}">
                 <i class="fas fa-fire" style="margin-right: 3px;"></i> <span>Berita Populer</span>
             </a>
+
+            <a href="/tentang-kami" class="ts-link {{ request()->is('tentang-kami') ? 'active' : '' }}">
+                <i class="fas fa-info-circle" style="margin-right: 3px;"></i><span>About Us</span>
+            </a>
+
         </div>
         <div class="ts-socials">
             <div class="ts-social" title="Facebook" onclick="openSocial('facebook')"><i class="fab fa-facebook-f"></i></div>

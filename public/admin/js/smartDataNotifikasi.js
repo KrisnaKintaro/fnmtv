@@ -6,6 +6,7 @@ const SmartNotif = {
     config: {
         apiUrl: null, // URL API masing-masing role
         renderItemHTML: null, // Fungsi template HTML dari halaman
+        onDataLoaded: null,
     },
     initialized: false,
 
@@ -48,6 +49,11 @@ const SmartNotif = {
         $.get(this.config.apiUrl, (res) => {
             if (res.status === "success") {
                 this.render(res.data);
+
+                                
+                if (typeof this.config.onDataLoaded === 'function') {
+                    this.config.onDataLoaded(res.data);
+                }
             }
         }).fail(() => console.error("Gagal load data notifikasi cuy!"));
     },
