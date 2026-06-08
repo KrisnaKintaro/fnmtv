@@ -72,6 +72,9 @@
                 <div class="tab-p" onclick="filterTab(this,'pending')">Pending <span
                         style="margin-left:4px;background:#e6ecf4;color:var(--blue);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
                 </div>
+                <div class="tab-p" onclick="filterTab(this,'published')"> Dipublikasikan 
+                    <span style="margin-left:4px;background:#e6f4f0;color:var(--success);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
+                </div>
                 <div class="tab-p" onclick="filterTab(this,'rejected')">Ditolak <span
                         style="margin-left:4px;background:#fde8e8;color:var(--red);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
                 </div>
@@ -282,6 +285,7 @@
                         const draft = response.filter(b => b.status_berita === 'Draft').length;
                         const pending = response.filter(b => b.status_berita === 'Pending').length;
                         const rejected = response.filter(b => b.status_berita === 'Rejected').length;
+                        const published = response.filter(b => b.status_berita === 'Published').length;
 
                         $('#editorSidebarBadge').text(all);
                         const tabs = $('#tabPills .tab-p span');
@@ -290,6 +294,7 @@
                             $(tabs[1]).text(draft);
                             $(tabs[2]).text(pending);
                             $(tabs[3]).text(rejected);
+                            $(tabs[4]).text(published);
                         }
                     }
                 },
