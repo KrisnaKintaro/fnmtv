@@ -46,6 +46,10 @@ Route::get('/', function () {
 Route::get('/search', function () {
     return view('Viewers.pages.beritaHasilSearch');
 });
+
+Route::get('/tentang-kami', function () {
+    return view('viewers.pages.about');
+});
 #================= ADMIN =================
 
 Route::get('/kategori/{slug}', function () {

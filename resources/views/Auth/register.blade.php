@@ -235,7 +235,10 @@
                 </div>
                 <div class="lfield">
                     <label for="password_confirmation">Konfirmasi Password</label>
-                    <input type="password" id="password_confirmation" placeholder="Konfirmasi password" required>
+                    <div style="position: relative;">
+                        <input type="password" id="password_confirmation" placeholder="Konfirmasi password" required style="padding-right: 40px;">
+                        <i class="fas fa-eye toggle-password" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--muted);"></i>
+                    </div>
                 </div>
                 <button type="submit" class="login-btn" id="btnSubmitRegister">Daftar</button>
             </form>

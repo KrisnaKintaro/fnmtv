@@ -5,8 +5,20 @@
 <div class="topstrip">
     <div class="ts-inner">
         <div class="ts-links">
+<<<<<<< Updated upstream
             <a href="/" class="ts-link {{ request()->is('/') ? 'active' : '' }}"><i class="fas fa-bolt" style="margin-right: 5px;"></i> Berita Terkini</a>
             <a href="/kategori/populer" class="ts-link {{ request()->is('kategori/populer') ? 'active' : '' }}"><i class="fas fa-fire" style="margin-right: 5px;"></i> Berita Populer</a>
+=======
+            <a href="/" class="ts-link {{ request()->is('/') ? 'active' : '' }}">
+                <i class="fas fa-bolt" style="margin-right: 3px;"></i> <span>Berita Terkini</span>
+            </a>
+            <a href="/kategori/populer" class="ts-link {{ request()->is('kategori/populer') ? 'active' : '' }}">
+                <i class="fas fa-fire" style="margin-right: 3px;"></i> <span>Berita Populer</span>
+            </a>
+            <a href="/tentang-kami" class="ts-link {{ request()->is('tentang-kami') ? 'active' : '' }}">
+                <i class="fas fa-info-circle" style="margin-right: 3px;"></i><span>About Us</span>
+            </a>
+>>>>>>> Stashed changes
         </div>
         <div class="ts-socials">
             <div class="ts-social" title="Facebook" onclick="openSocial('facebook')"><i class="fab fa-facebook-f"></i></div>

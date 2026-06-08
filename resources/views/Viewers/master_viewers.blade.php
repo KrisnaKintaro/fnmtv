@@ -13,6 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('viewers/css/viewers_css.css') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/logo_fenomenatv.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/logo_fenomenatv.png') }}" type="image/png">
     @yield('css')
 </head>
 
