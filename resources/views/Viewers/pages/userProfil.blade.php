@@ -158,6 +158,7 @@
     // FUNGSI SIMPAN INFO PROFIL (AJAX AMAN 100%)
     function simpanProfil() {
         const username = document.getElementById('inputUsername').value.trim();
+        const email    = '{{ Auth::user()->email }}'; // Ambil email dari user yang login
         const btn      = document.getElementById('btnSimpanProfil');
 
         if (!username) {
@@ -169,9 +170,12 @@
         btn.disabled  = true;
 
         $.ajax({
-            url: '/api/auth/update-profil',
-            type: 'POST',
-            data: { username: username },
+            url: '/api/viewers/update-profil',
+            type: 'PUT',
+            data: { 
+                username: username,
+                email: email
+            },
             success: function(res) {
                 Toast.show('success', res.message || 'Profil berhasil diperbarui!');
                 // Update text di navbar secara live kalau ada elemen targetnya
