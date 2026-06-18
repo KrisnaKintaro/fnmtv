@@ -93,6 +93,7 @@ Route::prefix('viewers')->group(function () {
     Route::get('/search', [ViewerController::class, 'searchBerita']);
     Route::get('/site-info', [SettingController::class, 'getSiteInfo']);
     Route::get('/iklan', [IklanController::class, 'getIklanAktif']);
+    Route::put('/update-profil', [AuthController::class, 'updateProfil']);
 });
 
 // API Viewers yang WAJIB BAWA TOKEN (Wajib login)
@@ -100,9 +101,10 @@ Route::prefix('viewers')->middleware('auth:sanctum')->group(function () {
     // Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar'])->middleware('throttle:10,1');
     // Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi'])->middleware('throttle:10,1');
     Route::post('/tambahKomentar', [KomentarController::class, 'kirimKomentar']);
-    Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
     Route::put('/komentar/{id}', [KomentarController::class, 'editKomentar']);
     Route::delete('/komentar/{id}', [KomentarController::class, 'hapusKomentar']);
+    Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
+    Route::post('/update-profil', [AuthController::class, 'updateProfil']);
 });
 
 
