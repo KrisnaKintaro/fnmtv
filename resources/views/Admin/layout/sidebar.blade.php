@@ -30,7 +30,7 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
       Analisis Tren Berita
     </a>
-    <a href="/iklan" class="s-item">
+    <a href="/promo-iklan" class="s-item">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10h14"/></svg>
       Manajemen Iklan
     </a>
@@ -62,12 +62,12 @@
     <div class="s-avatar">
       {{ strtoupper(substr(Auth::user()->username ?? 'U', 0, 1)) }}
     </div>
-    <div>
-      <div class="s-uname"> {{ Auth::user()->username ?? 'User' }} </div>
-      <div class="s-urole"> {{ Auth::user()->role ?? 'User' }} </div>
+    <div style="min-width: 0; flex: 1;">
+      <div class="s-uname" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Auth::user()->username ?? 'User' }}</div>
+      <div class="s-urole">{{ Auth::user()->role ?? 'User' }}</div>
     </div>
     @endauth
-    <div class="s-logout" onclick="doLogout(event)" title="Keluar">
+    <div class="s-logout" onclick="doLogout(event)" title="Keluar" style="flex-shrink: 0;">
       <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
     </div>
   </div>

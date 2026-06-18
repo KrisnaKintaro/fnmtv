@@ -1,4 +1,3 @@
-<!-- FOOTER VIEWERS -->
 <div class="footer">
     <div class="footer-inner">
         <div>
@@ -20,12 +19,14 @@
             <a href="#" class="ft-link">Editorial Policy</a>
             <a href="#" class="ft-link">Contact Us</a>
         </div>
+
         <div>
             <div class="ft-col-title">Ikuti Kami</div>
-            <a class="ft-link" onclick="openSocial('facebook')">Facebook</a>
-            <a class="ft-link" onclick="openSocial('instagram')">Instagram</a>
-            <a class="ft-link" onclick="openSocial('twitter')">Twitter / X</a>
+            <a class="ft-link" onclick="openSocial('facebook')" style="cursor: pointer;">Facebook</a>
+            <a class="ft-link" onclick="openSocial('instagram')" style="cursor: pointer;">Instagram</a>
+            <a class="ft-link" onclick="openSocial('twitter')" style="cursor: pointer;">Twitter / X</a>
         </div>
     </div>
+
     <div class="footer-bottom">© {{ date('Y') }} Fenomena News Media. All rights reserved.</div>
 </div>

@@ -10,14 +10,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('admin/css/redaksi_css.css') }}">
     @yield('css')
+
+    {{-- ── Sidebar toggle tersedia sebelum DOM & script lain ── --}}
+    <script>
+        (function () {
+            if (localStorage.getItem('sidebarClosed') === '1') {
+                document.documentElement.classList.add('sidebar-toggled-pre');
+            }
+        })();
+
+        function toggleSidebar() {
+            document.body.classList.toggle('sidebar-toggled');
+            if (document.body.classList.contains('sidebar-toggled')) {
+                localStorage.setItem('sidebarClosed', '1');
+            } else {
+                localStorage.removeItem('sidebarClosed');
+            }
+        }
+    </script>
 </head>
 
 <body>
+    <div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
-    @include('Redaksi.layout.sidebar')
+    @include('redaksi.layout.sidebar')
     <!-- ═══════════ MAIN ═══════════ -->
     <main class="main">
-        @include('Redaksi.layout.navbar')
+        @include('redaksi.layout.navbar')
         @yield('konten')
     </main>
     <div id="toast" style="position:fixed; bottom:28px; right:28px; background:#1a1a1a; color:#fff; padding:14px 20px; border-radius:8px; font-size:13px; font-weight:600; display:none; align-items:center; gap:12px; box-shadow:0 8px 30px rgba(0,0,0,.3); z-index:9999; min-width:280px; max-width:400px; transition:opacity .3s; opacity:0;">
@@ -54,7 +73,7 @@
             },
             cache: false
         });
-    
+
         function doLogout(e) {
             if (e) e.preventDefault();
             ModalManager.open('modalLogoutConfirm');
@@ -76,6 +95,13 @@
                 }
             });
         }
+
+        /* ── RESTORE STATE SIDEBAR ── */
+        (function () {
+            if (localStorage.getItem('sidebarClosed') === '1') {
+                document.body.classList.add('sidebar-toggled');
+            }
+        })();
     </script>
     @yield('js')
 </body>

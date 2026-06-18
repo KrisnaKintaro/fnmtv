@@ -1,4 +1,4 @@
-@extends('Viewers.master_viewers')
+@extends('viewers.master_viewers')
 
 @section('konten')
 <div class="container page-anim">
@@ -29,7 +29,7 @@
         </div>
 
         <div class="sidebar-col">
-            @include('Viewers.layout.sidebar')
+            @include('viewers.layout.sidebar')
         </div>
 
     </div>
@@ -109,7 +109,9 @@
             const cat = item.kategori ? item.kategori.nama_kategori : 'Umum';
             let img = item.foto_thumbnail;
             if (img && !img.startsWith('http')) img = `/uploads/thumbnail/${img}`;
-            const thumb = img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover;">` : `📰`;
+
+            // 🔥 DI SINI GW SUNTIK LAZY LOADING-NYA 🔥
+            const thumb = img ? `<img src="${img}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">` : `📰`;
 
             html += `
                 <div class="news-list-item" onclick="window.location.href='/berita/${item.slug}'">

@@ -1,9 +1,7 @@
-@extends('Admin.master_admin')
+@extends('admin.master_admin')
 
 @section('css')
-    <link
-        href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --red: #cc0000;
@@ -73,17 +71,9 @@
             background: var(--c, var(--red));
         }
 
-        .stat-card:nth-child(2) {
-            --c: #1a3a7a;
-        }
-
-        .stat-card:nth-child(3) {
-            --c: #1a7a3c;
-        }
-
-        .stat-card:nth-child(4) {
-            --c: #b86200;
-        }
+        .stat-card:nth-child(2) { --c: #1a3a7a; }
+        .stat-card:nth-child(3) { --c: #1a7a3c; }
+        .stat-card:nth-child(4) { --c: #b86200; }
 
         .stat-ico {
             font-size: 26px;
@@ -113,13 +103,8 @@
             gap: 4px;
         }
 
-        .chg-up {
-            color: var(--success);
-        }
-
-        .chg-dn {
-            color: var(--red);
-        }
+        .chg-up { color: var(--success); }
+        .chg-dn { color: var(--red); }
 
         .analytics-grid {
             display: grid;
@@ -186,13 +171,8 @@
             vertical-align: middle;
         }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr:hover td {
-            background: #faf9f7;
-        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #faf9f7; }
 
         .tbl-title {
             font-weight: 600;
@@ -219,15 +199,8 @@
             font-weight: 600;
         }
 
-        .b-pub {
-            background: #e6f4ec;
-            color: var(--success);
-        }
-
-        .b-cat {
-            background: #fde8e8;
-            color: var(--red);
-        }
+        .b-pub { background: #e6f4ec; color: var(--success); }
+        .b-cat { background: #fde8e8; color: var(--red); }
 
         .rank-num {
             font-family: 'JetBrains Mono', monospace;
@@ -238,17 +211,9 @@
             text-align: center;
         }
 
-        .rank-1 {
-            color: var(--warning);
-        }
-
-        .rank-2 {
-            color: var(--muted);
-        }
-
-        .rank-3 {
-            color: #8b6914;
-        }
+        .rank-1 { color: var(--warning); }
+        .rank-2 { color: var(--muted); }
+        .rank-3 { color: #8b6914; }
 
         .views-bar-wrap {
             display: flex;
@@ -271,9 +236,7 @@
             white-space: nowrap;
         }
 
-        .chart-area {
-            padding: 20px 24px;
-        }
+        .chart-area { padding: 20px 24px; }
 
         .chart-period {
             padding: 5px 12px;
@@ -319,9 +282,7 @@
             border-top: 1px solid var(--border);
         }
 
-        .cs-item {
-            text-align: center;
-        }
+        .cs-item { text-align: center; }
 
         .cs-val {
             font-family: 'Merriweather', serif;
@@ -345,9 +306,7 @@
             align-items: flex-start;
         }
 
-        .eng-item:last-child {
-            border-bottom: none;
-        }
+        .eng-item:last-child { border-bottom: none; }
 
         .eng-rank-badge {
             width: 28px;
@@ -362,25 +321,10 @@
             flex-shrink: 0;
         }
 
-        .e-r1 {
-            background: #fff3cd;
-            color: var(--warning);
-        }
-
-        .e-r2 {
-            background: #e8e8e8;
-            color: #555;
-        }
-
-        .e-r3 {
-            background: #f3e8d5;
-            color: #8b6914;
-        }
-
-        .e-rn {
-            background: var(--surface2);
-            color: var(--muted);
-        }
+        .e-r1 { background: #fff3cd; color: var(--warning); }
+        .e-r2 { background: #e8e8e8; color: #555; }
+        .e-r3 { background: #f3e8d5; color: #8b6914; }
+        .e-rn { background: var(--surface2); color: var(--muted); }
 
         .eng-content {
             flex: 1;
@@ -424,9 +368,7 @@
             gap: 14px;
         }
 
-        .cat-perf-item:last-child {
-            border-bottom: none;
-        }
+        .cat-perf-item:last-child { border-bottom: none; }
 
         .cat-emoji {
             font-size: 20px;
@@ -434,9 +376,7 @@
             text-align: center;
         }
 
-        .cat-info {
-            flex: 1;
-        }
+        .cat-info { flex: 1; }
 
         .cat-name-lbl {
             font-size: 13px;
@@ -473,15 +413,8 @@
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: .4;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
         }
 
         .skel {
@@ -500,13 +433,8 @@
         }
 
         @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .period-bar {
@@ -580,28 +508,6 @@
             color: var(--muted);
         }
 
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: var(--text);
-            color: #fff;
-            padding: 12px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            z-index: 999;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all .3s;
-            pointer-events: none;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -609,41 +515,66 @@
         }
 
         .table-responsive table {
-            min-width: 550px; /* Tabel akan maksa munculin scrollbar kalau layarnya lebih sempit dari 550px */
+            min-width: 550px;
+        }
+
+        /* =========================================================
+           🔥 MEDIA QUERIES UNTUK LAYAR HP & TABLET 🔥
+           ========================================================= */
+        @media screen and (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .analytics-grid, .analytics-grid-full { grid-template-columns: 1fr; }
+        }
+
+        @media screen and (max-width: 768px) {
+            .page-content { padding: 16px 12px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .period-bar {
+                padding: 14px 16px;
+                justify-content: center;
+            }
+            .refresh-btn {
+                margin-left: 0;
+                width: 100%;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            .chart-stats-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .card-hd {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
         }
     </style>
 @endsection
 
 @section('konten')
     <div class="page-content">
-        <!-- Period Filter -->
         <div class="period-bar">
             <span class="period-lbl">Periode:</span>
             <button class="period-btn" onclick="setPeriod('today',this)">Hari ini</button>
             <button class="period-btn active" onclick="setPeriod('week',this)">7 Hari</button>
             <button class="period-btn" onclick="setPeriod('month',this)">30 Hari</button>
             <button class="period-btn" onclick="setPeriod('year',this)">1 Tahun</button>
-            <button class="period-btn" onclick="setPeriod('all',this)">Semua Tahun</button>
+            <button class="period-btn" onclick="setPeriod('all',this)">Semua</button>
             <span class="last-updated" id="lastUpdated">Terakhir diperbarui: —</span>
             <button class="refresh-btn" onclick="loadAllData()">
-                <svg id="refreshIcon2" width="12" height="12" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg id="refreshIcon2" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 Perbarui
             </button>
         </div>
 
-        <!-- 1. SUMMARY CARDS -->
         <div class="section-title">Ringkasan Sistem</div>
-        <div class="stats-grid" id="summaryCards">
-            <!-- will be filled by JS -->
-        </div>
+        <div class="stats-grid" id="summaryCards"></div>
 
-        <!-- 2. VISIT TREND -->
         <div class="card" style="margin-bottom:20px;">
-            <div class="card-hd">
+            <div class="card-hd" style="flex-direction: row;">
                 <div>
                     <div class="card-ht">📈 Tren Kunjungan</div>
                     <div class="card-hm">Performa traffic website</div>
@@ -651,80 +582,59 @@
                 <div style="display:flex;gap:6px;" id="chartPeriodBtns">
                     <button class="chart-period active" onclick="switchChart('views',this)">Views</button>
                     <button class="chart-period" onclick="switchChart('visitors',this)">Pengunjung</button>
-                    <button class="chart-period" onclick="switchChart('comments',this)">Komentar</button>
                 </div>
             </div>
             <div class="chart-area">
                 <div class="chart-canvas-wrap" style="height:180px;">
                     <canvas id="visitChart" class="chart-canvas"></canvas>
                 </div>
-                <div class="chart-stats-row" id="chartStatsRow">
-                    <!-- filled by JS -->
-                </div>
+                <div class="chart-stats-row" id="chartStatsRow"></div>
             </div>
         </div>
 
-        <!-- 3. TOP NEWS + ENGAGEMENT -->
         <div class="analytics-grid-full">
-
-            <!-- Top News by Views -->
             <div class="card">
-                <div class="card-hd">
+                <div class="card-hd" style="flex-direction: row;">
                     <div>
-                        <div class="card-ht">👑 Top Berita — Paling Banyak Dilihat</div>
+                        <div class="card-ht">👑 Top Berita Dilihat</div>
                         <div class="card-hm" id="topNewsSubtitle">Memuat data...</div>
                     </div>
                     <span class="badge b-pub">Live</span>
                 </div>
                 <div id="topNewsTable" class="table-responsive">
                     <div style="padding:20px;">
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;"></div>
+                        <div class="skel skel-row"></div><div class="skel skel-row"></div><div class="skel skel-row"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Viral / Engagement Tracker -->
             <div class="card">
-                <div class="card-hd">
+                <div class="card-hd" style="flex-direction: row;">
                     <div>
-                        <div class="card-ht">🔥 Viral — Engagement Tracker</div>
+                        <div class="card-ht">🔥 Viral Tracker</div>
                         <div class="card-hm" id="viralSubtitle">Memuat data...</div>
                     </div>
-                    <select id="viralFilter" onchange="renderViral()"
-                        style="border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:12px;font-family:inherit;outline:none;background:var(--white);cursor:pointer;">
+                    <select id="viralFilter" onchange="renderViral()" style="border:1px solid var(--border);border-radius:6px;padding:5px;font-size:12px;outline:none;cursor:pointer;">
                         <option value="comments">💬 Komentar</option>
                         <option value="reactions">❤️ Reaksi</option>
                         <option value="shares">🔗 Share</option>
                     </select>
                 </div>
                 <div id="viralList">
-                    <div style="padding:20px;">
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;margin-bottom:8px;"></div>
-                        <div class="skel skel-row" style="width:100%;"></div>
-                    </div>
+                    <div style="padding:20px;"><div class="skel skel-row"></div><div class="skel skel-row"></div></div>
                 </div>
             </div>
         </div>
 
-        <!-- 4. CATEGORY PERFORMANCE -->
         <div class="analytics-grid">
             <div class="card">
                 <div class="card-hd">
                     <div>
-                        <div class="card-ht">📁 Performa per Kategori</div>
+                        <div class="card-ht">📁 Performa Kategori</div>
                         <div class="card-hm">Distribusi views berdasarkan kategori</div>
                     </div>
                 </div>
-                <div id="categoryPerf" style="padding:8px 0;">
-                    <!-- filled by JS -->
-                </div>
+                <div id="categoryPerf" style="padding:8px 0;"></div>
             </div>
 
             <div class="card">
@@ -734,38 +644,55 @@
                         <div class="card-hm">Jam & hari dengan traffic tertinggi</div>
                     </div>
                 </div>
-                <div style="padding:20px 22px;">
-                    <canvas id="heatmapCanvas" width="300" height="180"></canvas>
+                <div style="padding:20px 22px; width: 100%; box-sizing: border-box;" id="heatmapContainer">
+                    <canvas id="heatmapCanvas"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Toast -->
         <div class="toast" id="toast"></div>
     </div>
 @endsection
 
 @section('js')
     <script>
-        // ═══════════════════════════════════════════════════
-        // API DATA ENGINE (FULL SYNC + FULL UI FEATURES)
-        // ═══════════════════════════════════════════════════
         let APP_DATA = null;
         let currentPeriod = 'week';
         let currentChartMetric = 'views';
 
+        // MENGATASI ISU PLACEHOLDER SEARCH BAR DI HP & PC BEDA TEKS
+        document.addEventListener('DOMContentLoaded', () => {
+            const placeholderText = 'Cari data analitik...';
+
+            // Ganti teks placeholder versi PC dan versi HP secara sinkron
+            const searchInputs = document.querySelectorAll('#searchInput, .mobile-search-input');
+            searchInputs.forEach(input => {
+                input.placeholder = placeholderText;
+            });
+
+            // Setup Text Halaman Dashboard
+            const tbTitle = document.getElementById('tbTitle');
+            const tbCrumb = document.getElementById('tbCrumb');
+            if (tbTitle) tbTitle.textContent = 'Analisis Tren Berita';
+            if (tbCrumb) tbCrumb.textContent = 'Admin / Analisis Tren Berita';
+
+            loadAllData();
+
+            // Handle redraw untuk responsive Canvas saat layar dibolak-balik
+            window.addEventListener('resize', () => {
+                if (APP_DATA) {
+                    drawChart(currentChartMetric);
+                    drawHeatmap();
+                }
+            });
+        });
+
         // 1. Render Summary
         function renderSummaryCards(d) {
             if (!d) return;
-
-            // Helper untuk nentuin class warna berdasarkan teks (hijau jika ada '+', merah jika '0' atau '-')
             const getChgClass = (str) => {
                 if (!str) return 'chg-up';
-
-                // Ambil cuma angkanya saja dari string (misal: "Rp 233 periode ini" -> 233)
                 const num = parseInt(str.replace(/[^0-9]/g, '')) || 0;
-
-                // Kalau angkanya di atas 0, kasih Hijau. Kalau 0 atau kurang, kasih Merah.
                 return num > 0 ? 'chg-up' : 'chg-dn';
             };
 
@@ -773,13 +700,13 @@
             <div class="stat-card">
                 <div class="stat-ico">📰</div>
                 <div class="stat-val">${(d.totalNews || 0).toLocaleString('id')}</div>
-                <div class="stat-lbl">Total Berita Published</div>
+                <div class="stat-lbl">Total Berita</div>
                 <div class="stat-chg ${getChgClass(d.newsChange)}">${d.newsChange}</div>
             </div>
             <div class="stat-card">
                 <div class="stat-ico">💬</div>
                 <div class="stat-val">${(d.totalComments || 0).toLocaleString('id')}</div>
-                <div class="stat-lbl">Total Komentar Approved</div>
+                <div class="stat-lbl">Komentar</div>
                 <div class="stat-chg ${getChgClass(d.commentsChange)}">${d.commentsChange}</div>
             </div>
             <div class="stat-card">
@@ -791,21 +718,19 @@
             <div class="stat-card">
                 <div class="stat-ico">💰</div>
                 <div class="stat-val">Rp ${(d.revenue).toLocaleString('id')}</div>
-                <div class="stat-lbl">Total Pendapatan</div>
+                <div class="stat-lbl">Pendapatan</div>
                 <div class="stat-chg ${getChgClass(d.revenueChange)}">${d.revenueChange}</div>
-            </div>
-        `;
+            </div>`;
         }
 
-        // 2. Render Chart
-        // 2. Render Chart (BALIK KE DESAIN ASLI YANG CAKEP)
+        // 2. Render Chart View (Tetap dinamis dan fluid)
         function drawChart(metric) {
             if (!APP_DATA || !APP_DATA.chartData) return;
             const canvas = document.getElementById('visitChart');
             const ctx = canvas.getContext('2d');
             const data = APP_DATA.chartData;
             const values = data[metric];
-            const labels = data.labels; // Tarik data label horizontal
+            const labels = data.labels;
 
             const W = canvas.parentElement.clientWidth;
             const H = canvas.parentElement.clientHeight || 180;
@@ -815,37 +740,25 @@
             ctx.clearRect(0, 0, W, H);
             if (!values || values.length === 0) return;
 
-            // --- PADDING SETUP (Buat ngasih ruang ke Grid Y-Axis & X-Axis) ---
             const padL = 48, padR = 24, padT = 16, padB = 28;
             const chartW = W - padL - padR;
             const chartH = H - padT - padB;
 
-            // Hitung skala berdasarkan metrik yang aktif aja, biar angkanya pas
             const maxVal = Math.max(...values) * 1.15 || 10;
             const step = values.length > 1 ? chartW / (values.length - 1) : chartW / 2;
 
-            // --- 1. GAMBAR GRID HORIZONTAL & LABEL SUMBU Y ---
+            // Grid y-axis
             ctx.strokeStyle = '#e0ddd6';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 4; i++) {
                 const y = padT + chartH - (i / 4) * chartH;
-
-                // Garis abu-abu background
-                ctx.beginPath();
-                ctx.moveTo(padL, y);
-                ctx.lineTo(W - padR, y);
-                ctx.stroke();
-
-                // Teks angka sumbu Y (misal: 10K, 15K)
-                ctx.fillStyle = '#7a7570';
-                ctx.font = '10px JetBrains Mono, monospace';
-                ctx.textAlign = 'right';
+                ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+                ctx.fillStyle = '#7a7570'; ctx.font = '10px JetBrains Mono, monospace'; ctx.textAlign = 'right';
                 const val = Math.round((maxVal / 4) * i);
                 const textVal = val >= 1000 ? (val / 1000).toFixed(1).replace('.0','') + 'K' : val;
                 ctx.fillText(textVal, padL - 8, y + 3);
             }
 
-            // --- 2. GAMBAR AREA SHADOW MERAH (GRADIENT) ---
             const gradient = ctx.createLinearGradient(0, padT, 0, padT + chartH);
             gradient.addColorStop(0, 'rgba(204,0,0,0.18)');
             gradient.addColorStop(1, 'rgba(204,0,0,0.01)');
@@ -854,29 +767,22 @@
             values.forEach((v, i) => {
                 const x = values.length > 1 ? padL + (i * step) : padL + (chartW / 2);
                 const y = padT + chartH - (v / maxVal) * chartH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
             ctx.lineTo(values.length > 1 ? padL + chartW : padL + (chartW / 2), padT + chartH);
             ctx.lineTo(padL, padT + chartH);
             ctx.closePath();
-            ctx.fillStyle = gradient;
-            ctx.fill();
+            ctx.fillStyle = gradient; ctx.fill();
 
-            // --- 3. GAMBAR GARIS UTAMA (MERAH) ---
             ctx.beginPath();
-            ctx.strokeStyle = '#cc0000';
-            ctx.lineWidth = 2.5;
-            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#cc0000'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
             values.forEach((v, i) => {
                 const x = values.length > 1 ? padL + (i * step) : padL + (chartW / 2);
                 const y = padT + chartH - (v / maxVal) * chartH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
             });
             ctx.stroke();
 
-            // --- 4. GAMBAR TITIK LINGKARAN & LABEL SUMBU X ---
             let skip = 1;
             if (labels.length > 15) skip = Math.ceil(labels.length / 6);
 
@@ -884,100 +790,61 @@
                 const x = values.length > 1 ? padL + (i * step) : padL + (chartW / 2);
                 const y = padT + chartH - (v / maxVal) * chartH;
 
-                // Titik Lingkaran di tiap sudut
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
-                ctx.fill();
-                ctx.strokeStyle = '#cc0000';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff'; ctx.fill();
+                ctx.strokeStyle = '#cc0000'; ctx.lineWidth = 2; ctx.stroke();
 
-                // Gambar Label Sumbu X (dengan logic skip biar ga numpuk)
-                let isFirst = i === 0;
-                let isLast = i === labels.length - 1;
+                let isFirst = i === 0, isLast = i === labels.length - 1;
                 let isTick = (i % skip === 0) && (labels.length - 1 - i > skip / 2);
 
                 if (isFirst || isLast || isTick) {
-                    ctx.fillStyle = '#7a7570';
-                    ctx.font = "11px 'JetBrains Mono', monospace";
-
+                    ctx.fillStyle = '#7a7570'; ctx.font = "11px 'JetBrains Mono', monospace";
                     if (isFirst) ctx.textAlign = "left";
                     else if (isLast) ctx.textAlign = "right";
                     else ctx.textAlign = "center";
-
                     ctx.fillText(labels[i], x, padT + chartH + 18);
                 }
             });
 
-            // --- 5. UPDATE STATISTIK DINAMIS DI BAWAH CHART ---
-            // Notalin khusus untuk data period dan filter yang aktif saat ini
             const total = values.reduce((a, b) => a + b, 0);
             const avg = Math.round(total / (values.length || 1));
             const peak = Math.max(...values, 0);
+            let labelName = metric === 'visitors' ? 'Pengunjung' : metric === 'comments' ? 'Komentar' : 'Views';
 
-            // Nentuin Label Teks sesuai permintaan lu
-            let labelName = 'Views';
-            if (metric === 'visitors') labelName = 'Pengunjung';
-            if (metric === 'comments') labelName = 'Komentar';
-
-            // Render stats
             document.getElementById('chartStatsRow').innerHTML = `
-                <div class="cs-item">
-                    <div class="cs-val">${total.toLocaleString('id')}</div>
-                    <div class="cs-lbl">Total ${labelName}</div>
-                </div>
-                <div class="cs-item">
-                    <div class="cs-val">${avg.toLocaleString('id')}</div>
-                    <div class="cs-lbl">Rata-rata/hari</div>
-                </div>
-                <div class="cs-item">
-                    <div class="cs-val">${peak.toLocaleString('id')}</div>
-                    <div class="cs-lbl">Peak ${labelName}</div>
-                </div>
+                <div class="cs-item"><div class="cs-val">${total.toLocaleString('id')}</div><div class="cs-lbl">Total ${labelName}</div></div>
+                <div class="cs-item"><div class="cs-val">${avg.toLocaleString('id')}</div><div class="cs-lbl">Rata-rata/hari</div></div>
+                <div class="cs-item"><div class="cs-val">${peak.toLocaleString('id')}</div><div class="cs-lbl">Peak ${labelName}</div></div>
             `;
         }
 
-        // 3. Render Top News (BALIKIN MEDALI & BAR)
+        // 3. Render Top News
         function renderTopNews(list) {
             if (!list || list.length === 0) {
-                document.getElementById('topNewsTable').innerHTML = `
-            <div style="padding: 40px; text-align: center; color: var(--muted); font-family: 'Source Sans 3';">
-                <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
-                <div style="font-weight: 600;">Belum ada data berita</div>
-                <div style="font-size: 11px;">Tidak ada aktivitas publikasi pada periode ini.</div>
-            </div>`;
-                document.getElementById('topNewsSubtitle').textContent = `Top 0 berita periode ini`;
+                document.getElementById('topNewsTable').innerHTML = `<div style="padding:40px;text-align:center;color:var(--muted);"><div style="font-size:40px;">📭</div><div>Belum ada data</div></div>`;
                 return;
             }
             const maxViews = Math.max(...list.map(n => n.views)) || 1;
-            let html =
-                `<table><thead><tr><th>#</th><th>Judul Berita</th><th>Kategori</th><th>Views</th><th>Tren</th></tr></thead><tbody>`;
+            let html = `<table><thead><tr><th>#</th><th>Judul</th><th>Kategori</th><th>Views</th><th>Tren</th></tr></thead><tbody>`;
 
             list.forEach((n, i) => {
                 const pct = Math.round((n.views / maxViews) * 100);
                 const trendIco = n.trend === 'up' ? '▲' : '●';
-                const rankLabel = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
                 const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+                const rankLabel = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
 
                 html += `<tr>
                 <td><span class="rank-num ${rankClass}">${rankLabel}</span></td>
-                <td><div class="tbl-title">${n.title}</div><div class="tbl-meta">${n.author} · ${n.published}</div></td>
+                <td><div class="tbl-title">${n.title}</div><div class="tbl-meta">${n.author}</div></td>
                 <td><span class="badge b-cat">${n.category}</span></td>
-                <td>
-                    <div class="views-bar-wrap">
-                        <div class="views-bar" style="width:${Math.max(pct, 5)}px; max-width:80px;"></div>
-                        <span class="views-num">${n.views.toLocaleString('id')}</span>
-                    </div>
-                </td>
-                <td style="color:${n.trend==='up'?'var(--success)':'var(--muted)'}; font-weight:bold;">${trendIco}</td>
-            </tr>`;
+                <td><div class="views-bar-wrap"><div class="views-bar" style="width:${Math.max(pct, 5)}px;max-width:80px;"></div><span class="views-num">${n.views.toLocaleString('id')}</span></div></td>
+                <td style="color:${n.trend==='up'?'var(--success)':'var(--muted)'};font-weight:bold;">${trendIco}</td></tr>`;
             });
             document.getElementById('topNewsTable').innerHTML = html + '</tbody></table>';
             document.getElementById('topNewsSubtitle').textContent = `Top ${list.length} berita periode ini`;
         }
 
-        // 4. Render Viral (BALIKIN PROGRESS BAR MERAH & BADGE)
+        // 4. Render Viral
         function renderViral() {
             if (!APP_DATA || !APP_DATA.viral) return;
             const filter = document.getElementById('viralFilter').value;
@@ -985,13 +852,7 @@
             const maxVal = Math.max(...list.map(n => n[filter])) || 1;
 
             if (list.length === 0) {
-                document.getElementById('viralList').innerHTML = `
-            <div style="padding: 40px; text-align: center; color: var(--muted); font-family: 'Source Sans 3';">
-                <div style="font-size: 40px; margin-bottom: 10px;">✨</div>
-                <div style="font-weight: 600;">Belum ada interaksi</div>
-                <div style="font-size: 11px;">Belum ada komentar atau reaksi untuk periode ini.</div>
-            </div>`;
-                document.getElementById('viralSubtitle').textContent = `Berdasarkan interaksi terbanyak`;
+                document.getElementById('viralList').innerHTML = `<div style="padding:40px;text-align:center;color:var(--muted);"><div style="font-size:40px;">✨</div><div>Belum ada interaksi</div></div>`;
                 return;
             }
 
@@ -1010,42 +871,71 @@
                         <div class="eng-metric">💬 <span>${n.comments}</span></div>
                         <div class="eng-metric">❤️ <span>${n.reactions}</span></div>
                         <div class="eng-metric">🔗 <span>${n.shares}</span></div>
-                        <div class="eng-metric">👤 ${n.author}</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-                        <div style="flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;">
-                            <div style="height:100%;width:${pct}%;background:linear-gradient(to right, #cc0000, #ff6b35);border-radius:3px;transition:width .8s;"></div>
-                        </div>
-                        <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--muted);">${filterIcon} ${val}</span>
+                        <div style="flex:1;height:5px;background:var(--surface2);border-radius:3px;"><div style="height:100%;width:${pct}%;background:linear-gradient(to right,#cc0000,#ff6b35);border-radius:3px;"></div></div>
+                        <span style="font-size:11px;color:var(--muted);">${filterIcon} ${val}</span>
                     </div>
-                </div>
-            </div>`;
+                </div></div>`;
             });
             document.getElementById('viralList').innerHTML = html;
-            document.getElementById('viralSubtitle').textContent = `Berdasarkan interaksi terbanyak`;
         }
 
-        // 5. Render Heatmap (Publikasi Berita)
+        // 5. Render Heatmap (Telah dioptimalkan menjadi Canvas Responsif / Fluid)
         function drawHeatmap() {
             if (!APP_DATA || !APP_DATA.heatmapData) return;
             const canvas = document.getElementById('heatmapCanvas');
             const ctx = canvas.getContext('2d');
             const d = APP_DATA.heatmapData;
-            const cellW = 38,
-                cellH = 22;
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Ukur lebar asli dari parent container (bukan hardcoded 300px lagi)
+            const W = canvas.parentElement.clientWidth;
+            const H = 220;
+            canvas.width = W;
+            canvas.height = H;
+
+            ctx.clearRect(0, 0, W, H);
+
+            // Setup padding
+            const padL = 35, padR = 10, padT = 10, padB = 25;
+            const chartW = W - padL - padR;
+            const chartH = H - padT - padB;
+
+            const cols = d.hours.length || 24;
+            const rows = d.days.length || 7;
+            const cellW = chartW / cols;
+            const cellH = chartH / rows;
+
+            // Gambar kotak-kotak intensitas (Heatmap Cells)
             d.intensities.forEach((row, i) => {
                 row.forEach((val, j) => {
                     ctx.fillStyle = `rgba(204, 0, 0, ${val})`;
-                    // ctx.roundRect (hanya jika browser support) atau fillRect biasa
-                    ctx.fillRect((j * cellW) + 30, (i * cellH), cellW - 5, cellH - 5);
+                    ctx.fillRect(padL + (j * cellW), padT + (i * cellH), cellW - 1, cellH - 1);
                 });
             });
+
+            // Tulis label sumbu Y (Nama Hari)
             ctx.fillStyle = "#7a7570";
             ctx.font = "600 10px 'Source Sans 3'";
-            d.days.forEach((day, i) => ctx.fillText(day, 0, (i * cellH) + 15));
-            d.hours.forEach((hr, j) => ctx.fillText(hr, (j * cellW) + 35, 175));
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            d.days.forEach((day, i) => {
+                // Di layar sempit, singkat hari jadi 3 huruf (cth: "Sen", "Sel")
+                let textDay = W < 400 ? day.substring(0,3) : day;
+                ctx.fillText(textDay, 0, padT + (i * cellH) + (cellH / 2));
+            });
+
+            // Tulis label sumbu X (Jam)
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+
+            // Logic cerdas: kalau layar sempit, teks sumbu X diloncat (skip) biar gak tabrakan/tumpuk-tumpukan
+            let skip = W < 500 ? 3 : (W < 768 ? 2 : 1);
+            d.hours.forEach((hr, j) => {
+                if (j % skip === 0) {
+                    ctx.fillText(hr, padL + (j * cellW) + (cellW / 2), H - padB + 6);
+                }
+            });
         }
 
         // 6. Performa Kategori
@@ -1059,10 +949,9 @@
                     <div class="cat-name-lbl">${c.name}</div>
                     <div class="cat-bar-wrap">
                         <div class="cat-prog"><div class="cat-prog-fill" style="width:${c.pct}%"></div></div>
-                        <span class="cat-pct">${(c.views).toLocaleString('id')} views</span>
+                        <span class="cat-pct">${(c.views).toLocaleString('id')} v</span>
                     </div>
-                </div>
-            </div>`;
+                </div></div>`;
             });
             document.getElementById('categoryPerf').innerHTML = html;
         }
@@ -1083,8 +972,7 @@
                         renderCategoryPerf(APP_DATA.categoryPerformance);
                         drawChart(currentChartMetric);
                         drawHeatmap();
-                        document.getElementById('lastUpdated').textContent =
-                            `Terakhir diperbarui: ${new Date().toLocaleTimeString('id-ID')}`;
+                        document.getElementById('lastUpdated').textContent = `Diperbarui: ${new Date().toLocaleTimeString('id-ID')}`;
                     }
                     if (refreshIcon) refreshIcon.classList.remove('spin');
                 })
@@ -1104,7 +992,6 @@
         function switchChart(m, btn) {
             currentChartMetric = m;
             document.querySelectorAll('.chart-period').forEach(b => b.classList.remove('active'));
-
             if (btn) btn.classList.add('active');
             drawChart(m);
         }
@@ -1112,20 +999,5 @@
         function loadAllData() {
             fetchAndRenderData(currentPeriod);
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const tbTitle = document.getElementById('tbTitle');
-            const tbCrumb = document.getElementById('tbCrumb');
-            if (tbTitle) tbTitle.textContent = 'Analisis Tren Berita';
-            if (tbCrumb) tbCrumb.textContent = 'Admin / Analisis Tren Berita';
-            loadAllData();
-            // Handle responsive chart redraw
-            window.addEventListener('resize', () => {
-                if (APP_DATA) {
-                    drawChart(currentChartMetric);
-                    drawHeatmap();
-                }
-            });
-        });
     </script>
 @endsection

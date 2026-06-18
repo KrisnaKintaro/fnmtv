@@ -1,94 +1,105 @@
-@extends('Redaksi.redaksi_master')
+@extends('redaksi.redaksi_master')
 
 @section('css')
+<style>
+    /* ── FIX RESPONSIVE: Scroll Tabel Horizontal ── */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive table {
+        min-width: 850px; /* Paksa muncul scroll horizontal di layar sempit */
+    }
+
+    /* ── FIX RESPONSIVE: Filter Bar ── */
+    .filter-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    @media screen and (max-width: 768px) {
+        .filter-actions {
+            margin-left: 0;
+            width: 100%;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .filter-actions .filter-select {
+            flex: 1; /* Biar dropdown penuhi layar di HP dan gampang di-tap */
+        }
+    }
+</style>
 @endsection
 
 @section('konten')
-<!-- ══ HALAMAN UTAMA ══ -->
 <div class="page active">
     <div class="section-title">Monitoring & Validasi Berita</div>
 
-    <!-- FILTER BAR -->
     <div class="filter-bar">
         <div class="tab-pills" id="tabPills">
             <div class="tab-p active" id="tab-all" onclick="showTab('all', this)">
-                Semua <span class="tab-cnt cnt-all" id="cnt-all">9</span>
+                Semua <span class="tab-cnt cnt-all" id="cnt-all">0</span>
             </div>
             <div class="tab-p" id="tab-pending" onclick="showTab('pending', this)">
-                Pending <span class="tab-cnt cnt-pending" id="cnt-pending">5</span>
+                Pending <span class="tab-cnt cnt-pending" id="cnt-pending">0</span>
             </div>
             <div class="tab-p" id="tab-published" onclick="showTab('published', this)">
                 Terbit <span class="tab-cnt cnt-published" id="cnt-published">0</span>
             </div>
             <div class="tab-p" id="tab-rejected" onclick="showTab('rejected', this)">
-                Ditolak <span class="tab-cnt cnt-rejected" id="cnt-rejected">1</span>
+                Ditolak <span class="tab-cnt cnt-rejected" id="cnt-rejected">0</span>
             </div>
         </div>
-        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;">
-            <select class="filter-select" id="filterKategori" style="font-size:12px;padding:6px 10px;"
-                onchange="filterChanged()">
+
+        <div class="filter-actions">
+            <select class="filter-select" id="filterKategori" style="font-size:12px;padding:6px 10px;" onchange="filterChanged()">
                 <option value="">Semua Kategori</option>
-                <option>Politik</option>
-                <option>Ekonomi</option>
-                <option>Teknologi</option>
-                <option>Olahraga</option>
-                <option>Kesehatan</option>
-                <option>Internasional</option>
-                <option>Sains</option>
-                <option>Infrastruktur</option>
-                <option>Hiburan</option>
             </select>
-            <select class="filter-select" id="filterPenulis" style="font-size:12px;padding:6px 10px;"
-                onchange="filterChanged()">
+            <select class="filter-select" id="filterPenulis" style="font-size:12px;padding:6px 10px;" onchange="filterChanged()">
                 <option value="">Semua Penulis</option>
-                <option>Budi Santoso</option>
-                <option>Arif Wibowo</option>
-                <option>Dewi Puspita</option>
-                <option>Sari Maharani</option>
             </select>
         </div>
     </div>
 
-    <!-- ══ TABEL ══ -->
     <div class="card">
         <div class="card-hd">
             <div class="card-ht" id="cardTitle">Daftar Artikel Masuk dari Editor</div>
-            <div class="card-hm" id="tableCount">Menampilkan 9 artikel</div>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width:70px;">Thumbnail</th>
-                    <th>Judul &amp; Informasi</th>
-                    <th>Kategori</th>
-                    <th>Penulis</th>
-                    <th>Tanggal Kirim</th>
-                    <th>Status</th>
-                    <th style="width:80px;text-align:center;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="newsBody">
-            </tbody>
-        </table>
-
-        <!-- empty state -->
-        <div class="empty-state" id="emptyState" style="display:none;">
-            <div class="ico">📭</div>
-            <p>Tidak ada artikel / Berita ditemukan pada kategori ini.</p>
+            <div class="card-hm" id="tableCount">Memuat data...</div>
         </div>
 
-        <div class="pager">
-            <div id="paginationControls" style="display:flex; gap:4px;">
-            </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:70px;">Thumbnail</th>
+                        <th>Judul &amp; Informasi</th>
+                        <th>Kategori</th>
+                        <th>Penulis</th>
+                        <th>Tanggal Kirim</th>
+                        <th>Status</th>
+                        <th style="width:80px;text-align:center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="newsBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display:none; padding: 40px; text-align: center;">
+            <div class="ico" style="font-size: 40px; margin-bottom: 10px;">📭</div>
+            <p style="color: var(--muted);">Tidak ada artikel / Berita ditemukan pada kategori ini.</p>
+        </div>
+
+        <div class="pager" style="flex-wrap: wrap;">
+            <div id="paginationControls" style="display:flex; gap:4px; flex-wrap: wrap;"></div>
             <div class="pg-info" id="pagerInfo">Menampilkan 0 dari 0 artikel</div>
         </div>
     </div>
-</div><!-- /page -->
-
-<!-- ══════════════════════════════════════
-             MODAL DETAIL ARTIKEL + VALIDASI
-        ══════════════════════════════════════ -->
-<div class="modal-backdrop" id="modalDetail" style="display:none;">
+</div><div class="modal-backdrop" id="modalDetail" style="display:none;">
     <div class="modal">
         <div class="modal-hd">
             <div class="modal-hd-text">
@@ -112,7 +123,6 @@
             <div class="modal-article-body" id="mdContent"></div>
             <div class="modal-divider"></div>
 
-            <!-- KOTAK VALIDASI — hanya muncul jika status pending -->
             <div id="mdVerdictWrap" style="display:none;">
                 <div class="verdict-box">
                     <div class="verdict-title">Keputusan Redaksi</div>
@@ -134,7 +144,6 @@
                             Tolak Artikel
                         </button>
                     </div>
-                    <!-- Form alasan penolakan -->
                     <div class="reject-note" id="mdRejectNote">
                         <label>Alasan Penolakan (wajib diisi)</label>
                         <textarea id="mdRejectText"
@@ -154,7 +163,6 @@
                 </div>
             </div>
 
-            <!-- STATUS INFO — muncul jika sudah disetujui atau ditolak -->
             <div id="mdResultWrap" style="display:none; margin-top:20px;">
                 <div class="info-result-box" id="mdResultBox" style="display:flex; gap:12px; align-items:flex-start; padding:16px; border-radius:8px; border:1px solid #eee; background:#fafafa;">
                     <div class="ico" id="mdResultIco" style="font-size:24px; line-height:1;"></div>
@@ -189,7 +197,6 @@
     </div>
 </div>
 
-<!-- ── TOAST ── -->
 <div id="toast" style="display:none;opacity:1;">
     <span id="toastIco"></span>
     <span id="toastMsg"></span>
@@ -207,17 +214,17 @@
     </div>
 </div>
 @endsection
+
 @section('js')
 <script>
     $(document).ready(function() {
-        loadDataTabel(); // Load pertama (muncul tulisan memuat)
-        pollData(); // Mulai polling data berkala
+        loadDataTabel();
+        pollData();
         updateCounts();
+
         SmartNotif.init({
-            apiUrl: '/api/redaksi/getNotifikasi', // Nembak ke API yang baru lu bikin
+            apiUrl: '/api/redaksi/getNotifikasi',
             renderItemHTML: function(item) {
-                // Semua notif Redaksi (Pending) kita kasih background sedikit kuning/orange biar keliatan butuh aksi
-                // Kalau di-klik, langsung buka modal review berdasarkan item.id!
                 return `
                     <div class="notif-item" onclick="bukaNotifReview(${item.id})" style="cursor:pointer; padding:12px; border-bottom:1px solid #eee; display:flex; gap:12px; background: #fffaf0; transition: background 0.2s;">
                         <div style="font-size:20px;">${item.icon}</div>
@@ -237,23 +244,21 @@
             openModal(id);
         } else {
             Toast.show('info', 'Sedang memuat data artikel, tunggu sebentar...');
-            loadDataTabel(true); // Paksa narik data
+            loadDataTabel(true);
             setTimeout(() => {
                 if(DB[id]) openModal(id);
             }, 1000);
         }
     }
 
-    function pollData() {
-        loadDataTabel(true); // Panggil fungsi loadDataTabel yang silent tadi
-
-        // Tunggu 5 detik baru panggil lagi diri sendiri
-        setTimeout(pollData, 5000);
-    }
+    // Reload data tiap 5 detik
+    // function pollData() {
+    //     loadDataTabel(true);
+    //     setTimeout(pollData, 5000);
+    // }
 
     let DB = {};
 
-    /* ── KONSTANTA & PENGATURAN UI ── */
     const BADGE_CLASS = {
         pending: 'b-pending',
         published: 'b-published',
@@ -280,11 +285,10 @@
     let currentTab = 'all';
 
     function filterChanged() {
-        currentPage = 1; // Balikin ke halaman 1 tiap kali ngetik search / ganti dropdown
+        currentPage = 1;
         jalankanFilter();
     }
 
-    /* ── SETUP DATATABLE ENGINE ── */
     const beritaTable = new DataTableEngine({
         tableBody: '#newsBody',
         paginationWrapper: '#paginationControls',
@@ -292,7 +296,6 @@
         emptyState: '#emptyState',
         perPage: 5,
         renderRowHTML: function(val) {
-            // Mapping penyesuaian (karena ini ntar dari API)
             const status = (val.status_berita || val.status).toLowerCase();
             const judul = val.judul_berita || val.title;
             const penulis = val.user ? val.user.username : (val.author || 'Unknown');
@@ -310,13 +313,13 @@
             else if (status === 'published') metaText = `Disetujui oleh Redaksi · ${tanggal}`;
             else metaText = `Ditolak · ${alasanTolak ? alasanTolak.substring(0, 50) + '…' : 'Sumber tidak terverifikasi'}`;
 
-            // ── LOGIKA GAMBAR KHUSUS TABEL (Biar sama kayak modal) ──
+            // 🔥 SUNTIK LAZY LOADING DI SINI 🔥
             let imgUrl = val.foto_thumbnail;
             if (imgUrl && !imgUrl.startsWith('http')) {
-                imgUrl = `/uploads/thumbnail/${imgUrl}`; // Path folder asli lu
+                imgUrl = `/uploads/thumbnail/${imgUrl}`;
             }
             const thumbHTML = imgUrl ?
-                `<img src="${imgUrl}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/eeeeee/999999?text=No+Image';" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
+                `<img src="${imgUrl}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/100x100/eeeeee/999999?text=No+Image';" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
                 `<div style="font-size:24px; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">${val.emoji || '📰'}</div>`;
 
             return `
@@ -344,7 +347,6 @@
         }
     });
 
-    /* ── TAB & FILTER LOGIC (Versi Bersih) ── */
     function showTab(status, el) {
         currentTab = status;
         const [title, crumb] = TITLES[status];
@@ -361,11 +363,15 @@
     function jalankanFilter() {
         const cat = document.getElementById('filterKategori').value;
         const author = document.getElementById('filterPenulis').value;
-        const searchInput = document.getElementById('searchInput');
-        const search = searchInput ? searchInput.value.toLowerCase() : '';
+
+        // Cek input dari Search Desktop maupun Mobile
+        const desktopSearch = document.getElementById('searchInput');
+        const mobileSearch = document.querySelector('.mobile-search-input');
+        let search = '';
+        if (desktopSearch && desktopSearch.value) search = desktopSearch.value.toLowerCase();
+        else if (mobileSearch && mobileSearch.value) search = mobileSearch.value.toLowerCase();
 
         beritaTable.setFilterAndSearch((val) => {
-            // MAPPING FORMAT BARU BIAR GAK UNDEFINED ERROR
             const statusBaris = (val.status_berita || val.status || '').toLowerCase();
             const kategoriBaris = val.kategori ? val.kategori.nama_kategori : (val.cat || '');
             const penulisBaris = val.user ? val.user.username : (val.author || '');
@@ -381,31 +387,21 @@
     }
 
     function applyVerdict(row, key, status) {
-        // 1. Normalisasi status biar sinkron sama LABEL & BADGE_CLASS
         const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
         const lowerStatus = status.toLowerCase();
 
-        // 2. Update data di memori lokal (DB)
         if (DB[key]) {
             DB[key].status_berita = capitalizedStatus;
-            DB[key].status = lowerStatus; // Jaga-jaga buat logic filter
+            DB[key].status = lowerStatus;
         }
 
-        // 3. KUNCI UTAMA: Paksa DataTableEngine buat render ulang data yang udah diupdate
-        // Kita ambil semua nilai dari DB yang udah berubah tadi
         const dataTerupdate = Object.values(DB);
         beritaTable.loadData(dataTerupdate);
-
-        // 4. Jalankan filter (biar kalau lagi di tab 'Pending', artikelnya langsung ilang pindah tab)
         jalankanFilter();
-
-        // 5. Update angka counter di atas (Semua, Pending, Terbit, Ditolak)
         updateCounts();
     }
 
-    // Fungsi buat ngubah Dummy Object 'DB' jadi Array biar bisa dibaca DataEngine
     function loadDataTabel(isSilent = false) {
-        // Cuma tampilin "Memuat" kalau BUKAN update otomatis (isSilent = false)
         if (!isSilent) {
             document.getElementById('newsBody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">Memuat data dari server...</td></tr>';
         }
@@ -428,7 +424,6 @@
                         if (item.user && item.user.username) listPenulis.add(item.user.username);
                     });
 
-                    // Update dropdown cuma kalau dipanggil pertama kali (biar pilihan user gak keganti pas ngetik)
                     if (!isSilent) {
                         renderFilterOptions(listKategori, listPenulis);
                     }
@@ -444,7 +439,6 @@
         });
     }
 
-    // Pisahin fungsi render filter biar rapi
     function renderFilterOptions(kategoriSet, penulisSet) {
         let htmlKategori = '<option value="">Semua Kategori</option>';
         kategoriSet.forEach(k => htmlKategori += `<option value="${k}">${k}</option>`);
@@ -455,7 +449,6 @@
         document.getElementById('filterPenulis').innerHTML = htmlPenulis;
     }
 
-    /* ── FUNGSI MODAL DETAIL & REVIEW (UPDATE API) ── */
     function openModal(key) {
         const a = DB[key];
 
@@ -471,18 +464,15 @@
             month: 'short',
             year: 'numeric'
         }) : 'Baru Saja';
-        const alasanTolak = a.catatan_penolakan || null; // Ambil catatan asli dari API
+        const alasanTolak = a.catatan_penolakan || null;
 
         document.getElementById('mdTitle').textContent = judul;
         document.getElementById('mdSub').textContent = `${penulis} · ${kategori} · ${tgl}`;
 
-        // ── [BARU] LOGIKA TAMPILKAN CATATAN PENOLAKAN SEBELUMNYA ──
-        // Hapus elemen lama kalau ada biar gak duplikat saat pindah-pindah modal
         const oldAlert = document.getElementById('mdPrevRejectAlert');
         if (oldAlert) oldAlert.remove();
 
         if (alasanTolak) {
-            // Buat elemen alert box baru
             const alertBox = document.createElement('div');
             alertBox.id = 'mdPrevRejectAlert';
             alertBox.style = `
@@ -504,19 +494,17 @@
                     <span style="color: var(--text); line-height: 1.5;">${alasanTolak}</span>
                 </div>
             `;
-            // Sisipkan di bawah Header (mdSub) dan di atas Gambar (mdThumb)
             document.getElementById('mdThumb').before(alertBox);
         }
 
-        // LOGIKA EMOJI & GAMBAR MODAL
         let imgUrl = a.foto_thumbnail;
         if (imgUrl && !imgUrl.startsWith('http')) {
             imgUrl = `/uploads/thumbnail/${imgUrl}`;
         }
 
-        // Kalau gambar ada, render gambar. Kalau gada, besarin emojinya
+        // 🔥 LAZY LOADING UNTUK GAMBAR DI MODAL JUGA 🔥
         document.getElementById('mdThumb').innerHTML = imgUrl ?
-            `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
+            `<img src="${imgUrl}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
             `<div style="font-size:36px; display:flex; align-items:center; justify-content:center; height:100%; width:100%;">${a.emoji || '📰'}</div>`;
 
         document.getElementById('md-author').textContent = penulis;
@@ -560,11 +548,9 @@
     }
 
     function cancelPublish() {
-        // Kita panggil modal custom kita, bukan confirm() web lagi
         ModalManager.open('modalConfirmUnpublish');
     }
 
-    /* ── FUNGSI BARU: EKSEKUSI BATAL PUBLISH ── */
     function executeUnpublish() {
         const key = document.getElementById('modalDetail').dataset.currentKey;
         const row = document.querySelector(`tr[data-key="${key}"]`);
@@ -577,7 +563,6 @@
             },
             success: function(response) {
                 applyVerdict(row, key, 'Pending');
-
                 ModalManager.close('modalConfirmUnpublish');
                 ModalManager.close('modalDetail');
                 Toast.show('warning', 'Publikasi ditarik. Artikel kembali ke status Pending.');
@@ -588,10 +573,8 @@
         });
     }
 
-    // Fungsi Helper buat nangkep Error API (Biar ga duplikat kodenya)
     function handleApiError(xhr) {
         if (xhr.status === 403) {
-            // Error khusus: Berita sudah dibayar Admin
             Toast.show('error', xhr.responseJSON.message || "Aksi ditolak oleh sistem.");
         } else {
             Toast.show('error', "Gagal memperbarui status berita. Cek koneksi!");
@@ -599,21 +582,18 @@
         console.error("API Error:", xhr.responseText);
     }
 
-    // 2. Eksekusi Publish
     function executePublish() {
         const key = document.getElementById('modalDetail').dataset.currentKey;
         const row = document.querySelector(`tr[data-key="${key}"]`);
 
         $.ajax({
             url: `/api/redaksi/verifikasiBerita/${key}`,
-            type: 'PATCH', // Sesuai spek lu pakai PATCH
+            type: 'PATCH',
             data: {
                 status_berita: 'Published'
             },
             success: function(response) {
-                // Update UI lokal
                 applyVerdict(row, key, 'published');
-
                 ModalManager.close('modalConfirmPublish');
                 ModalManager.close('modalDetail');
                 Toast.show('success', response.message || 'Artikel berhasil diterbitkan!');
@@ -624,7 +604,6 @@
         });
     }
 
-    // 3. Eksekusi Reject
     function verdictReject() {
         document.getElementById('mdRejectNote').classList.add('show');
     }
@@ -644,7 +623,6 @@
         const key = document.getElementById('modalDetail').dataset.currentKey;
         const row = document.querySelector(`tr[data-key="${key}"]`);
 
-        // ── PROSES TEMBAK API PATCH ──
         $.ajax({
             url: `/api/redaksi/verifikasiBerita/${key}`,
             type: 'PATCH',
@@ -653,7 +631,6 @@
                 catatan_penolakan: note
             },
             success: function(response) {
-                // Update state di memori JS biar tabel & counter langsung berubah
                 DB[key].catatan_penolakan = note;
                 applyVerdict(row, key, 'rejected');
 
@@ -661,13 +638,11 @@
                 Toast.show('error', 'Artikel ditolak & alasan dikirim ke Editor.');
             },
             error: function(xhr) {
-                // Nangkep error 403 (sudah lunas) atau error lainnya
                 handleApiError(xhr);
             }
         });
     }
 
-    /* ── UPDATE COUNTER ANGKA TAB & SIDEBAR ── */
     function updateCounts() {
         let cnt = {
             pending: 0,
@@ -676,22 +651,19 @@
             all: 0
         };
 
-        // Hitung langsung dari object DB, MAPPING KE FORMAT BARU
         Object.values(DB).forEach(val => {
             let s = (val.status_berita || val.status || '').toLowerCase();
-            if (s === 'approved') s = 'published'; // Auto map
+            if (s === 'approved') s = 'published';
 
             if (cnt[s] !== undefined) cnt[s]++;
             cnt.all++;
         });
 
-        // Update tab counts di topbar
         if (document.getElementById('cnt-all')) document.getElementById('cnt-all').textContent = cnt.all;
         if (document.getElementById('cnt-pending')) document.getElementById('cnt-pending').textContent = cnt.pending;
         if (document.getElementById('cnt-published')) document.getElementById('cnt-published').textContent = cnt.published;
         if (document.getElementById('cnt-rejected')) document.getElementById('cnt-rejected').textContent = cnt.rejected;
 
-        // Update sidebar count
         if (document.getElementById('pendingCount')) document.getElementById('pendingCount').textContent = cnt.pending;
     }
 </script>
