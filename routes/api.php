@@ -104,6 +104,7 @@ Route::prefix('viewers')->middleware('auth:sanctum')->group(function () {
     Route::put('/komentar/{id}', [KomentarController::class, 'editKomentar']);
     Route::delete('/komentar/{id}', [KomentarController::class, 'hapusKomentar']);
     Route::post('/toggleReaksi', [ReaksiController::class, 'toggleReaksi']);
+    Route::post('/update-profil', [AuthController::class, 'updateProfil']);
 });
 
 
