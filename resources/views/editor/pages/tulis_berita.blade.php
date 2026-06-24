@@ -109,21 +109,33 @@
                         <label>Konten Berita *</label>
                         <div class="rte-mock">
                             <div class="rte-toolbar">
-                                <button type="button" class="rte-btn rte-btn-bold" onmousedown="event.preventDefault();" onclick="RTE.exec('bold')" title="Tebal"><b>B</b></button>
-                                <button type="button" class="rte-btn rte-btn-italic" onmousedown="event.preventDefault();" onclick="RTE.exec('italic')" title="Miring"><i>I</i></button>
-                                <button type="button" class="rte-btn rte-btn-underline" onmousedown="event.preventDefault();" onclick="RTE.exec('underline')" title="Garis Bawah"><u>U</u></button>
+                                <button type="button" class="rte-btn rte-btn-bold" onmousedown="event.preventDefault();"
+                                    onclick="RTE.exec('bold')" title="Tebal"><b>B</b></button>
+                                <button type="button" class="rte-btn rte-btn-italic" onmousedown="event.preventDefault();"
+                                    onclick="RTE.exec('italic')" title="Miring"><i>I</i></button>
+                                <button type="button" class="rte-btn rte-btn-underline"
+                                    onmousedown="event.preventDefault();" onclick="RTE.exec('underline')"
+                                    title="Garis Bawah"><u>U</u></button>
                                 <div class="rte-sep"></div>
 
-                                <button type="button" class="rte-btn rte-btn-normal" onmousedown="event.preventDefault();" onclick="RTE.applyHeading('normal')" title="Reset ke Teks Normal (Paragraf)" style="font-size:12px; font-weight:600; padding:4px 8px;">Normal</button>
-                                <button type="button" class="rte-btn rte-btn-h1" onmousedown="event.preventDefault();" onclick="RTE.applyHeading('H1')" title="Heading 1">H1</button>
-                                <button type="button" class="rte-btn rte-btn-h2" onmousedown="event.preventDefault();" onclick="RTE.applyHeading('H2')" title="Heading 2">H2</button>
-                                <button type="button" class="rte-btn rte-btn-h3" onmousedown="event.preventDefault();" onclick="RTE.applyHeading('H3')" title="Heading 3">H3</button>
+                                <button type="button" class="rte-btn rte-btn-normal" onmousedown="event.preventDefault();"
+                                    onclick="RTE.applyHeading('normal')" title="Reset ke Teks Normal (Paragraf)"
+                                    style="font-size:12px; font-weight:600; padding:4px 8px;">Normal</button>
+                                <button type="button" class="rte-btn rte-btn-h1" onmousedown="event.preventDefault();"
+                                    onclick="RTE.applyHeading('H1')" title="Heading 1">H1</button>
+                                <button type="button" class="rte-btn rte-btn-h2" onmousedown="event.preventDefault();"
+                                    onclick="RTE.applyHeading('H2')" title="Heading 2">H2</button>
+                                <button type="button" class="rte-btn rte-btn-h3" onmousedown="event.preventDefault();"
+                                    onclick="RTE.applyHeading('H3')" title="Heading 3">H3</button>
 
                                 <div class="rte-sep"></div>
-                                <button type="button" class="rte-btn" onmousedown="event.preventDefault();" onclick="RTE.exec('justifyLeft')" title="Rata Kiri">≡</button>
-                                <button type="button" class="rte-btn" onmousedown="event.preventDefault();" onclick="RTE.exec('justifyCenter')" title="Rata Tengah">≣</button>
+                                <button type="button" class="rte-btn" onmousedown="event.preventDefault();"
+                                    onclick="RTE.exec('justifyLeft')" title="Rata Kiri">≡</button>
+                                <button type="button" class="rte-btn" onmousedown="event.preventDefault();"
+                                    onclick="RTE.exec('justifyCenter')" title="Rata Tengah">≣</button>
                                 <div class="rte-sep"></div>
-                                <button type="button" class="rte-btn" onmousedown="event.preventDefault();" onclick="RTE.insertLink()" title="Tambah Link">🔗</button>
+                                <button type="button" class="rte-btn" onmousedown="event.preventDefault();"
+                                    onclick="RTE.insertLink()" title="Tambah Link">🔗</button>
                             </div>
                             <div class="rte-body" id="inputKonten" contenteditable="true" required
                                 style="min-height: 250px;"></div>
@@ -140,6 +152,49 @@
                         <select id="select-kategori" name="kategori_id" style="font-size:13px;padding:8px 10px;">
                             <option value="">-- Memuat Kategori... --</option>
                         </select>
+                    </div>
+                </div>
+                <div class="form-card" style="margin-bottom: 16px;">
+                    <div class="form-title">Tipe Publikasi</div>
+
+                    <div class="field" style="margin-bottom: 0;">
+                        <label for="jenis_berita">Jenis Berita *</label>
+                        <select id="jenis_berita" name="jenis_berita"
+                            style="font-size:13px; padding:8px 10px; width: 100%; border: 1px solid var(--border); border-radius: 6px;"
+                            required>
+                            <option value="reguler" selected>Reguler</option>
+                            <option value="feature">Feature (Berbayar)</option>
+                        </select>
+                    </div>
+
+                    <div id="form_feature_wrapper"
+                        style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #ccc;">
+                        <div class="field">
+                            <label for="harga_berita">Harga Berita *</label>
+                            <input type="number" id="harga_berita" name="harga_berita" placeholder="Rp. "
+                                style="font-size: 13px; padding: 8px 10px; width: 100%; border: 1px solid var(--border); border-radius: 6px;">
+                        </div>
+
+                        <div class="field" style="margin-bottom: 0;">
+                            <label>Bukti Pembayaran (JPG, PNG, PDF) *</label>
+                            <input type="file" id="bukti_pembayaran" name="bukti_pembayaran" style="display:none;"
+                                accept="image/png, image/jpeg, image/jpg, application/pdf">
+
+                            <div class="thumb-upload" id="uploadBuktiBox"
+                                onclick="document.getElementById('bukti_pembayaran').click()">
+                                <div class="ico" id="icoBukti">📄</div>
+                                <p id="labelBukti"><span>Pilih file bukti transfer</span> atau seret ke sini</p>
+
+                                <img id="imgPreviewBukti"
+                                    style="display:none; width:100%; height:100%; object-fit:cover; border-radius:8px; max-height: 200px;">
+
+                                <div id="pdfPreviewBukti"
+                                    style="display:none; padding: 20px; background: #eef2ff; color: var(--blue); border-radius: 8px; font-weight: 600; font-size: 13px; word-break: break-all;">
+                                    ✅ File PDF Terpilih
+                                </div>
+                            </div>
+                            <p style="font-size:11px; margin-top:4px; color:var(--muted);">Maks. 2 MB</p>
+                        </div>
                     </div>
                 </div>
 
@@ -284,6 +339,8 @@
                         $('#inputJudul').val(berita.judul_berita);
                         $('#inputSlug').val(berita.slug);
                         $('#inputKonten').html(berita.isi_berita);
+                        $('#jenis_berita').val(berita.jenis_berita || 'reguler').trigger('change');
+                        $('#harga_berita').val(berita.harga_berita || '');
 
                         setTimeout(() => {
                             $('#select-kategori').val(berita.kategori_id);
@@ -323,6 +380,16 @@
             formData.append('kategori_id', $('#select-kategori').val());
             formData.append('isi_berita', $('#inputKonten').html());
             formData.append('status_berita', statusTujuan);
+            formData.append('jenis_berita', $('#jenis_berita').val());
+
+            if ($('#jenis_berita').val() === 'feature') {
+                formData.append('harga_berita', $('#harga_berita').val());
+
+                let fileBukti = $('#bukti_pembayaran')[0].files[0];
+                if (fileBukti) {
+                    formData.append('bukti_pembayaran', fileBukti);
+                }
+            }
 
             let foto = $('#inputFoto')[0].files[0];
             if (foto) formData.append('foto_thumbnail', foto);
@@ -382,12 +449,66 @@
                 ModalManager.close('modalDraft');
                 document.getElementById('tglDraft').classList.remove('sel-draft');
                 if (!$('#alertRejectBox').is(':visible')) document.getElementById('tglPending').classList.add(
-                'sel-pending');
+                    'sel-pending');
             } else {
                 ModalManager.close('modalPending');
                 if (!$('#alertRejectBox').is(':visible')) document.getElementById('tglDraft').classList.add('sel-draft');
                 document.getElementById('tglPending').classList.remove('sel-pending');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const jenisBerita = document.getElementById('jenis_berita');
+            const featureWrapper = document.getElementById('form_feature_wrapper');
+            const inputHarga = document.getElementById('harga_berita');
+            const inputBukti = document.getElementById('bukti_pembayaran');
+
+            // Fungsi untuk memunculkan/menyembunyikan form feature
+            function toggleFeatureFields() {
+                if (jenisBerita.value === 'feature') {
+                    // Tampilkan form dan jadikan field wajib diisi
+                    featureWrapper.style.display = 'block';
+                    inputHarga.setAttribute('required', 'required');
+                    inputBukti.setAttribute('required', 'required');
+                } else {
+                    // Sembunyikan form dan hilangkan status wajib diisi
+                    featureWrapper.style.display = 'none';
+                    inputHarga.removeAttribute('required');
+                    inputBukti.removeAttribute('required');
+
+                    // Bersihkan isi form kalau user batal milih feature
+                    inputHarga.value = '';
+                    inputBukti.value = '';
+                }
+            }
+
+            // Panggil fungsi saat halaman pertama kali diload (berguna saat buka form Edit)
+            toggleFeatureFields();
+
+            // Panggil fungsi setiap kali dropdown jenis berita diubah
+            jenisBerita.addEventListener('change', toggleFeatureFields);
+        });
+
+        $('#bukti_pembayaran').change(function() {
+            const file = this.files[0];
+            if (file) {
+                // Sembunyikan icon dan teks default
+                $('#uploadBuktiBox .ico, #uploadBuktiBox p').hide();
+
+                if (file.type.startsWith('image/')) {
+                    // Jika yang diupload adalah gambar (JPG/PNG)
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#imgPreviewBukti').attr('src', e.target.result).show();
+                        $('#pdfPreviewBukti').hide();
+                    }
+                    reader.readAsDataURL(file);
+                } else if (file.type === 'application/pdf') {
+                    // Jika yang diupload adalah PDF (karena PDF gak bisa dipreview pake tag <img>)
+                    $('#imgPreviewBukti').hide();
+                    $('#pdfPreviewBukti').html('📄 ' + file.name + ' (Siap diupload)').show();
+                }
+            }
+        });
     </script>
 @endsection
