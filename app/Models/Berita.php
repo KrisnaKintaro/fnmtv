@@ -20,7 +20,10 @@ class Berita extends Model
         'status_berita',
         'jumlah_view',
         'catatan_penolakan',
-        'waktu_publikasi'
+        'waktu_publikasi',
+        'jenis_berita',
+        'harga_berita',
+        'bukti_pembayaran'
     ];
 
     public function user() { return $this->belongsTo(User::class); }
