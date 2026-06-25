@@ -75,6 +75,11 @@
                 <div class="tab-p" onclick="filterTab(this,'published')"> Dipublikasikan
                     <span style="margin-left:4px;background:#e6f4f0;color:var(--success);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
                 </div>
+
+                <div class="tab-p" onclick="filterTab(this,'revisi')">Perlu Revisi 
+                    <span style="margin-left:4px;background:#fff3e0;color:#e67e00;font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
+                </div>
+
                 <div class="tab-p" onclick="filterTab(this,'rejected')">Ditolak <span
                         style="margin-left:4px;background:#fde8e8;color:var(--red);font-size:10px;padding:1px 6px;border-radius:8px;">0</span>
                 </div>
@@ -138,10 +143,10 @@
 
     <div id="modalAlasanTolak" class="modal-backdrop" style="display:none;">
         <div class="modal" style="max-width:400px; text-align:center; padding:32px 20px;">
-            <div style="font-size:40px; margin-bottom:12px;">❌</div>
-            <div style="font-family:'Merriweather',serif;font-size:18px;font-weight:700;margin-bottom:8px;">Artikel Ditolak</div>
-            <div style="font-size:13px;color:var(--text);background:#fde8e8;padding:16px;border-radius:8px;border:1px solid #f5b8b8;margin-bottom:24px;line-height:1.6;text-align:left;">
-                <strong style="color:var(--red);">Catatan Redaksi:</strong><br>
+            <div style="font-size:40px; margin-bottom:12px;" id="modalCatatanIcon">❌</div>
+            <div id="modalCatatanJudul" style="font-family:'Merriweather',serif;font-size:18px;font-weight:700;margin-bottom:8px;">Artikel Ditolak</div>
+            <div id="modalCatatanBox" style="font-size:13px;color:var(--text);background:#fde8e8;padding:16px;border-radius:8px;border:1px solid #f5b8b8;margin-bottom:24px;line-height:1.6;text-align:left;">
+                <strong id="modalCatatanLabel" style="color:var(--red);">Alasan Penolakan:</strong><br>
                 <span id="teksAlasanTolak"></span>
             </div>
             <div style="display:flex;justify-content:center;">
@@ -186,6 +191,17 @@
                             </div>
                         </div>
                     `;
+                },
+
+                /**
+                 * onDataLoaded — dipanggil SmartNotif setiap kali data notifikasi selesai dimuat.
+                 * Sinkronisasi jumlah notifikasi → badge sidebar via updateSidebarBadge().
+                 */
+                onDataLoaded: function (items) {
+                    const needAttention = Array.isArray(items)
+                        ? items.filter(item => item.type === 'rejected' || item.type === 'revisi')
+                        : [];
+                    updateSidebarBadge(needAttention.length);
                 }
             });
         });
@@ -197,32 +213,38 @@
             emptyState: '#emptyState',
             perPage: 5,
 
-            renderRowHTML: function(val) {
-                let badgeClass = val.status_berita.toLowerCase() === 'draft' ? 'b-draft' :
-                    val.status_berita.toLowerCase() === 'pending' ? 'b-review' : 'b-reject';
+            renderRowHTML: function (val) {
+                const statusLower = (val.status_berita || '').toLowerCase();
+                let badgeClass = statusLower === 'draft'     ? 'b-draft'   :
+                                statusLower === 'pending'   ? 'b-review'  :
+                                statusLower === 'published' ? 'b-publish' :
+                                statusLower === 'revisi'    ? 'b-warn'    : 'b-reject';
 
-                let btnInfoTolak = '';
+                let btnCatatan = '';
                 if (val.status_berita === 'Rejected') {
-                    let alasan = val.catatan_penolakan ? val.catatan_penolakan.replace(/'/g, "\\'") : 'Tidak ada catatan';
-                    btnInfoTolak = `<div class="ico-btn" title="Lihat Alasan Tolak" onclick="lihatAlasanTolak('${alasan}')">💬</div>`;
+                    let alasan = (val.catatan_penolakan || val.catatan_redaksi || 'Tidak ada catatan').replace(/'/g, "\\'");
+                    btnCatatan = `<div class="ico-btn" title="Lihat Alasan Tolak" onclick="lihatCatatanRedaksi('${alasan}','rejected')">💬</div>`;
+                } else if (val.status_berita === 'Revisi') {
+                    let catatan = (val.catatan_penolakan || val.catatan_redaksi || 'Tidak ada catatan').replace(/'/g, "\\'");
+                    btnCatatan = `<div class="ico-btn" title="Lihat Catatan Revisi" onclick="lihatCatatanRedaksi('${catatan}','revisi')">📝</div>`;
                 }
 
-                // --- LOGIKA BADGE JENIS BERITA ---
+                const bisaEdit  = ['Draft', 'Revisi'].includes(val.status_berita);
+                const bisaHapus = ['Draft', 'Revisi', 'Rejected'].includes(val.status_berita);
+
                 let badgeJenis = '';
                 if (val.jenis_berita === 'feature') {
-                    // Format angka jadi Rupiah (contoh: 500000 jadi 500.000)
                     let harga = new Intl.NumberFormat('id-ID').format(val.harga_berita || 0);
-                    badgeJenis = `<span style="background:#fff3cd; color:#856404; border:1px solid #ffeeba; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold;">🌟 Feature (Rp ${harga})</span>`;
+                    badgeJenis = `<span style="background:#fff3cd;color:#856404;border:1px solid #ffeeba;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:bold;">🌟 Feature (Rp ${harga})</span>`;
                 } else {
-                    badgeJenis = `<span style="background:#f8f9fa; color:#6c757d; border:1px solid #ddd; padding:2px 6px; border-radius:4px; font-size:10px;">Reguler</span>`;
+                    badgeJenis = `<span style="background:#f8f9fa;color:#6c757d;border:1px solid #ddd;padding:2px 6px;border-radius:4px;font-size:10px;">Reguler</span>`;
                 }
 
                 return `
                 <tr data-key="${val.id}">
                     <td>
-                        <div class="tbl-img">
-                            <img src="/uploads/thumbnail/${val.foto_thumbnail}" loading="lazy" style="width:56px;height:40px;object-fit:cover;border-radius:4px;">
-                        </div>
+                        <img src="/uploads/thumbnail/${val.foto_thumbnail}" loading="lazy"
+                            style="width:56px;height:40px;object-fit:cover;border-radius:4px;">
                     </td>
                     <td>
                         <div class="tbl-title">${val.judul_berita}</div>
@@ -233,12 +255,18 @@
                     </td>
                     <td><span class="badge" style="background:#fde8e8;color:var(--red);">${val.kategori ? val.kategori.nama_kategori : 'Uncategorized'}</span></td>
                     <td><span class="badge ${badgeClass}">${val.status_berita}</span></td>
-                    <td style="font-size:12px;color:var(--muted);">${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</td>
+                    <td style="font-size:12px;color:var(--muted);">
+                        ${new Date(val.created_at).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'})}
+                    </td>
                     <td>
                         <div class="act-btns" style="justify-content:flex-start;">
-                            ${btnInfoTolak}
-                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn btn-edit" onclick="editBerita(${val.id})">✏️</div>` : `<div class="ico-btn btn-disabled" title="Sedang direview">✏️</div>`}
-                            ${val.status_berita !== 'Pending' ? `<div class="ico-btn btn-purge" onclick="confirmDelete(${val.id})">🗑</div>` : `<div class="ico-btn btn-disabled" title="Sedang direview">🗑</div>`}
+                            ${btnCatatan}
+                            ${bisaEdit
+                                ? `<div class="ico-btn btn-edit" onclick="editBerita(${val.id})">✏️</div>`
+                                : `<div class="ico-btn btn-disabled" title="Tidak bisa diedit">✏️</div>`}
+                            ${bisaHapus
+                                ? `<div class="ico-btn btn-purge" onclick="confirmDelete(${val.id})">🗑</div>`
+                                : `<div class="ico-btn btn-disabled" title="Tidak bisa dihapus">🗑</div>`}
                         </div>
                     </td>
                 </tr>`;
@@ -294,21 +322,35 @@
                     jalankanFilter();
 
                     if (response && Array.isArray(response)) {
-                        const all = response.length;
-                        const draft = response.filter(b => b.status_berita === 'Draft').length;
-                        const pending = response.filter(b => b.status_berita === 'Pending').length;
-                        const rejected = response.filter(b => b.status_berita === 'Rejected').length;
+                        const all       = response.length;
+                        const draft     = response.filter(b => b.status_berita === 'Draft').length;
+                        const pending   = response.filter(b => b.status_berita === 'Pending').length;
                         const published = response.filter(b => b.status_berita === 'Published').length;
+                        const revisi    = response.filter(b => b.status_berita === 'Revisi').length;
+                        const rejected  = response.filter(b => b.status_berita === 'Rejected').length;
 
                         $('#editorSidebarBadge').text(all);
                         const tabs = $('#tabPills .tab-p span');
-                        if (tabs.length >= 5) {
+                        if (tabs.length >= 6) {
                             $(tabs[0]).text(all);
                             $(tabs[1]).text(draft);
                             $(tabs[2]).text(pending);
-                            $(tabs[3]).text(rejected);
-                            $(tabs[4]).text(published);
+                            $(tabs[3]).text(published);
+                            $(tabs[4]).text(revisi);
+                            $(tabs[5]).text(rejected);
                         }
+
+                        /*
+                         * SINKRONISASI BADGE SIDEBAR
+                         * Badge merah muncul jika ada artikel berstatus Rejected.
+                         * Menggunakan helper updateSidebarBadge() agar konsisten
+                         * dengan sumber notifikasi dari SmartNotif.onDataLoaded.
+                         *
+                         * CATATAN: Jika ingin badge menampilkan total notifikasi
+                         * dari SmartNotif (bukan hanya rejected), hapus baris ini
+                         * dan biarkan SmartNotif yang menjadi sumber tunggal.
+                         */
+                        updateSidebarBadge(rejected + revisi);
                     }
                 },
                 error: function(xhr) {
@@ -360,11 +402,22 @@
             });
         }
 
-        function lihatAlasanTolak(alasan) {
-            document.getElementById('teksAlasanTolak').textContent = alasan || 'Tidak ada catatan dari Redaksi.';
+        /* ════════════════════════════════════════════════════════════
+         *  MODAL ALASAN TOLAK
+         * ════════════════════════════════════════════════════════════ */
+        // HAPUS fungsi lihatAlasanTolak(), GANTI dengan ini:
+        function lihatCatatanRedaksi(catatan, tipe) {
+            const isRevisi = tipe === 'revisi';
+            document.getElementById('modalCatatanIcon').textContent  = isRevisi ? '📝' : '❌';
+            document.getElementById('modalCatatanJudul').textContent = isRevisi ? 'Perlu Revisi' : 'Artikel Ditolak';
+            document.getElementById('modalCatatanBox').style.background   = isRevisi ? '#fff8e1' : '#fde8e8';
+            document.getElementById('modalCatatanBox').style.borderColor  = isRevisi ? '#ffe082' : '#f5b8b8';
+            document.getElementById('modalCatatanLabel').style.color      = isRevisi ? '#e67e00' : 'var(--red)';
+            document.getElementById('modalCatatanLabel').textContent      = isRevisi ? 'Catatan Redaksi:' : 'Alasan Penolakan:';
+            document.getElementById('teksAlasanTolak').textContent        = catatan || 'Tidak ada catatan dari Redaksi.';
             ModalManager.open('modalAlasanTolak');
         }
-
+        
         /* ── FILTER TABS & SEARCH LOGIC ── */
         let statusAktif = 'all';
 
