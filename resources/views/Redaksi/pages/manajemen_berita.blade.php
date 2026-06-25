@@ -50,6 +50,9 @@
             <div class="tab-p" id="tab-published" onclick="showTab('published', this)">
                 Terbit <span class="tab-cnt cnt-published" id="cnt-published">0</span>
             </div>
+            <div class="tab-p" id="tab-revisi" onclick="showTab('revisi', this)">
+                Revisi <span class="tab-cnt cnt-revisi" id="cnt-revisi">0</span>
+            </div>
             <div class="tab-p" id="tab-rejected" onclick="showTab('rejected', this)">
                 Ditolak <span class="tab-cnt cnt-rejected" id="cnt-rejected">0</span>
             </div>
@@ -80,6 +83,7 @@
                         <th>Kategori</th>
                         <th>Penulis</th>
                         <th>Tanggal Kirim</th>
+                        <th>Jenis</th>
                         <th>Status</th>
                         <th style="width:80px;text-align:center;">Aksi</th>
                     </tr>
@@ -126,24 +130,36 @@
             <div id="mdVerdictWrap" style="display:none;">
                 <div class="verdict-box">
                     <div class="verdict-title">Keputusan Redaksi</div>
-                    <div class="verdict-desc">Periksa artikel dengan saksama sebelum memberikan keputusan. Keputusan
-                        akan langsung diteruskan ke Editor yang bersangkutan.</div>
+                    <div class="verdict-desc">Periksa artikel dengan saksama sebelum memberikan keputusan. Keputusan akan langsung diteruskan ke Editor yang bersangkutan.</div>
+
+                    {{-- Komentar selalu tampil di atas tombol --}}
+                    <div style="margin-bottom:16px;">
+                        <label style="font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px;">Komentar Redaksi</label>
+                        <textarea id="mdRejectText" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.6;resize:vertical;min-height:90px;box-sizing:border-box;font-family:inherit;"
+                            placeholder="Tuliskan komentar atau catatan untuk Editor mengenai artikel ini..."></textarea>
+                    </div>
+
                     <div class="verdict-actions">
-                        <button class="vbtn vbtn-publish" onclick="ModalManager.open('modalConfirmPublish')">
+                        <button class="vbtn vbtn-publish" onclick="executeVerdictWithNote('Published')">
                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                             </svg>
                             Setujui & Publish
                         </button>
-                        <button class="vbtn vbtn-reject" onclick="verdictReject()">
-                            <svg width="14" height="14" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                    d="M6 18L18 6M6 6l12 12" />
+                        <button class="vbtn" style="background:#fff8e1;color:#92400e;border:1px solid #fde68a;" onclick="executeVerdictWithNote('Revisi')">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Perlu Revisi
+                        </button>
+                        <button class="vbtn vbtn-reject" onclick="executeVerdictWithNote('Rejected')">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                             Tolak Artikel
                         </button>
                     </div>
+                </div>
                     <div class="reject-note" id="mdRejectNote">
                         <label>Alasan Penolakan (wajib diisi)</label>
                         <textarea id="mdRejectText"
@@ -262,24 +278,28 @@
     const BADGE_CLASS = {
         pending: 'b-pending',
         published: 'b-published',
-        rejected: 'b-rejected'
+        rejected: 'b-rejected',
+        revisi: 'b-warn'
     };
     const LABEL = {
         pending: 'Pending',
         published: 'Terbit',
-        rejected: 'Ditolak'
+        rejected: 'Ditolak',
+        revisi: 'Perlu Revisi'
     };
     const TITLES = {
         all: ['Manajemen Berita', 'Redaksi / Manajemen Berita'],
         pending: ['Manajemen Berita', 'Redaksi / Manajemen Berita'],
         published: ['Manajemen Berita', 'Redaksi / Manajemen Berita'],
-        rejected: ['Manajemen Berita', 'Redaksi / Manajemen Berita']
+        rejected: ['Manajemen Berita', 'Redaksi / Manajemen Berita'],
+        revisi: ['Manajemen Berita', 'Redaksi / Manajemen Berita']
     };
     const CARD_TITLES = {
         all: 'Daftar Artikel Masuk dari Editor',
         pending: 'Artikel Menunggu Keputusan',
         published: 'Artikel Telah Diterbitkan',
-        rejected: 'Artikel Telah Ditolak'
+        rejected: 'Artikel Telah Ditolak',
+        revisi: 'Artikel Perlu Revisi'
     };
 
     let currentTab = 'all';
@@ -295,6 +315,7 @@
         infoWrapper: '#pagerInfo',
         emptyState: '#emptyState',
         perPage: 5,
+        // GANTI seluruh renderRowHTML: function(val) { ... }
         renderRowHTML: function(val) {
             const status = (val.status_berita || val.status).toLowerCase();
             const judul = val.judul_berita || val.title;
@@ -302,25 +323,26 @@
             const kategori = val.kategori ? val.kategori.nama_kategori : (val.cat || 'Uncategorized');
             const rawDate = val.created_at || val.date || '';
             const tanggal = rawDate ? new Date(rawDate).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
+                day: 'numeric', month: 'short', year: 'numeric'
             }) : '-';
             const alasanTolak = val.catatan_penolakan || val.rejectReason;
 
             let metaText = '';
-            if (status === 'pending') metaText = 'Menunggu keputusan Redaksi';
+            if (status === 'pending')        metaText = 'Menunggu keputusan Redaksi';
             else if (status === 'published') metaText = `Disetujui oleh Redaksi · ${tanggal}`;
+            else if (status === 'revisi')    metaText = `Perlu Revisi · ${alasanTolak ? alasanTolak.substring(0, 50) + '…' : '-'}`;
             else metaText = `Ditolak · ${alasanTolak ? alasanTolak.substring(0, 50) + '…' : 'Sumber tidak terverifikasi'}`;
 
-            // 🔥 SUNTIK LAZY LOADING DI SINI 🔥
             let imgUrl = val.foto_thumbnail;
-            if (imgUrl && !imgUrl.startsWith('http')) {
-                imgUrl = `/uploads/thumbnail/${imgUrl}`;
-            }
-            const thumbHTML = imgUrl ?
-                `<img src="${imgUrl}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/100x100/eeeeee/999999?text=No+Image';" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">` :
-                `<div style="font-size:24px; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">${val.emoji || '📰'}</div>`;
+            if (imgUrl && !imgUrl.startsWith('http')) imgUrl = `/uploads/thumbnail/${imgUrl}`;
+            const thumbHTML = imgUrl
+                ? `<img src="${imgUrl}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/100x100/eeeeee/999999?text=No+Image';" style="width:100%;height:100%;object-fit:cover;border-radius:4px;">`
+                : `<div style="font-size:24px;display:flex;align-items:center;justify-content:center;width:100%;height:100%;">${val.emoji || '📰'}</div>`;
+
+            const jenis = val.jenis_berita || 'reguler';
+            const badgeJenis = jenis === 'feature'
+                ? `<span class="badge" style="background:#fff3cd;color:#856404;border:1px solid #ffeeba;">🌟 Feature</span>`
+                : `<span class="badge" style="background:#f8f9fa;color:#6c757d;border:1px solid #ddd;">Reguler</span>`;
 
             return `
             <tr data-key="${val.key || val.id}">
@@ -332,13 +354,14 @@
                 <td><span class="badge b-cat">${kategori}</span></td>
                 <td style="font-size:12px;color:var(--muted);">${penulis}</td>
                 <td style="font-size:12px;color:var(--muted);">${tanggal}</td>
-                <td><span class="badge ${BADGE_CLASS[status]}">${LABEL[status] || status}</span></td>
+                <td>${badgeJenis}</td>
+                <td><span class="badge ${BADGE_CLASS[status] || 'b-reject'}">${LABEL[status] || status}</span></td>
                 <td>
                     <div class="act-btns">
                         <div class="ico-btn" title="${status === 'pending' ? 'Lihat & Validasi' : 'Lihat Detail'}" onclick="openModal('${val.key || val.id}')">
                             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
                         </div>
                     </div>
@@ -522,9 +545,56 @@
         document.getElementById('mdRejectNote').classList.remove('show');
         document.getElementById('mdRejectText').value = '';
 
+        // GANTI blok if (status === 'pending') { ... } else { ... } di dalam openModal()
+        // Hapus mdFeatureInfo lama setiap buka modal
+        const oldFeatureInfo = document.getElementById('mdFeatureInfo');
+        if (oldFeatureInfo) oldFeatureInfo.remove();
+        const oldRevertBtn = document.getElementById('btnRevertPending');
+        if (oldRevertBtn) oldRevertBtn.remove();
+
         if (status === 'pending') {
             vw.style.display = 'block';
+            const btnTolak = document.querySelector('.vbtn.vbtn-reject');
+            if (btnTolak) {
+                btnTolak.style.display = a.jenis_berita === 'feature' ? 'none' : '';
+            }
             rw.style.display = 'none';
+
+            if (a.jenis_berita === 'feature') {
+                const harga = a.harga_berita ? new Intl.NumberFormat('id-ID').format(a.harga_berita) : '0';
+                const featureBox = document.createElement('div');
+                featureBox.id = 'mdFeatureInfo';
+                featureBox.style.cssText = 'background:#fffbea;border:1px solid #fde68a;padding:14px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;';
+                featureBox.innerHTML = `
+                    <div style="font-weight:700;color:#92400e;margin-bottom:8px;">🌟 Artikel Feature</div>
+                    <div style="color:var(--text);line-height:1.6;">
+                        <div>Harga: <strong>Rp ${harga}</strong></div>
+                        ${a.bukti_pembayaran
+                            ? `<div style="margin-top:6px;">Bukti Pembayaran: <a href="/uploads/bukti_pembayaran/${a.bukti_pembayaran}" target="_blank" style="color:var(--blue);font-weight:600;">Lihat Bukti →</a></div>`
+                            : `<div style="margin-top:6px;color:#b45309;">⚠️ Bukti pembayaran belum diupload.</div>`
+                        }
+                    </div>
+                `;
+                document.getElementById('mdVerdictWrap').before(featureBox);
+            }
+
+        } else if (status === 'revisi') {
+            vw.style.display = 'none';
+            rw.style.display = 'block';
+            rb.className = 'info-result-box revisi';
+            document.getElementById('mdResultIco').textContent = '📝';
+            document.getElementById('mdResultTitle').textContent = 'Artikel Perlu Direvisi';
+            document.getElementById('mdResultDesc').innerHTML = `<strong>Catatan:</strong> ${a.catatan_penolakan || '-'}`;
+            btnUnpublish.style.display = 'none';
+
+            const revertBtn = document.createElement('button');
+            revertBtn.id = 'btnRevertPending';
+            revertBtn.className = 'btn btn-outline btn-sm';
+            revertBtn.style.marginTop = '12px';
+            revertBtn.innerHTML = '↩ Kembalikan ke Pending';
+            revertBtn.onclick = cancelPublish;
+            document.getElementById('mdResultDesc').after(revertBtn);
+
         } else {
             vw.style.display = 'none';
             rw.style.display = 'block';
@@ -538,7 +608,7 @@
             } else {
                 document.getElementById('mdResultIco').textContent = '❌';
                 document.getElementById('mdResultTitle').textContent = 'Artikel Ditolak';
-                document.getElementById('mdResultDesc').innerHTML = '<strong style="color:var(--text);">Alasan:</strong> ' + (alasanTolak || 'Ditolak oleh Redaksi.');
+                document.getElementById('mdResultDesc').innerHTML = `<strong style="color:var(--text);">Alasan:</strong> ${alasanTolak || 'Ditolak oleh Redaksi.'}`;
                 btnUnpublish.style.display = 'none';
             }
         }
@@ -583,43 +653,33 @@
     }
 
     function executePublish() {
-        const key = document.getElementById('modalDetail').dataset.currentKey;
-        const row = document.querySelector(`tr[data-key="${key}"]`);
-
-        $.ajax({
-            url: `/api/redaksi/verifikasiBerita/${key}`,
-            type: 'PATCH',
-            data: {
-                status_berita: 'Published'
-            },
-            success: function(response) {
-                applyVerdict(row, key, 'published');
-                ModalManager.close('modalConfirmPublish');
-                ModalManager.close('modalDetail');
-                Toast.show('success', response.message || 'Artikel berhasil diterbitkan!');
-            },
-            error: function(xhr) {
-                handleApiError(xhr);
-            }
-        });
+        const note = document.getElementById('modalDetail').dataset.pendingNote || '';
+        ModalManager.close('modalConfirmPublish');
+        kirimVerdict('Published', note);
     }
 
-    function verdictReject() {
-        document.getElementById('mdRejectNote').classList.add('show');
-    }
-
-    function closeRejectNote() {
-        document.getElementById('mdRejectNote').classList.remove('show');
-        document.getElementById('mdRejectText').value = '';
-    }
-
-    function submitRejectFromDetail() {
+    function executeVerdictWithNote(statusKirim) {
         const note = document.getElementById('mdRejectText').value.trim();
-        if (!note) {
-            Toast.show('warning', 'Harap isi alasan penolakan untuk Editor.');
+
+        // Wajib isi komentar kalau Revisi atau Rejected
+        if (!note && (statusKirim === 'Revisi' || statusKirim === 'Rejected')) {
+            Toast.show('warning', 'Komentar wajib diisi untuk Revisi atau Penolakan.');
+            document.getElementById('mdRejectText').focus();
             return;
         }
 
+        // Kalau Publish, konfirmasi dulu
+        if (statusKirim === 'Published') {
+            // Simpan note sementara ke dataset, lalu buka modal konfirmasi
+            document.getElementById('modalDetail').dataset.pendingNote = note;
+            ModalManager.open('modalConfirmPublish');
+            return;
+        }
+
+        kirimVerdict(statusKirim, note);
+    }
+
+    function kirimVerdict(statusKirim, note) {
         const key = document.getElementById('modalDetail').dataset.currentKey;
         const row = document.querySelector(`tr[data-key="${key}"]`);
 
@@ -627,15 +687,22 @@
             url: `/api/redaksi/verifikasiBerita/${key}`,
             type: 'PATCH',
             data: {
-                status_berita: 'Rejected',
-                catatan_penolakan: note
+                status_berita: statusKirim,
+                catatan_penolakan: note || ''
             },
             success: function(response) {
                 DB[key].catatan_penolakan = note;
-                applyVerdict(row, key, 'rejected');
-
+                DB[key].catatan_redaksi   = note;
+                applyVerdict(row, key, statusKirim.toLowerCase());
                 ModalManager.close('modalDetail');
-                Toast.show('error', 'Artikel ditolak & alasan dikirim ke Editor.');
+
+                if (statusKirim === 'Published') {
+                    Toast.show('success', response.message || 'Artikel berhasil diterbitkan!');
+                } else if (statusKirim === 'Revisi') {
+                    Toast.show('warning', 'Artikel dikembalikan untuk direvisi oleh Editor.');
+                } else {
+                    Toast.show('error', 'Artikel ditolak & catatan dikirim ke Editor.');
+                }
             },
             error: function(xhr) {
                 handleApiError(xhr);
@@ -648,6 +715,7 @@
             pending: 0,
             published: 0,
             rejected: 0,
+            revisi: 0,
             all: 0
         };
 
@@ -663,6 +731,7 @@
         if (document.getElementById('cnt-pending')) document.getElementById('cnt-pending').textContent = cnt.pending;
         if (document.getElementById('cnt-published')) document.getElementById('cnt-published').textContent = cnt.published;
         if (document.getElementById('cnt-rejected')) document.getElementById('cnt-rejected').textContent = cnt.rejected;
+        if (document.getElementById('cnt-revisi')) document.getElementById('cnt-revisi').textContent = cnt.revisi;
 
         if (document.getElementById('pendingCount')) document.getElementById('pendingCount').textContent = cnt.pending;
     }

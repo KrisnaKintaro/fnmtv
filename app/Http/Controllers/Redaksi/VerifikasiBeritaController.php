@@ -12,7 +12,7 @@ class VerifikasiBeritaController extends Controller
     // List berita yang masuk (Pending, Published, dan Rejected untuk monitoring)
     public function getBeritaMasuk()
     {
-        $data = Berita::whereIn('status_berita', ['Pending', 'Published', 'Rejected'])
+        $data = Berita::whereIn('status_berita', ['Pending', 'Published', 'Rejected', 'Revisi'])
                 ->with(['user:id,id,username', 'kategori:id,id,nama_kategori'])
                 ->orderBy('created_at', 'DESC')
                 ->get()
@@ -25,6 +25,9 @@ class VerifikasiBeritaController extends Controller
                         'foto_thumbnail' => $item->foto_thumbnail,
                         'status_berita' => $item->status_berita,
                         'catatan_penolakan' => $item->catatan_penolakan,
+                        'jenis_berita'      => $item->jenis_berita,
+                        'harga_berita'      => $item->harga_berita,
+                        'bukti_pembayaran'  => $item->bukti_pembayaran,
                         'created_at' => $item->created_at,
                         'waktu_publikasi' => $item->waktu_publikasi,
                         'user' => [
@@ -50,11 +53,20 @@ class VerifikasiBeritaController extends Controller
     // Proses Verifikasi (ACC/Tolak/Unpublish)
     public function verifikasiBerita(Request $request, $id)
     {
+        $berita = Berita::findOrFail($id);
+
+        if ($berita->jenis_berita === 'feature' && $request->status_berita === 'Rejected') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Berita berbayar (Feature) tidak dapat ditolak. Silakan publish atau minta revisi.'
+            ], 403);
+        }
+        
         $request->validate([
-            'status_berita'     => 'required|in:Published,Rejected,Pending',
-            'catatan_penolakan' => 'required_if:status_berita,Rejected'
+            'status_berita'     => 'required|in:Published,Rejected,Pending,Revisi',
+            'catatan_penolakan' => 'required_if:status_berita,Rejected|required_if:status_berita,Revisi'
         ], [
-            'catatan_penolakan.required_if' => 'Catatan penolakan wajib diisi kalau artikel ditolak cuy!'
+            'catatan_penolakan.required_if' => 'Catatan wajib diisi kalau artikel ditolak atau perlu revisi!'
         ]);
 
         $berita = Berita::findOrFail($id);
@@ -66,7 +78,7 @@ class VerifikasiBeritaController extends Controller
                 ['berita_id' => $berita->id],
                 [
                     'user_id' => $berita->user_id, // Editor yang punya berita
-                    'nominal_pendapatan' => 0,
+                    'nominal_pendapatan' => $berita->jenis_berita === 'feature' ? ($berita->harga_berita ?? 0) : 0,
                     'status_pembayaran' => 'Unpaid'
                 ]
             );
@@ -99,6 +111,9 @@ class VerifikasiBeritaController extends Controller
         } else if ($request->status_berita == 'Rejected') {
             $updateData['catatan_penolakan'] = $request->catatan_penolakan;
             $updateData['waktu_publikasi'] = null;
+        } else if ($request->status_berita === 'Revisi'){
+            $updateData['catatan_penolakan'] = $request->catatan_penolakan;
+            $updateData['waktu_publikasi']  = null;
         } else if ($request->status_berita == 'Pending') {
             // 🔴 FIX 2: Bersihin tanggal publikasi kalau ditarik jadi Unpublish (Pending)
             $updateData['catatan_penolakan'] = null;

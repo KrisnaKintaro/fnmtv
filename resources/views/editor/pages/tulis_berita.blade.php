@@ -353,8 +353,18 @@
 
                         if (berita.status_berita === 'Rejected') {
                             $('#alertRejectBox').show();
-                            $('#alertRejectText').text(berita.catatan_penolakan || 'Tidak ada catatan.');
-
+                            $('#alertRejectBox').css('background', '#fde8e8').css('border-color', '#f5b8b8');
+                            $('#alertRejectBox').find('div:first').html('⚠️ Artikel ini <strong>ditolak</strong> oleh Redaksi');
+                            $('#alertRejectText').text(berita.catatan_redaksi || berita.catatan_penolakan || 'Tidak ada catatan.');
+                            $('#tglDraft').hide();
+                            $('#tglPending').addClass('sel-pending');
+                        } 
+                        
+                        else if (berita.status_berita === 'Revisi') {
+                            $('#alertRejectBox').show();
+                            $('#alertRejectBox').css('background', '#fff8e1').css('border-color', '#ffe082');
+                            $('#alertRejectBox').find('div:first').html('📝 Artikel ini perlu <strong>direvisi</strong> oleh Redaksi');
+                           $('#alertRejectText').text(berita.catatan_redaksi || berita.catatan_penolakan || 'Tidak ada catatan.');
                             $('#tglDraft').hide();
                             $('#tglPending').addClass('sel-pending');
                         }

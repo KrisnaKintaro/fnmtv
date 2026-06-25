@@ -17,7 +17,6 @@ class BeritaController extends Controller
     {
         $data = Berita::with('kategori:id,nama_kategori')
             ->where('user_id', Auth::id())
-            //->where('status_berita', '!=', 'Published')
             ->latest()
             ->get();
         return response()->json($data);
@@ -31,7 +30,7 @@ class BeritaController extends Controller
             'kategori_id' => 'required|exists:kategoris,id',
             'judul_berita' => 'required|string|max:255',
             'isi_berita' => 'required',
-            'foto_thumbnail' => 'required|image|mimes:jpg,png,jpeg|max:2048',
+            'foto_thumbnail' => 'required|image|mimes:jpg,png,jpeg|max:5120',
             'jenis_berita' => 'required|in:reguler,feature',
             'harga_berita' => 'required_if:jenis_berita,feature|nullable|numeric',
             'bukti_pembayaran' => 'required_if:jenis_berita,feature|nullable|file|mimes:jpg,png,jpeg,pdf|max:2048',
@@ -94,7 +93,7 @@ class BeritaController extends Controller
 
             $berita = Berita::where('id', $id_berita)->where('user_id', Auth::id())->firstOrFail();
 
-            if (!in_array($berita->status_berita, ['Draft', 'Rejected'])) {
+            if (!in_array($berita->status_berita, ['Draft', 'Revisi'])) {
                 return response()->json(['message' => 'Berita tidak bisa diubah'], 403);
             }
 
@@ -191,20 +190,28 @@ class BeritaController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
+        $revisiNotif = Berita::where('user_id', $userId)
+            ->where('status_berita', 'Revisi')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
         // Gabungin datanya
-        $allNotif = $rejectedNotif->merge($publishedNotif)->sortByDesc('updated_at')->values();
+        $allNotif = $rejectedNotif->merge($publishedNotif)->merge($revisiNotif)->sortByDesc('updated_at')->values();
 
         $data = $allNotif->map(function ($item) {
             $isRejected = $item->status_berita === 'Rejected';
+            $isRevisi   = $item->status_berita === 'Revisi';
 
             return [
                 'id'      => $item->id,
-                'type'    => $isRejected ? 'rejected' : 'published',
-                'icon'    => $isRejected ? '⚠️' : '🎉',
-                'title'   => $isRejected ? 'Artikel Ditolak' : 'Artikel Terbit',
+                'type'    => $isRejected ? 'rejected' : ($isRevisi ? 'revisi' : 'published'),
+                'icon'    => $isRejected ? '⚠️' : ($isRevisi ? '📝' : '🎉'),
+                'title'   => $isRejected ? 'Artikel Ditolak' : ($isRevisi ? 'Perlu Revisi' : 'Artikel Terbit'),
                 'message' => $isRejected
-                    ? "Berita '<strong>{$item->judul_berita}</strong>' dikembalikan. Klik buat benerin cuy!"
-                    : "Hore! Berita '<strong>{$item->judul_berita}</strong>' sudah tayang di publik.",
+                    ? "Berita '<strong>{$item->judul_berita}</strong>' dikembalikan. Klik untuk memperbaiki!"
+                    : ($isRevisi
+                        ? "Berita '<strong>{$item->judul_berita}</strong>' perlu direvisi. Cek catatan Redaksi!"
+                        : "Hore! Berita '<strong>{$item->judul_berita}</strong>' sudah tayang di publik."),
                 'time'    => $item->updated_at->diffForHumans(),
                 'status'  => $item->status_berita
             ];
