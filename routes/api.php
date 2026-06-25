@@ -153,6 +153,7 @@ Route::middleware(['web', 'auth', 'RoleCheck:Editor'])->group(function () {
     Route::prefix('editor/manajemen_berita')->group(function () {
         Route::get('/ambilData', [BeritaController::class, 'getDaftarBerita']);
         Route::post('/tambahData', [BeritaController::class, 'tambahBeritaBaru']);
+        Route::post('/uploadImage', [BeritaController::class, 'uploadImage']);
         Route::put('/ubahData/{id_berita}', [BeritaController::class, 'ubahDataBerita']);
         Route::delete('/hapusBerita/{id_berita}', [BeritaController::class, 'hapusDataBerita']);
         Route::get('/ambilNotifikasi', [BeritaController::class, 'ambilNotifikasi']);
