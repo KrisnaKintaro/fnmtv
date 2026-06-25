@@ -22,6 +22,35 @@ class BeritaController extends Controller
         return response()->json($data);
     }
 
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpg,png,jpeg|max:5120',
+        ]);
+
+        try {
+            $file = $request->file('image');
+            $nama_file = time() . '_' . $file->hashName();
+            $folder = public_path('uploads/content');
+
+            if (!File::exists($folder)) {
+                File::makeDirectory($folder, 0755, true);
+            }
+
+            $file->move($folder, $nama_file);
+
+            return response()->json([
+                'status' => 'success',
+                'url' => asset('uploads/content/' . $nama_file),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal upload gambar: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     // Tambah Berita Baru
     public function tambahBeritaBaru(Request $request)
     {

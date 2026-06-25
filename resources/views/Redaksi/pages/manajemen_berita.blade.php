@@ -32,6 +32,23 @@
             flex: 1; /* Biar dropdown penuhi layar di HP dan gampang di-tap */
         }
     }
+
+    /* Responsive images in Redaksi modal article detail */
+    .modal-article-body img,
+    .modal-article-body video,
+    .modal-article-body iframe {
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        display: block;
+        margin: 1rem auto;
+    }
+    .modal-article-body table,
+    .modal-article-body pre,
+    .modal-article-body blockquote {
+        max-width: 100%;
+        overflow-x: auto;
+    }
 </style>
 @endsection
 
@@ -536,6 +553,7 @@
         document.getElementById('md-slug').textContent = slug;
         document.getElementById('md-status').textContent = LABEL[status] || status;
         document.getElementById('mdContent').innerHTML = konten;
+        normalizeModalContentImages();
 
         const vw = document.getElementById('mdVerdictWrap');
         const rw = document.getElementById('mdResultWrap');
@@ -615,6 +633,19 @@
 
         document.getElementById('modalDetail').dataset.currentKey = key;
         ModalManager.open('modalDetail');
+    }
+
+    function normalizeModalContentImages() {
+        const content = document.getElementById('mdContent');
+        if (!content) return;
+        const media = content.querySelectorAll('img, video, iframe');
+        media.forEach(el => {
+            el.style.maxWidth = '100%';
+            el.style.width = 'auto';
+            el.style.height = 'auto';
+            el.style.display = 'block';
+            el.style.margin = '1rem auto';
+        });
     }
 
     function cancelPublish() {

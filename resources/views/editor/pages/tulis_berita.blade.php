@@ -37,6 +37,16 @@
             max-width: 100%;
         }
 
+        .rte-body img {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 0.75rem auto;
+            touch-action: manipulation;
+            user-select: auto;
+        }
+
         @media screen and (max-width: 768px) {
             .page-header {
                 margin-bottom: 16px !important;
@@ -136,7 +146,10 @@
                                 <div class="rte-sep"></div>
                                 <button type="button" class="rte-btn" onmousedown="event.preventDefault();"
                                     onclick="RTE.insertLink()" title="Tambah Link">🔗</button>
+                                <button type="button" class="rte-btn" onmousedown="event.preventDefault();"
+                                    onclick="openImagePicker()" title="Tambah Gambar">🖼</button>
                             </div>
+                            <input type="file" id="imageUploadInput" accept="image/png, image/jpeg, image/jpg" style="display:none;">
                             <div class="rte-body" id="inputKonten" contenteditable="true" required
                                 style="min-height: 250px;"></div>
                         </div>
@@ -298,6 +311,16 @@
                 }
             });
 
+            $('#imageUploadInput').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    uploadKontenImage(file);
+                    $(this).val('');
+                }
+            });
+
+            enableImageSelectionForCut();
+
             if (typeof ImageDropZone !== 'undefined') {
                 new ImageDropZone({
                     dropZoneSelector: '.thumb-upload',
@@ -373,6 +396,116 @@
                     }
                 }
             });
+        }
+
+        function openImagePicker() {
+            document.getElementById('imageUploadInput').click();
+        }
+
+        function uploadKontenImage(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            const uploadButton = document.querySelector('.rte-btn[title="Tambah Gambar"]');
+            if (uploadButton) uploadButton.disabled = true;
+
+            $.ajax({
+                url: '/api/editor/manajemen_berita/uploadImage',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success' && response.url) {
+                        insertImageToEditor(response.url);
+                        Toast.show('success', 'Gambar berhasil ditambahkan.');
+                    } else {
+                        Toast.show('error', response.message || 'Gagal upload gambar.');
+                    }
+                },
+                error: function(xhr) {
+                    Toast.show('error', 'Gagal upload gambar.');
+                },
+                complete: function() {
+                    if (uploadButton) uploadButton.disabled = false;
+                }
+            });
+        }
+
+        function normalizeEditorImages() {
+            const editor = document.getElementById('inputKonten');
+            if (!editor) return;
+            const imgs = editor.querySelectorAll('img');
+            imgs.forEach(img => {
+                img.style.maxWidth = '100%';
+                img.style.width = 'auto';
+                img.style.height = 'auto';
+                img.style.display = 'block';
+                img.style.margin = '0.75rem auto';
+            });
+        }
+
+        function insertImageToEditor(url) {
+            const html = `<p><img src="${url}" alt="Gambar Berita" style="max-width:100%;width:auto;height:auto;display:block;margin:0.75rem auto;"></p>`;
+            RTE.exec('insertHTML', html);
+            setTimeout(() => {
+                normalizeEditorImages();
+                enableImageSelectionForCut();
+            }, 50);
+        }
+
+        function enableImageSelectionForCut() {
+            const editor = document.getElementById('inputKonten');
+            if (!editor) return;
+
+            let touchTimer = null;
+            let touchTarget = null;
+
+            const selectImage = (img) => {
+                if (!img) return;
+                const range = document.createRange();
+                range.selectNode(img);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            };
+
+            editor.addEventListener('click', function(event) {
+                const img = event.target.closest('img');
+                if (img && editor.contains(img)) {
+                    selectImage(img);
+                }
+            });
+
+            editor.addEventListener('contextmenu', function(event) {
+                const img = event.target.closest('img');
+                if (img && editor.contains(img)) {
+                    selectImage(img);
+                }
+            });
+
+            editor.addEventListener('touchstart', function(event) {
+                const img = event.target.closest('img');
+                if (img && editor.contains(img)) {
+                    touchTarget = img;
+                    touchTimer = setTimeout(() => {
+                        selectImage(touchTarget);
+                        touchTimer = null;
+                        touchTarget = null;
+                    }, 650);
+                }
+            });
+
+            const cancelTouch = () => {
+                if (touchTimer) {
+                    clearTimeout(touchTimer);
+                    touchTimer = null;
+                    touchTarget = null;
+                }
+            };
+
+            editor.addEventListener('touchend', cancelTouch);
+            editor.addEventListener('touchmove', cancelTouch);
         }
 
         function applyStatus(v) {
